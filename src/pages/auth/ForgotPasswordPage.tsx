@@ -80,7 +80,7 @@ const ForgotPasswordPage = () => {
         <div className='text-center pt-2'>
           <Link
             href='/auth/sign-in'
-            className='inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors font-medium'
+            className='inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-title transition-colors font-medium'
           >
             <ArrowLeft className='w-4 h-4' />
             <span>Back to Sign In</span>
@@ -90,11 +90,11 @@ const ForgotPasswordPage = () => {
 
       {/* Footer Info */}
       <div className='mt-12 text-center space-y-4'>
-        <div className='flex items-center justify-center gap-1.5 text-slate-400 text-[11px] font-medium'>
+        <div className='flex items-center justify-center gap-1.5 text-subtitle text-[11px] font-medium'>
           <Lock className='w-3.5 h-3.5' />
           <span>Secured access — unauthorized login is strictly prohibited</span>
         </div>
-        <p className='text-slate-400 text-[11px] font-light'>
+        <p className='text-subtitle text-[11px] font-light'>
           LandSecure &copy; 2025 &middot; Cameroon Land Administration
         </p>
       </div>

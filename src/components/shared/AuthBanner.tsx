@@ -11,11 +11,11 @@ const AuthBanner = () => {
                 {/* Top Logo Section */}
                 <div className='flex items-center justify-start gap-4'>
                     <div className='bg-button-color/15 border border-button-color/30 p-2.5 rounded-xl flex items-center justify-center shadow-lg shadow-black/10'>
-                        <Image width={50} height={50} src={logo} alt='logo'/>
+                        <Image width={50} height={50} src={logo} alt='logo' />
                     </div>
                     <div>
                         <h2 className='font-bold text-lg leading-none tracking-wide text-white'>LandSecure</h2>
-                        <p className='text-[10px] uppercase tracking-widest text-slate-400 mt-1 font-semibold'>Admin Platform</p>
+                        <p className='text-[10px] uppercase tracking-widest text-subtitle mt-1 font-semibold'>Admin Platform</p>
                     </div>
                 </div>
 

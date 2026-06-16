@@ -63,7 +63,7 @@ const ResetPasswordPage = () => {
             <button
               type='button'
               onClick={() => setShowPassword(!showPassword)}
-              className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none'
+              className='absolute right-3 top-1/2 -translate-y-1/2 text-subtitle hover:text-slate-600 focus:outline-none'
             >
               {showPassword ? (
                 <EyeOff className='w-4.5 h-4.5' />
@@ -90,7 +90,7 @@ const ResetPasswordPage = () => {
             <button
               type='button'
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none'
+              className='absolute right-3 top-1/2 -translate-y-1/2 text-subtitle hover:text-slate-600 focus:outline-none'
             >
               {showConfirmPassword ? (
                 <EyeOff className='w-4.5 h-4.5' />
