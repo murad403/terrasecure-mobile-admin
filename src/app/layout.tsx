@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
+import ReduxWrapper from "@/components/wrapper/ReduxWrapper";
 
 const roboto = Roboto({
   weight: ["200", "300", "400", "500", "600", "700", "800"],
@@ -23,7 +24,9 @@ export default function RootLayout({
       lang="en"
       className={`${roboto.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <ReduxWrapper>
+        <body className="min-h-full flex flex-col">{children}</body>
+      </ReduxWrapper>
     </html>
   );
 }
