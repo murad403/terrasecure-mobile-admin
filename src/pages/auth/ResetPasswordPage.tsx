@@ -37,7 +37,7 @@ const ResetPasswordPage = () => {
   }
 
   return (
-    <div className='w-full max-w-md px-6 md:px-0 flex flex-col justify-between min-h-[500px] py-10 font-sans'>
+    <div className='w-full'>
       {/* Title & Subtitle */}
       <div className='mb-8 text-center md:text-left'>
         <h1 className='text-3xl font-bold text-title tracking-tight mb-2'>
@@ -59,7 +59,6 @@ const ResetPasswordPage = () => {
               type={showPassword ? 'text' : 'password'}
               placeholder='••••••••'
               {...register('password')}
-              className={errors.password ? 'border-destructive pr-10 focus:ring-destructive/20 focus:border-destructive' : 'pr-10'}
             />
             <button
               type='button'
@@ -87,7 +86,6 @@ const ResetPasswordPage = () => {
               type={showConfirmPassword ? 'text' : 'password'}
               placeholder='••••••••'
               {...register('confirmPassword')}
-              className={errors.confirmPassword ? 'border-destructive pr-10 focus:ring-destructive/20 focus:border-destructive' : 'pr-10'}
             />
             <button
               type='button'
@@ -110,7 +108,6 @@ const ResetPasswordPage = () => {
         <Button
           type='submit'
           disabled={isLoading}
-          className='w-full h-11 bg-button-color hover:bg-button-color/90 text-white font-semibold transition-all rounded-lg active:scale-[0.99] text-sm shadow-sm flex items-center justify-center gap-2'
         >
           {isLoading ? (
             <div className='w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin' />
@@ -123,7 +120,7 @@ const ResetPasswordPage = () => {
         <div className='text-center pt-2'>
           <Link
             href='/auth/sign-in'
-            className='inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors font-medium'
+            className='inline-flex items-center gap-1.5 text-sm text-subtitle hover:text-title transition-colors font-medium'
           >
             <ArrowLeft className='w-4 h-4' />
             <span>Back to Sign In</span>
@@ -133,11 +130,11 @@ const ResetPasswordPage = () => {
 
       {/* Footer Info */}
       <div className='mt-12 text-center space-y-4'>
-        <div className='flex items-center justify-center gap-1.5 text-slate-400 text-[11px] font-medium'>
+        <div className='flex items-center justify-center gap-1.5 text-subtitle text-xs font-medium'>
           <Lock className='w-3.5 h-3.5' />
           <span>Secured access — unauthorized login is strictly prohibited</span>
         </div>
-        <p className='text-slate-400 text-[11px] font-light'>
+        <p className='text-subtitle text-xs font-light'>
           LandSecure &copy; 2025 &middot; Cameroon Land Administration
         </p>
       </div>

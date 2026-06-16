@@ -186,11 +186,11 @@ const VerifyOtpPage = () => {
 
       {/* Footer Info */}
       <div className='mt-12 text-center space-y-4'>
-        <div className='flex items-center justify-center gap-1.5 text-slate-400 text-xs font-medium'>
+        <div className='flex items-center justify-center gap-1.5 text-subtitle text-xs font-medium'>
           <Lock className='w-3.5 h-3.5' />
           <span>Secured access — unauthorized login is strictly prohibited</span>
         </div>
-        <p className='text-slate-400 text-xs font-light'>
+        <p className='text-subtitle text-xs font-light'>
           LandSecure &copy; 2025 &middot; Cameroon Land Administration
         </p>
       </div>
