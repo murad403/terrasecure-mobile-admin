@@ -16,12 +16,12 @@ const DashboardPage = () => {
             title="Dashboard"
             subtitle="Land Monitoring & Security Overview — Cameroon"
         >
-            <div className="space-y-6 pb-12">
+            <div className="space-y-4 md:space-y-6">
                 {/* Stats cards grid */}
                 <DashboardStats />
                 
                 {/* First chart row: Donut & Line charts */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
                     <div className="lg:col-span-4 flex flex-col">
                         <ParcelsByStatusChart />
                     </div>
@@ -31,7 +31,7 @@ const DashboardPage = () => {
                 </div>
 
                 {/* Second chart row: Revenue Bar & GIS Coverage Progress Bars */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
                     <div className="lg:col-span-8 flex flex-col">
                         <RevenueOverviewChart />
                     </div>
@@ -41,11 +41,11 @@ const DashboardPage = () => {
                 </div>
 
                 {/* Third row: Recent Activity & Quick Actions / GIS Coverage Map */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
                     <div className="lg:col-span-8 flex flex-col">
                         <RecentActivity />
                     </div>
-                    <div className="lg:col-span-4 flex flex-col gap-6">
+                    <div className="lg:col-span-4 flex flex-col gap-4 md:gap-6">
                         <QuickActions />
                         <GISCoverageMap />
                     </div>

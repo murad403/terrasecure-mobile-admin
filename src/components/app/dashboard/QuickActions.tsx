@@ -41,7 +41,7 @@ const QuickActions = () => {
                         key={act.name}
                         onClick={act.onClick}
                         className={cn(
-                            "w-full flex items-center justify-between px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all shadow-sm active:translate-y-px",
+                            "w-full flex items-center justify-between px-4 py-3 rounded-lg text-xs font-semibold tracking-wide transition-all shadow-sm active:translate-y-px",
                             act.bgClass
                         )}
                     >
