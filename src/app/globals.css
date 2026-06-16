@@ -4,7 +4,9 @@
 
 @theme{
   --color-title: #1A1A2E;
-  --color-subtitle: #94A3B8
+  --color-subtitle: #6B7280;
+  --color-button-color: #4A89F3;
+  --font-sans: var(--font-roboto);
 }
 
 @custom-variant dark (&:is(.dark *));
