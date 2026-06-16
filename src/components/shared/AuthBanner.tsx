@@ -1,5 +1,8 @@
 import React from 'react'
 import { Map } from 'lucide-react'
+import Image from 'next/image'
+import logo from "@/assets/logo/logo.png";
+
 
 const AuthBanner = () => {
     return (
@@ -8,7 +11,7 @@ const AuthBanner = () => {
                 {/* Top Logo Section */}
                 <div className='flex items-center justify-start gap-4'>
                     <div className='bg-button-color/15 border border-button-color/30 p-2.5 rounded-xl flex items-center justify-center shadow-lg shadow-black/10'>
-                        <Map className='w-6 h-6 text-button-color' />
+                        <Image width={50} height={50} src={logo} alt='logo'/>
                     </div>
                     <div>
                         <h2 className='font-bold text-lg leading-none tracking-wide text-white'>LandSecure</h2>
