@@ -108,7 +108,7 @@ const GisMapPage = () => {
     const [importGeoJSONOpen, setImportGeoJSONOpen] = useState(false)
     const [drawPolygonOpen, setDrawPolygonOpen] = useState(false)
     const [editPolygonOpen, setEditPolygonOpen] = useState(false)
-
+    
     /* ── Init Leaflet map ── */
     useEffect(() => {
         if (!mapRef.current || leafletMapRef.current) return
@@ -116,8 +116,7 @@ const GisMapPage = () => {
         const init = async () => {
             const { default: L } = await import('leaflet')
 
-            // Fix default marker icons for Next.js
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // আপনার আগের সেটিংস (Marker Icons Fix)
             delete (L.Icon.Default.prototype as any)._getIconUrl
             L.Icon.Default.mergeOptions({
                 iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -135,23 +134,37 @@ const GisMapPage = () => {
 
             map.setView([5.6, 12.3], 9)
 
-            // Add parcel polygons
-            PARCELS.forEach((parcel) => {
-                const poly = L.polygon(parcel.coords, {
-                    color: parcel.color,
-                    weight: 2,
-                    fillColor: parcel.fillColor,
-                    fillOpacity: 0.4,
-                }).addTo(map)
+            // আপনার আগের PARCELS ডেটা দিয়ে GeoJSON লেয়ার তৈরি
+            const geoJsonFeatures = PARCELS.map(p => ({
+                type: "Feature" as const,
+                properties: { id: p.id, status: p.status, area: p.area, color: p.color, fillColor: p.fillColor },
+                geometry: {
+                    type: "Polygon" as const,
+                    coordinates: [p.coords.map(c => [c[1], c[0]])] // [lng, lat] ফরম্যাটে রূপান্তর
+                }
+            }));
 
-                poly.on('click', () => setSelectedParcel(parcel))
-                poly.bindTooltip(parcel.id, {
-                    permanent: false,
-                    direction: 'center',
-                    className: 'text-xs font-bold',
-                })
-                polygonLayersRef.current[parcel.id] = poly
-            })
+            const geoJsonLayer = L.geoJSON(geoJsonFeatures as any, {
+                style: (feature) => ({
+                    color: feature?.properties.color,
+                    fillColor: feature?.properties.fillColor,
+                    weight: 2,
+                    fillOpacity: 0.4,
+                }),
+                onEachFeature: (feature, layer) => {
+                    const parcel = PARCELS.find(p => p.id === feature.properties.id);
+                    if (parcel) {
+                        layer.on('click', () => setSelectedParcel(parcel));
+                        layer.bindTooltip(parcel.id, {
+                            permanent: false,
+                            direction: 'center',
+                            className: 'text-xs font-bold',
+                        });
+                    }
+                }
+            }).addTo(map);
+
+            polygonLayersRef.current = geoJsonLayer as any;
         }
 
         init()
