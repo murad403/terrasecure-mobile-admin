@@ -1,4 +1,4 @@
-import VerifyOtpPage from '@/pages/auth/VerifyOtpPage'
+import VerifyOtpPage from '@/components/auth/VerifyOtpPage'
 import React from 'react'
 
 const page = () => {

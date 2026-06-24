@@ -7,7 +7,7 @@ import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Parcel } from '@/pages/app/ParcelsPage'
+import { Parcel } from '@/components/app/parcels/ParcelsPage'
 
 interface EditParcelModalProps {
   isOpen: boolean
@@ -78,7 +78,7 @@ const EditParcelModal = ({ isOpen, onClose, parcel, onUpdate }: EditParcelModalP
   }
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-[1px] p-4 overflow-y-auto animate-in fade-in duration-200"
       onClick={onClose}
     >
@@ -103,7 +103,7 @@ const EditParcelModal = ({ isOpen, onClose, parcel, onUpdate }: EditParcelModalP
           <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
             {/* Grid fields */}
             <div className="grid grid-cols-2 gap-4">
-              
+
               {/* Parcel Name */}
               <div className="col-span-2 space-y-1.5">
                 <Label htmlFor="name">Parcel Name</Label>

@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import { Owner } from '@/pages/app/ParcelsPage'
+import { Owner } from '@/components/app/parcels/ParcelsPage'
 import { Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'

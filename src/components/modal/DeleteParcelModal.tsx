@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react'
 import { X, Trash2, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Parcel } from '@/pages/app/ParcelsPage'
+import { Parcel } from '@/components/app/parcels/ParcelsPage'
 
 interface DeleteParcelModalProps {
   isOpen: boolean
@@ -12,7 +12,7 @@ interface DeleteParcelModalProps {
 }
 
 const DeleteParcelModal = ({ isOpen, onClose, parcel, onDelete }: DeleteParcelModalProps) => {
-  
+
   // Lock scroll
   useEffect(() => {
     if (isOpen) {
@@ -28,7 +28,7 @@ const DeleteParcelModal = ({ isOpen, onClose, parcel, onDelete }: DeleteParcelMo
   if (!isOpen) return null
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-[1px] p-4 overflow-y-auto animate-in fade-in duration-200"
       onClick={onClose}
     >

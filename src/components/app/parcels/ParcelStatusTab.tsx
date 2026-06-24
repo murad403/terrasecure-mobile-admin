@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react'
-import { Parcel } from '@/pages/app/ParcelsPage'
+import { Parcel } from '@/components/app/parcels/ParcelsPage'
 import { Label } from '@/components/ui/label'
 
 interface ParcelStatusTabProps {
@@ -46,7 +46,7 @@ const ParcelStatusTab = ({ parcel, onUpdateStatus }: ParcelStatusTabProps) => {
       {/* Lock status changes switch */}
       <div className="flex items-center justify-between p-3.5 bg-slate-50/50 rounded-xl border border-slate-100 mt-2">
         <span className="text-sm font-semibold text-slate-700">Lock status changes</span>
-        
+
         {/* Customized CSS Switch Toggle */}
         <label className="relative inline-flex items-center cursor-pointer select-none">
           <input

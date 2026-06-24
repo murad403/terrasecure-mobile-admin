@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react'
-import { Parcel } from '@/pages/app/ParcelsPage'
+import { Parcel } from '@/components/app/parcels/ParcelsPage'
 import { cn } from '@/lib/utils'
 
 // Import tabs

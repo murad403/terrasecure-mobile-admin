@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import { Parcel } from '@/pages/app/ParcelsPage'
+import { Parcel } from '@/components/app/parcels/ParcelsPage'
 
 interface ParcelInfoTabProps {
   parcel: Parcel
