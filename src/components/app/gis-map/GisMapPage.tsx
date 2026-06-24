@@ -8,6 +8,9 @@ import ImportSHPModal from './ImportSHPModal'
 import ImportGeoJSONModal from './ImportGeoJSONModal'
 import DrawPolygonModal from './DrawPolygonModal'
 import EditPolygonModal from './EditPolygonModal'
+import ManageZoneModal from './ManageZoneModal'
+import AddZoneModal from './AddZoneModal'
+import EditZoneModal from './EditZoneModal'
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout'
 import Toggle from '@/components/shared/Toggle'
 
@@ -20,6 +23,101 @@ interface Parcel {
     color: string
     fillColor: string
 }
+
+export interface Zone {
+    id: string
+    name: string
+    type: 'Covered / Surveyed' | 'Uncovered / Unsurveyed' | 'Future Survey Needed'
+    city: string
+    district: string
+    area: string
+    parcelsCount?: number
+    lastSurveyDate?: string
+    notes?: string
+}
+
+const INITIAL_ZONES: Zone[] = [
+    {
+        id: 'ZN-001',
+        name: 'Bastos Zone',
+        type: 'Covered / Surveyed',
+        city: 'All Statuses',
+        district: 'Bastos',
+        area: '4.2',
+        parcelsCount: 312,
+        lastSurveyDate: 'Feb 2024',
+        notes: 'Fully surveyed. High density residential.'
+    },
+    {
+        id: 'ZN-002',
+        name: 'Melen Zone',
+        type: 'Covered / Surveyed',
+        city: 'All Statuses',
+        district: 'Melen',
+        area: '2.8',
+        parcelsCount: 187,
+        lastSurveyDate: 'Apr 2024',
+        notes: 'Secondary survey completed April 2024.'
+    },
+    {
+        id: 'ZN-003',
+        name: 'Biyem-Assi Zone',
+        type: 'Covered / Surveyed',
+        city: 'All Statuses',
+        district: 'Biyem-Assi',
+        area: '5.1',
+        parcelsCount: 443,
+        lastSurveyDate: 'Jan 2024',
+        notes: 'Mixed use. Updated after road expansion.'
+    },
+    {
+        id: 'ZN-004',
+        name: 'Nlongkak Zone',
+        type: 'Covered / Surveyed',
+        city: 'All Statuses',
+        district: 'Nlongkak',
+        area: '3.3',
+        parcelsCount: 228,
+        lastSurveyDate: 'Mar 2024',
+        notes: ''
+    },
+    {
+        id: 'ZN-005',
+        name: 'Eastern Fringe',
+        type: 'Uncovered / Unsurveyed',
+        city: 'All Statuses',
+        district: 'Périphérie Est',
+        area: '8.9',
+        notes: 'Remote. No road access for survey teams.'
+    },
+    {
+        id: 'ZN-006',
+        name: 'Southern Gap Zone',
+        type: 'Uncovered / Unsurveyed',
+        city: 'All Statuses',
+        district: 'Périphérie Sud',
+        area: '6.2',
+        notes: 'Forest area. Unclear boundary with private land.'
+    },
+    {
+        id: 'ZN-007',
+        name: 'Nkoldongo Zone',
+        type: 'Future Survey Needed',
+        city: 'All Statuses',
+        district: 'Nkoldongo',
+        area: '3.7',
+        notes: 'High speculation reported. Survey scheduled Q3 2025.'
+    },
+    {
+        id: 'ZN-008',
+        name: 'Ekounou Extension',
+        type: 'Future Survey Needed',
+        city: 'All Statuses',
+        district: 'Ekounou',
+        area: '2.1',
+        notes: 'Rapid urbanisation. Requested by local gov.'
+    }
+]
 
 /* ── Mock parcel data (matches screenshot IDs & statuses) ── */
 const PARCELS: Parcel[] = [
@@ -108,6 +206,32 @@ const GisMapPage = () => {
     const [importGeoJSONOpen, setImportGeoJSONOpen] = useState(false)
     const [drawPolygonOpen, setDrawPolygonOpen] = useState(false)
     const [editPolygonOpen, setEditPolygonOpen] = useState(false)
+    const [manageZonesOpen, setManageZonesOpen] = useState(false)
+    const [addZoneOpen, setAddZoneOpen] = useState(false)
+    const [editZoneOpen, setEditZoneOpen] = useState(false)
+    const [editingZone, setEditingZone] = useState<Zone | null>(null)
+    const [zones, setZones] = useState<Zone[]>(INITIAL_ZONES)
+
+    const handleAddZone = (newZone: Omit<Zone, 'id'>) => {
+        const nextIdNumber = zones.length > 0 
+            ? Math.max(...zones.map(z => parseInt(z.id.split('-')[1]) || 0)) + 1 
+            : 1;
+        const formattedId = `ZN-${String(nextIdNumber).padStart(3, '0')}`;
+        const zoneWithId: Zone = {
+            ...newZone,
+            id: formattedId,
+            parcelsCount: newZone.type === 'Covered / Surveyed' ? Math.floor(Math.random() * 300) + 100 : undefined
+        };
+        setZones(prev => [...prev, zoneWithId]);
+    };
+
+    const handleUpdateZone = (updatedZone: Zone) => {
+        setZones(prev => prev.map(z => z.id === updatedZone.id ? updatedZone : z));
+    };
+
+    const handleDeleteZone = (zoneId: string) => {
+        setZones(prev => prev.filter(z => z.id !== zoneId));
+    };
     
     /* ── Init Leaflet map ── */
     useEffect(() => {
@@ -338,7 +462,7 @@ const GisMapPage = () => {
                             <ActionBtn icon={<Download className="w-3 h-3" />} label="Export SHP" onClick={() => { }} />
                             <ActionBtn icon={<Pencil className="w-3 h-3" />} label="Draw Polygon" onClick={() => setDrawPolygonOpen(true)} accent />
                             <ActionBtn icon={<Pencil className="w-3 h-3" />} label="Edit Polygon" onClick={() => setEditPolygonOpen(true)} accent />
-                            <ActionBtn icon={<Map className="w-3 h-3" />} label="Manage Zones" onClick={() => { }} accent="purple" />
+                            <ActionBtn icon={<Map className="w-3 h-3" />} label="Manage Zones" onClick={() => setManageZonesOpen(true)} accent="purple" />
                         </div>
                     </div>
 
@@ -415,11 +539,41 @@ const GisMapPage = () => {
                 </div>
             </div>
 
-            {/* ── Modals ── */}
+             {/* ── Modals ── */}
             <ImportSHPModal isOpen={importSHPOpen} onClose={() => setImportSHPOpen(false)} />
             <ImportGeoJSONModal isOpen={importGeoJSONOpen} onClose={() => setImportGeoJSONOpen(false)} />
             <DrawPolygonModal isOpen={drawPolygonOpen} onClose={() => setDrawPolygonOpen(false)} onSave={() => setDrawPolygonOpen(false)} />
             <EditPolygonModal isOpen={editPolygonOpen} onClose={() => setEditPolygonOpen(false)} onSave={() => setEditPolygonOpen(false)} />
+            
+            <ManageZoneModal 
+                isOpen={manageZonesOpen} 
+                onClose={() => setManageZonesOpen(false)} 
+                zones={zones} 
+                onDeleteZone={handleDeleteZone}
+                onEditZone={(zone) => {
+                    setEditingZone(zone);
+                    setEditZoneOpen(true);
+                }}
+                onOpenAddZone={() => setAddZoneOpen(true)}
+            />
+            
+            <AddZoneModal 
+                isOpen={addZoneOpen} 
+                onClose={() => setAddZoneOpen(false)} 
+                onAdd={handleAddZone} 
+            />
+            
+            {editingZone && (
+                <EditZoneModal 
+                    isOpen={editZoneOpen} 
+                    onClose={() => {
+                        setEditZoneOpen(false);
+                        setEditingZone(null);
+                    }} 
+                    zone={editingZone} 
+                    onSave={handleUpdateZone} 
+                />
+            )}
         </DashboardChildrenLayout>
     )
 }
