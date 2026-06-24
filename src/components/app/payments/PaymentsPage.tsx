@@ -18,11 +18,11 @@ const PaymentsPage = () => {
           className={cn(
             "px-5 py-2 text-xs font-extrabold rounded-lg cursor-pointer transition-all",
             activeTab === 'transactions'
-              ? "bg-white text-slate-800 shadow-sm"
-              : "text-slate-400 hover:text-slate-700"
+              ? "bg-[#1b5e20] text-white shadow-sm"
+              : "text-slate-600 hover:text-slate-800"
           )}
         >
-          Payment Transactions
+          Payments List
         </button>
         
         <button
@@ -31,8 +31,8 @@ const PaymentsPage = () => {
           className={cn(
             "px-5 py-2 text-xs font-extrabold rounded-lg cursor-pointer transition-all",
             activeTab === 'methods'
-              ? "bg-white text-slate-800 shadow-sm"
-              : "text-slate-400 hover:text-slate-700"
+              ? "bg-[#1b5e20] text-white shadow-sm"
+              : "text-slate-600 hover:text-slate-800"
           )}
         >
           Payment Methods

@@ -8,104 +8,89 @@ import PaymentDetailsModal from './PaymentDetailsModal'
 
 export interface PaymentRecord {
   id: string
-  registrationId: string
+  parcelId: string
   applicantName: string
   amount: number
+  type: string
   method: 'MTN Mobile Money' | 'Orange Money' | 'Credit Card' | 'Bank Transfer'
   date: string
-  status: 'Success' | 'Pending' | 'Failed'
+  status: 'Verified' | 'Pending' | 'Rejected'
   refNumber: string
   gatewayMessage: string
 }
 
 const initialPayments: PaymentRecord[] = [
   {
-    id: 'PAY-782',
-    registrationId: 'REG-1203',
-    applicantName: 'Jean Alima',
+    id: 'PAY-8821',
+    parcelId: 'CM-2847',
+    applicantName: 'Pierre Mballa',
     amount: 450000,
+    type: 'Registration Fee',
     method: 'Orange Money',
-    date: '24 Jun 2026',
-    status: 'Success',
+    date: '10 Jun 2025',
+    status: 'Verified',
     refNumber: 'REF-92847291',
     gatewayMessage: 'Orange Money transaction completed. Merchant API success.'
   },
   {
-    id: 'PAY-781',
-    registrationId: 'REG-1197',
-    applicantName: 'Marie Nkodo',
-    amount: 450000,
+    id: 'PAY-8820',
+    parcelId: 'CM-2848',
+    applicantName: 'Amina Fouda',
+    amount: 200000,
+    type: 'Consultation Fee',
     method: 'MTN Mobile Money',
-    date: '20 Jun 2026',
-    status: 'Success',
-    refNumber: 'REF-91827462',
-    gatewayMessage: 'MTN MoMo transaction completed. Merchant API success.'
+    date: '8 Jun 2025',
+    status: 'Pending',
+    refNumber: 'REF-28374829',
+    gatewayMessage: 'Waiting for manual bank slip verification.'
   },
   {
-    id: 'PAY-780',
-    registrationId: 'REG-1199',
+    id: 'PAY-8819',
+    parcelId: 'CM-2850',
+    applicantName: 'Grace Tanda',
+    amount: 1200000,
+    type: 'Transfer Tax',
+    method: 'Credit Card',
+    date: '5 Jun 2025',
+    status: 'Verified',
+    refNumber: 'REF-28374619',
+    gatewayMessage: 'Stripe payment intent completed successfully.'
+  },
+  {
+    id: 'PAY-8818',
+    parcelId: 'CM-2853',
     applicantName: 'Samuel Kotto',
-    amount: 250000,
+    amount: 350000,
+    type: 'Registration Fee',
     method: 'Bank Transfer',
-    date: '18 Jun 2026',
+    date: '1 Jun 2025',
     status: 'Pending',
     refNumber: 'REF-82736412',
     gatewayMessage: 'Waiting for manual bank slip verification.'
   },
   {
-    id: 'PAY-779',
-    registrationId: 'REG-1201',
-    applicantName: 'Grace Tanda',
-    amount: 450000,
-    method: 'Credit Card',
-    date: '15 Jun 2026',
-    status: 'Success',
-    refNumber: 'REF-28374619',
-    gatewayMessage: 'Stripe payment intent completed successfully.'
-  },
-  {
-    id: 'PAY-778',
-    registrationId: 'REG-1195',
-    applicantName: 'Amina Fouda',
-    amount: 450000,
-    method: 'MTN Mobile Money',
-    date: '12 Jun 2026',
-    status: 'Failed',
-    refNumber: 'REF-28374829',
-    gatewayMessage: 'Transaction declined. Insufficient customer wallet balance.'
-  },
-  {
-    id: 'PAY-777',
-    registrationId: 'REG-1192',
-    applicantName: 'Pierre Mballa',
-    amount: 450000,
+    id: 'PAY-8817',
+    parcelId: 'CM-2851',
+    applicantName: 'François Ngono',
+    amount: 890000,
+    type: 'Land Purchase',
     method: 'Orange Money',
-    date: '10 Jun 2026',
-    status: 'Success',
+    date: '28 May 2025',
+    status: 'Verified',
     refNumber: 'REF-18273645',
     gatewayMessage: 'Orange Money transaction completed. Merchant API success.'
   },
   {
-    id: 'PAY-776',
-    registrationId: 'REG-1190',
-    applicantName: 'Samuel Kotto',
-    amount: 250000,
-    method: 'Bank Transfer',
-    date: '08 Jun 2026',
-    status: 'Success',
-    refNumber: 'REF-18273699',
-    gatewayMessage: 'Direct bank transfer manual receipt verified.'
-  },
-  {
-    id: 'PAY-775',
-    registrationId: 'REG-1188',
+    id: 'PAY-8816',
+    parcelId: 'CM-2852',
     applicantName: 'Halima Bello',
-    amount: 450000,
+    amount: 150000,
+    type: 'Surveying Fee',
     method: 'Credit Card',
-    date: '05 Jun 2026',
-    status: 'Success',
+    date: '25 May 2025',
+    status: 'Rejected',
     refNumber: 'REF-19283746',
-    gatewayMessage: 'Stripe payment intent completed successfully.'
+    gatewayMessage: 'Transaction declined by gateway.'
   }
 ]
 
@@ -145,7 +130,7 @@ const PaymentListTab = () => {
         if (item.id === id) {
           const updated = {
             ...item,
-            status: 'Failed' as const,
+            status: 'Rejected' as const,
             gatewayMessage: 'Transaction refunded by Administrator.'
           }
           if (selectedPayment && selectedPayment.id === id) {
@@ -159,14 +144,35 @@ const PaymentListTab = () => {
     alert(`Payment ${id} refunded successfully.`)
   }
 
+  const handleVerify = (id: string) => {
+    setPayments((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const updated = {
+            ...item,
+            status: 'Verified' as const,
+            gatewayMessage: 'Payment verified and confirmed by Administrator.'
+          }
+          if (selectedPayment && selectedPayment.id === id) {
+            setSelectedPayment(updated)
+          }
+          return updated
+        }
+        return item
+      })
+    )
+    alert(`Payment ${id} has been verified.`)
+  }
+
   // Filter calculations
   const filteredPayments = payments.filter((item) => {
     const query = searchQuery.toLowerCase()
     const matchesSearch =
       item.id.toLowerCase().includes(query) ||
-      item.registrationId.toLowerCase().includes(query) ||
+      item.parcelId.toLowerCase().includes(query) ||
       item.applicantName.toLowerCase().includes(query) ||
-      item.refNumber.toLowerCase().includes(query)
+      item.refNumber.toLowerCase().includes(query) ||
+      item.type.toLowerCase().includes(query)
 
     const matchesStatus =
       statusFilter === 'All Statuses' || item.status === statusFilter
@@ -207,7 +213,7 @@ const PaymentListTab = () => {
           <CustomFilterDropdown
             label="All Statuses"
             header="All Statuses"
-            options={['All Statuses', 'Success', 'Pending', 'Failed']}
+            options={['All Statuses', 'Verified', 'Pending', 'Rejected']}
             selected={statusFilter}
             onSelect={setStatusFilter}
           />
@@ -253,7 +259,9 @@ const PaymentListTab = () => {
           isOpen={detailsOpen}
           onClose={handleCloseDetails}
           payment={selectedPayment}
+          payments={payments}
           onRefund={() => handleRefund(selectedPayment.id)}
+          onVerify={() => handleVerify(selectedPayment.id)}
         />
       )}
 
