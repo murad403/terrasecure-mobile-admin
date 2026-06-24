@@ -62,17 +62,14 @@ export const step5GisSchema = z.object({
 export type Step5GisFormValues = z.infer<typeof step5GisSchema>
 
 export const step6ApproveSchema = z.object({
-  decision: z.enum(['Approved', 'Rejected'], { message: 'Decision is required' }),
-  comments: z.string().min(5, 'Reviewer comments must be at least 5 characters')
+  reliabilityScore: z.string().min(1, 'Reliability score is required'),
+  comments: z.string().optional().default('')
 })
 
 export type Step6ApproveFormValues = z.infer<typeof step6ApproveSchema>
 
 export const step7PublishSchema = z.object({
-  volume: z.string().min(1, 'Registry volume is required'),
-  folio: z.string().min(1, 'Folio / Page Number is required'),
-  registryDate: z.string().min(1, 'Registry date is required'),
-  visibility: z.string().min(1, 'Visibility selection is required')
+  // No fields needed
 })
 
 export type Step7PublishFormValues = z.infer<typeof step7PublishSchema>
