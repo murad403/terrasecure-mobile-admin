@@ -4,6 +4,7 @@ import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout
 import ConflictStats from './ConflictStats';
 import ConflictCard from './ConflictCard';
 import ReviewOnMapModal from './ReviewOnMapModal';
+import ResolutionWorkflowSteps from './ResolutionWorkflowSteps';
 
 export interface Conflict {
     id: string;
@@ -79,6 +80,8 @@ const ConflictsPage = () => {
     const [conflicts, setConflicts] = useState<Conflict[]>(generateMockConflicts);
     const [selectedConflict, setSelectedConflict] = useState<Conflict | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [workflowOpen, setWorkflowOpen] = useState(false);
+    const [workflowConflict, setWorkflowConflict] = useState<Conflict | null>(null);
 
     // Dynamic stats calculation
     const total = conflicts.length;
@@ -89,6 +92,11 @@ const ConflictsPage = () => {
 
     const handleResolve = (id: string) => {
         setConflicts(prev => prev.filter(c => c.id !== id));
+    };
+
+    const handleOpenWorkflow = (conflict: Conflict) => {
+        setWorkflowConflict(conflict);
+        setWorkflowOpen(true);
     };
 
     const handleBlock = (id: string) => {
@@ -125,7 +133,7 @@ const ConflictsPage = () => {
                         key={conflict.id}
                         conflict={conflict}
                         onReviewOnMap={() => handleReviewOnMap(conflict)}
-                        onResolve={() => handleResolve(conflict.id)}
+                        onResolve={() => handleOpenWorkflow(conflict)}
                         onBlock={() => handleBlock(conflict.id)}
                         onApproveException={() => handleApproveException(conflict.id)}
                     />
@@ -149,6 +157,23 @@ const ConflictsPage = () => {
                     conflict={selectedConflict}
                     onBlock={() => handleBlock(selectedConflict.id)}
                     onApproveException={() => handleApproveException(selectedConflict.id)}
+                />
+            )}
+
+            {/* Workflow Drawer */}
+            {workflowConflict && (
+                <ResolutionWorkflowSteps
+                    isOpen={workflowOpen}
+                    onClose={() => {
+                        setWorkflowOpen(false);
+                        setWorkflowConflict(null);
+                    }}
+                    conflict={workflowConflict}
+                    onCompleteWorkflow={() => {
+                        handleResolve(workflowConflict.id);
+                        setWorkflowOpen(false);
+                        setWorkflowConflict(null);
+                    }}
                 />
             )}
 

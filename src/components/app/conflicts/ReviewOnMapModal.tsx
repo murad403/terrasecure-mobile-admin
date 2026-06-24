@@ -26,9 +26,17 @@ const ReviewOnMapModal = ({
   useEffect(() => {
     if (!isOpen || !mapContainerRef.current) return;
 
-    let map: any;
+    let active = true;
     const initMap = async () => {
       const L = await import('leaflet');
+
+      if (!active || !mapContainerRef.current) return;
+
+      // Fix double-render: remove previous map if already exists on the ref
+      if (leafletMapRef.current) {
+        leafletMapRef.current.remove();
+        leafletMapRef.current = null;
+      }
 
       // Fixing Leaflet default marker icons (just in case they are needed)
       delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -42,7 +50,13 @@ const ReviewOnMapModal = ({
       const center: [number, number] = [5.92, 12.08];
       
       // Initialize map without default zoom control (we'll render custom styled zoom buttons)
-      map = L.map(mapContainerRef.current!, { zoomControl: false }).setView(center, 13);
+      const map = L.map(mapContainerRef.current, { zoomControl: false }).setView(center, 13);
+      
+      if (!active) {
+        map.remove();
+        return;
+      }
+
       leafletMapRef.current = map;
 
       // Add Topo/Terrain Tile Layer
@@ -121,8 +135,10 @@ const ReviewOnMapModal = ({
     initMap();
 
     return () => {
-      if (map) {
-        map.remove();
+      active = false;
+      if (leafletMapRef.current) {
+        leafletMapRef.current.remove();
+        leafletMapRef.current = null;
       }
     };
   }, [isOpen, conflict]);
