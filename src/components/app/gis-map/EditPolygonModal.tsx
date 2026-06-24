@@ -38,14 +38,33 @@ const EditPolygonModal = ({ isOpen, onClose, onSave }: EditPolygonModalProps) =>
 
   useEffect(() => {
     if (!isOpen || !mapRef.current) return;
+    let isMounted = true;
     const initMap = async () => {
       const L = await import('leaflet');
+      if (!isMounted) return;
+
+      if (leafletMapRef.current || (mapRef.current && (mapRef.current as any)._leaflet_id)) {
+        return;
+      }
+
       const map = L.map(mapRef.current!).setView([5.65, 12.35], 8);
+      
+      if (!isMounted) {
+        map.remove();
+        return;
+      }
+
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
       leafletMapRef.current = map;
     };
     initMap();
-    return () => { if (leafletMapRef.current) leafletMapRef.current.remove(); };
+    return () => {
+      isMounted = false;
+      if (leafletMapRef.current) {
+        leafletMapRef.current.remove();
+        leafletMapRef.current = null;
+      }
+    };
   }, [isOpen]);
 
   const drawParcel = useCallback((parcel: Parcel) => {

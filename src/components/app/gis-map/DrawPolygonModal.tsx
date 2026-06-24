@@ -18,12 +18,22 @@ const DrawPolygonModal = ({ isOpen, onClose, onSave }: DrawPolygonModalProps) =>
   const [points, setPoints] = useState<LatLng[]>([]);
   const [closed, setClosed] = useState(false);
 
+  const closedRef = useRef(closed);
+  useEffect(() => {
+    closedRef.current = closed;
+  }, [closed]);
+
   useEffect(() => {
     if (!isOpen || !mapContainerRef.current) return;
 
-    let map: any;
+    let isMounted = true;
     const initMap = async () => {
       const L = await import('leaflet');
+      if (!isMounted) return;
+
+      if (leafletMapRef.current || (mapContainerRef.current && (mapContainerRef.current as any)._leaflet_id)) {
+        return;
+      }
 
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
@@ -32,12 +42,18 @@ const DrawPolygonModal = ({ isOpen, onClose, onSave }: DrawPolygonModalProps) =>
         shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
       });
 
-      map = L.map(mapContainerRef.current!).setView([5.6, 12.3], 9);
+      const map = L.map(mapContainerRef.current!).setView([5.6, 12.3], 9);
+      
+      if (!isMounted) {
+        map.remove();
+        return;
+      }
+
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
       leafletMapRef.current = map;
 
       map.on('click', (e: any) => {
-        if (closed) return;
+        if (closedRef.current) return;
         const newPoint = { lat: e.latlng.lat, lng: e.latlng.lng };
         setPoints(prev => [...prev, newPoint]);
         L.circleMarker([newPoint.lat, newPoint.lng], { radius: 5, color: 'green' }).addTo(map);
@@ -45,8 +61,14 @@ const DrawPolygonModal = ({ isOpen, onClose, onSave }: DrawPolygonModalProps) =>
     };
 
     initMap();
-    return () => { if (map) map.remove(); };
-  }, [isOpen, closed]);
+    return () => {
+      isMounted = false;
+      if (leafletMapRef.current) {
+        leafletMapRef.current.remove();
+        leafletMapRef.current = null;
+      }
+    };
+  }, [isOpen]);
 
   // পলিলাইন ড্রয়িং লজিক
   useEffect(() => {

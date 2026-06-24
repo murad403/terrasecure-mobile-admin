@@ -237,8 +237,17 @@ const GisMapPage = () => {
     useEffect(() => {
         if (!mapRef.current || leafletMapRef.current) return
 
+        let isMounted = true
+
         const init = async () => {
             const { default: L } = await import('leaflet')
+
+            if (!isMounted) return
+
+            // Check if map is already initialized on this container
+            if (leafletMapRef.current || (mapRef.current && (mapRef.current as any)._leaflet_id)) {
+                return
+            }
 
             // আপনার আগের সেটিংস (Marker Icons Fix)
             delete (L.Icon.Default.prototype as any)._getIconUrl
@@ -249,6 +258,12 @@ const GisMapPage = () => {
             })
 
             const map = L.map(mapRef.current!, { zoomControl: false })
+            
+            if (!isMounted) {
+                map.remove()
+                return
+            }
+
             leafletMapRef.current = map
 
             L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
@@ -294,6 +309,7 @@ const GisMapPage = () => {
         init()
 
         return () => {
+            isMounted = false
             if (leafletMapRef.current) {
                 leafletMapRef.current.remove()
                 leafletMapRef.current = null

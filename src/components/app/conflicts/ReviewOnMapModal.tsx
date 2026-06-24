@@ -32,10 +32,8 @@ const ReviewOnMapModal = ({
 
       if (!active || !mapContainerRef.current) return;
 
-      // Fix double-render: remove previous map if already exists on the ref
-      if (leafletMapRef.current) {
-        leafletMapRef.current.remove();
-        leafletMapRef.current = null;
+      if (leafletMapRef.current || (mapContainerRef.current && (mapContainerRef.current as any)._leaflet_id)) {
+        return;
       }
 
       // Fixing Leaflet default marker icons (just in case they are needed)
