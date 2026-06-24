@@ -1,8 +1,11 @@
+import QfieldSubmissionsPage from '@/components/app/qfield-submissions/QfieldSubmissionsPage'
 import React from 'react'
 
 const page = () => {
   return (
-    <div>page</div>
+    <div>
+        <QfieldSubmissionsPage />
+    </div>
   )
 }
 
