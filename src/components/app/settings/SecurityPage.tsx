@@ -1,6 +1,9 @@
 "use client"
 import React, { useState } from 'react'
 import { Laptop, Smartphone, Monitor, LogOut } from 'lucide-react'
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface SessionItem {
   id: string;
@@ -106,50 +109,50 @@ const SecurityPage = () => {
           <div className="space-y-3 max-w-sm">
             {/* Current Password */}
             <div className="space-y-1">
-              <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider block">
+              <Label>
                 Current Password
-              </label>
-              <input
+              </Label>
+              <Input
                 type="password"
                 value={passwords.current}
                 onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
+                
               />
             </div>
 
             {/* New Password */}
             <div className="space-y-1">
-              <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider block">
+              <Label>
                 New Password
-              </label>
-              <input
+              </Label>
+              <Input
                 type="password"
                 value={passwords.new}
                 onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
+                
               />
             </div>
 
             {/* Confirm New Password */}
             <div className="space-y-1">
-              <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider block">
+              <Label>
                 Confirm New Password
-              </label>
-              <input
+              </Label>
+              <Input
                 type="password"
                 value={passwords.confirm}
                 onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
+                
               />
             </div>
           </div>
 
-          <button
+          <Button
             type="submit"
-            className="bg-[#1b4332] hover:bg-[#143426] text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer shadow-sm"
+            className='w-auto'
           >
             Update Password
-          </button>
+          </Button>
         </form>
       </div>
 
