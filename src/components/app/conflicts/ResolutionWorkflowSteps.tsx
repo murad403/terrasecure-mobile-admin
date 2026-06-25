@@ -9,6 +9,7 @@ import MediationStep from './MediationStep';
 import LegalReviewStep from './LegalReviewStep';
 import ResolutionDecisionStep from './ResolutionDecisionStep';
 import ArchiveCaseStep from './ArchiveCaseStep';
+import { Button } from '@/components/ui/button';
 
 interface ResolutionWorkflowStepsProps {
   isOpen: boolean;
@@ -231,7 +232,7 @@ const ResolutionWorkflowSteps = ({
           {currentStep === 1 ? (
             <button
               onClick={handleNext}
-              className="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-lg text-xs font-bold transition-colors cursor-pointer text-center shadow-sm"
+              className="py-3.5 w-1/2 bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-lg text-xs font-bold transition-colors cursor-pointer text-center shadow-sm"
             >
               Complete & Continue
             </button>
@@ -239,16 +240,16 @@ const ResolutionWorkflowSteps = ({
             <div className="flex gap-4">
               <button
                 onClick={handleBack}
-                className="w-1/3 h-11 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-colors cursor-pointer text-center"
+                className="w-1/2 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-colors cursor-pointer text-center"
               >
                 Back
               </button>
-              <button
+              <Button
+              className='w-1/2'
                 onClick={handleNext}
-                className="w-2/3 h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-lg text-xs font-bold transition-colors cursor-pointer text-center shadow-sm"
               >
                 {currentStep === 6 ? 'Archive Case' : 'Complete & Continue'}
-              </button>
+              </Button>
             </div>
           )}
         </div>

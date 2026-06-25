@@ -1,5 +1,13 @@
 "use client";
 import React from 'react';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface ResolutionDecisionStepProps {
   decision: string;
@@ -21,60 +29,61 @@ const ResolutionDecisionStep = ({
   parcelIds = ['CM-2847', 'CM-2848'],
 }: ResolutionDecisionStepProps) => {
   return (
-    <div className="space-y-5 font-sans">
+    <div className="space-y-4 font-sans">
       <div>
         <h3 className="text-xs font-extrabold text-slate-800">Step 5: Resolution Decision</h3>
         <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Issue final resolution: approve, reject, or escalate</p>
       </div>
 
       {/* Resolution Decision Dropdown */}
-      <div>
-        <label className="block text-[11px] font-bold text-slate-700 mb-1.5">
+      <div className="space-y-1.5">
+        <Label htmlFor="decision">
           Resolution Decision *
-        </label>
-        <div className="relative">
-          <select
-            value={decision}
-            onChange={(e) => setDecision(e.target.value)}
-            className="w-full h-10 pl-3.5 pr-8 bg-[#f8fafc] border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:border-slate-300 focus:bg-white appearance-none transition-colors cursor-pointer"
-          >
-            <option value={`Approve - ${parcelIds[0] || 'CM-2847'} takes precedence`}>
+        </Label>
+        <Select value={decision} onValueChange={setDecision}>
+          <SelectTrigger id="decision" className="w-full">
+            <SelectValue placeholder="Select Decision" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={`Approve - ${parcelIds[0] || 'CM-2847'} takes precedence`}>
               Approve - {parcelIds[0] || 'CM-2847'} takes precedence
-            </option>
-            <option value={`Approve - ${parcelIds[1] || 'CM-2848'} takes precedence`}>
+            </SelectItem>
+            <SelectItem value={`Approve - ${parcelIds[1] || 'CM-2848'} takes precedence`}>
               Approve - {parcelIds[1] || 'CM-2848'} takes precedence
-            </option>
-            <option value="Reject Both / Request Resubmission">Reject Both / Request Resubmission</option>
-            <option value="Escalate to Land Commission">Escalate to Land Commission</option>
-          </select>
-          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
-              <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-            </svg>
-          </div>
-        </div>
+            </SelectItem>
+            <SelectItem value="Reject Both / Request Resubmission">Reject Both / Request Resubmission</SelectItem>
+            <SelectItem value="Escalate to Land Commission">Escalate to Land Commission</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Justification Textarea */}
-      <div>
+      <div className="space-y-1.5">
+        <Label htmlFor="justification">
+          Justification
+        </Label>
         <textarea
+          id="justification"
           value={justification}
           onChange={(e) => setJustification(e.target.value)}
           placeholder="Resolution justification..."
-          className="w-full min-h-[90px] p-3.5 bg-[#f8fafc] border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-300 focus:bg-white transition-colors resize-none"
+          rows={3}
+          className="flex py-3 w-full rounded-lg border border-slate-200 bg-slate-50/40 px-4 text-sm text-title transition-all placeholder:text-subtitle focus:border-button-color focus:bg-white focus:outline-none focus:ring-2 focus:ring-button-color/20 disabled:cursor-not-allowed disabled:opacity-50 min-h-24"
         />
       </div>
 
       {/* Notes */}
-      <div>
-        <label className="block text-[11px] font-bold text-slate-700 mb-1.5">
+      <div className="space-y-1.5">
+        <Label htmlFor="notes">
           Notes for this step
-        </label>
+        </Label>
         <textarea
+          id="notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Add notes..."
-          className="w-full min-h-[90px] p-3.5 bg-[#f8fafc] border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-300 focus:bg-white transition-colors resize-none"
+          rows={3}
+          className="flex py-3 w-full rounded-lg border border-slate-200 bg-slate-50/40 px-4 text-sm text-title transition-all placeholder:text-subtitle focus:border-button-color focus:bg-white focus:outline-none focus:ring-2 focus:ring-button-color/20 disabled:cursor-not-allowed disabled:opacity-50 min-h-24"
         />
       </div>
     </div>

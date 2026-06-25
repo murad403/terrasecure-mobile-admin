@@ -1,5 +1,7 @@
 "use client";
 import React from 'react';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 interface MediationStepProps {
   mediationDate: string;
@@ -29,30 +31,30 @@ const MediationStep = ({
   };
 
   return (
-    <div className="space-y-5 font-sans">
+    <div className="space-y-4 font-sans">
       <div>
         <h3 className="text-xs font-extrabold text-slate-800">Step 3: Mediation</h3>
         <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Formal mediation session with all parties</p>
       </div>
 
       {/* Mediation Date */}
-      <div>
-        <label className="block text-[11px] font-bold text-slate-700 mb-1.5">
+      <div className="space-y-1.5">
+        <Label htmlFor="mediationDate">
           Mediation Date
-        </label>
-        <input
+        </Label>
+        <Input
+          id="mediationDate"
           type="datetime-local"
           value={mediationDate}
           onChange={(e) => setMediationDate(e.target.value)}
-          className="w-full h-10 px-3.5 bg-[#f8fafc] border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:border-slate-300 focus:bg-white transition-colors cursor-pointer"
         />
       </div>
 
       {/* Parties Notified */}
-      <div>
-        <label className="block text-[11px] font-bold text-slate-700 mb-1.5">
+      <div className="space-y-1.5">
+        <Label>
           Parties Notified
-        </label>
+        </Label>
         <div className="space-y-2.5 mt-2 pl-1">
           {parcelIds.map((pid) => {
             const label = `Owner of ${pid}`;
@@ -73,15 +75,17 @@ const MediationStep = ({
       </div>
 
       {/* Notes */}
-      <div>
-        <label className="block text-[11px] font-bold text-slate-700 mb-1.5">
+      <div className="space-y-1.5">
+        <Label htmlFor="notes">
           Notes for this step
-        </label>
+        </Label>
         <textarea
+          id="notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Add notes..."
-          className="w-full min-h-[90px] p-3 bg-[#f8fafc] border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-300 focus:bg-white transition-colors resize-none"
+          rows={3}
+          className="flex py-3 w-full rounded-lg border border-slate-200 bg-slate-50/40 px-4 text-sm text-title transition-all placeholder:text-subtitle focus:border-button-color focus:bg-white focus:outline-none focus:ring-2 focus:ring-button-color/20 disabled:cursor-not-allowed disabled:opacity-50 min-h-24"
         />
       </div>
     </div>

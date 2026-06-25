@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import { Label } from '@/components/ui/label';
 
 interface ArchiveCaseStepProps {
   notes: string;
@@ -11,7 +12,7 @@ const ArchiveCaseStep = ({
   setNotes,
 }: ArchiveCaseStepProps) => {
   return (
-    <div className="space-y-5 font-sans">
+    <div className="space-y-4 font-sans">
       <div>
         <h3 className="text-xs font-extrabold text-slate-800">Step 6: Archive Case</h3>
         <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Archive the resolved case with documentation</p>
@@ -29,15 +30,17 @@ const ArchiveCaseStep = ({
       </div>
 
       {/* Notes */}
-      <div>
-        <label className="block text-[11px] font-bold text-slate-700 mb-1.5">
+      <div className="space-y-1.5">
+        <Label htmlFor="notes">
           Notes for this step
-        </label>
+        </Label>
         <textarea
+          id="notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Add notes..."
-          className="w-full min-h-[120px] p-3.5 bg-[#f8fafc] border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-300 focus:bg-white transition-colors resize-none"
+          rows={3}
+          className="flex py-3 w-full rounded-lg border border-slate-200 bg-slate-50/40 px-4 text-sm text-title transition-all placeholder:text-subtitle focus:border-button-color focus:bg-white focus:outline-none focus:ring-2 focus:ring-button-color/20 disabled:cursor-not-allowed disabled:opacity-50 min-h-24"
         />
       </div>
     </div>

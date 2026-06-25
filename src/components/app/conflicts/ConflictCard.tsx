@@ -2,6 +2,7 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Conflict } from './ConflictsPage';
+import { Button } from '@/components/ui/button';
 
 interface ConflictCardProps {
   conflict: Conflict;
@@ -67,15 +68,15 @@ const ConflictCard = ({
 
       {/* Action Buttons Stack */}
       <div className="flex flex-col gap-1.5 shrink-0 w-36">
-        <button
+        <Button
           onClick={onReviewOnMap}
-          className="w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-lg text-[11px] font-bold py-1.5 text-center cursor-pointer transition-colors shadow-sm"
+          className='w-auto py-1 text-sm'
         >
           Review on Map
-        </button>
+        </Button>
         <button
           onClick={onResolve}
-          className="w-full bg-[#14532d] hover:bg-[#166534] text-white rounded-lg text-[11px] font-bold py-1.5 text-center cursor-pointer transition-colors shadow-sm"
+          className="w-full bg-green-500 hover:bg-green-500/90 text-white rounded-lg text-[11px] font-bold py-1.5 text-center cursor-pointer transition-colors shadow-sm"
         >
           Resolve Workflow
         </button>
