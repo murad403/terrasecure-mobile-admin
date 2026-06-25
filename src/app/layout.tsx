@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+import {Sora } from "next/font/google";
 import "./globals.css";
 import ReduxWrapper from "@/components/wrapper/ReduxWrapper";
 
-const roboto = Roboto({
+const sora = Sora({
   weight: ["200", "300", "400", "500", "600", "700", "800"],
   subsets: ["latin"],
-  variable: "--font-roboto",
-});
+  variable: "--font-sora"
+})
 
 export const metadata: Metadata = {
   title: "Terrasecure Mobile Admin",
@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${roboto.variable} h-full antialiased`}
+      className={`${sora.className} h-full antialiased`}
     >
       <ReduxWrapper>
         <body className="min-h-full flex flex-col">{children}</body>
