@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface ScheduleSiteVisitModalProps {
   isOpen: boolean
@@ -131,16 +138,16 @@ const ScheduleSiteVisitModal = ({
           {/* Surveyor Selection */}
           <div className="space-y-1.5">
             <Label htmlFor="surveyorSelect" className="text-xs font-bold text-slate-700">Assign Surveyor</Label>
-            <select
-              id="surveyorSelect"
-              value={surveyorName}
-              onChange={(e) => setSurveyorName(e.target.value)}
-              className="w-full h-11 px-3.5 border border-slate-200 bg-white rounded-xl text-xs md:text-sm text-title focus:outline-none focus:border-button-color focus:ring-0 transition-none font-semibold leading-relaxed cursor-pointer"
-            >
-              <option value="Paul Biya Jr - Available">Paul Biya Jr - Available</option>
-              <option value="Martin Essono - Available">Martin Essono - Available</option>
-              <option value="Cécile Ondoua - Available">Cécile Ondoua - Available</option>
-            </select>
+            <Select value={surveyorName} onValueChange={setSurveyorName}>
+              <SelectTrigger id="surveyorSelect" className="w-full">
+                <SelectValue placeholder="Select Surveyor" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Paul Biya Jr - Available">Paul Biya Jr - Available</SelectItem>
+                <SelectItem value="Martin Essono - Available">Martin Essono - Available</SelectItem>
+                <SelectItem value="Cécile Ondoua - Available">Cécile Ondoua - Available</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Date & Time Input */}
@@ -158,17 +165,17 @@ const ScheduleSiteVisitModal = ({
           {/* Visit Type */}
           <div className="space-y-1.5">
             <Label htmlFor="visitTypeSelect" className="text-xs font-bold text-slate-700">Visit Type</Label>
-            <select
-              id="visitTypeSelect"
-              value={visitType}
-              onChange={(e) => setVisitType(e.target.value)}
-              className="w-full h-11 px-3.5 border border-slate-200 bg-white rounded-xl text-xs md:text-sm text-title focus:outline-none focus:border-button-color focus:ring-0 transition-none font-semibold leading-relaxed cursor-pointer"
-            >
-              <option value="Initial Survey">Initial Survey</option>
-              <option value="Boundary Verification">Boundary Verification</option>
-              <option value="Dispute Investigation">Dispute Investigation</option>
-              <option value="Re-survey">Re-survey</option>
-            </select>
+            <Select value={visitType} onValueChange={setVisitType}>
+              <SelectTrigger id="visitTypeSelect" className="w-full">
+                <SelectValue placeholder="Select Visit Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Initial Survey">Initial Survey</SelectItem>
+                <SelectItem value="Boundary Verification">Boundary Verification</SelectItem>
+                <SelectItem value="Dispute Investigation">Dispute Investigation</SelectItem>
+                <SelectItem value="Re-survey">Re-survey</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Special Instructions / Notes */}
@@ -205,13 +212,13 @@ const ScheduleSiteVisitModal = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="flex-1 h-11 bg-slate-100 border-none hover:bg-slate-200 text-slate-700 text-xs font-bold shadow-sm rounded-xl cursor-pointer"
+              className="flex-1 py-3 bg-slate-100 border-none hover:bg-slate-200 text-slate-700 text-xs font-bold shadow-sm rounded-lg cursor-pointer"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="flex-1 h-11 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm rounded-xl cursor-pointer flex items-center justify-center gap-2 border-none"
+              className="w-1/2"
             >
               <Calendar className="w-4 h-4" />
               Schedule Visit

@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'
 import { type InvestigationRecord } from './InvestigationsPage'
+import { Button } from '@/components/ui/button'
 
 interface InvestigationsTableProps {
   investigations: InvestigationRecord[]
@@ -96,14 +97,14 @@ const InvestigationsTable = ({
 
         {/* Action Button: Create Investigation (Red background) */}
         <div className="flex items-center gap-3 w-full xl:w-auto shrink-0 justify-end">
-          <button
+          <Button
             type="button"
             onClick={onOpenCreateModal}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold bg-red-650 bg-red-700 text-white hover:bg-red-800/90 rounded-lg transition-all cursor-pointer shadow-sm border border-transparent"
+            className='w-auto'
           >
             <Plus className="w-4.5 h-4.5" />
             <span>Create Investigation</span>
-          </button>
+          </Button>
         </div>
       </div>
 

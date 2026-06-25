@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'
 import { type SiteVisitRecord } from './SiteVisitsPage'
+import { Button } from '@/components/ui/button'
 
 interface SiteVisitsTableProps {
   siteVisits: SiteVisitRecord[]
@@ -94,14 +95,14 @@ const SiteVisitsTable = ({
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3 w-full xl:w-auto shrink-0 justify-end">
-          <button
+          <Button
             type="button"
             onClick={onOpenScheduleModal}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold bg-button-color hover:bg-button-color/90 text-white rounded-lg transition-all cursor-pointer shadow-sm border border-transparent"
+            className='w-auto'
           >
             <Plus className="w-4.5 h-4.5" />
             <span>Schedule Visit</span>
-          </button>
+          </Button>
         </div>
       </div>
 

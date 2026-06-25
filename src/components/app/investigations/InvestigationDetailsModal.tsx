@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { X, MapPin, Upload, ChevronDown, Check } from 'lucide-react'
 import { type InvestigationRecord } from './InvestigationsPage'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 interface InvestigationDetailsModalProps {
   isOpen: boolean
@@ -232,13 +233,13 @@ const InvestigationDetailsModal = ({
               />
 
               {/* Action upload button */}
-              <button
+              <Button
                 type="button"
                 onClick={handleUploadClick}
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg cursor-pointer transition-colors text-center select-none shadow-sm block w-fit border-none"
+                className='w-auto'
               >
                 Upload Findings
-              </button>
+              </Button>
             </div>
           )}
 
@@ -247,13 +248,13 @@ const InvestigationDetailsModal = ({
         {/* Footer actions: Close Investigation */}
         {investigation.status !== 'Closed' && (
           <div className="border-t border-slate-100 p-4 bg-slate-50/50 flex items-center justify-stretch shrink-0 select-none">
-            <button
+            <Button
               type="button"
               onClick={onCloseCase}
-              className="w-full py-3 bg-red-650 hover:bg-red-800/90 bg-red-700 text-white font-bold text-xs rounded-lg cursor-pointer transition-colors text-center select-none shadow-sm border-none"
+              className='bg-red-700 hover:bg-red-800/90'
             >
               Close Investigation
-            </button>
+            </Button>
           </div>
         )}
 

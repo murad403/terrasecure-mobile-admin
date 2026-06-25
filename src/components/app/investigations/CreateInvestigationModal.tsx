@@ -245,13 +245,13 @@ const CreateInvestigationModal = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="px-5 py-2.5 w-auto bg-slate-100 border-none hover:bg-slate-200 text-slate-700 text-xs font-bold shadow-sm rounded-lg cursor-pointer"
+              className="px-5 py-3.5 w-1/2 bg-slate-100 border-none hover:bg-slate-200 text-slate-700 text-xs font-bold shadow-sm rounded-lg cursor-pointer"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="px-6 py-2.5 w-auto bg-red-650 hover:bg-red-700 bg-red-800/90 text-white text-xs font-bold shadow-sm rounded-lg cursor-pointer flex items-center gap-1 select-none border-none"
+              className='w-1/2'
             >
               Create Investigation
             </Button>

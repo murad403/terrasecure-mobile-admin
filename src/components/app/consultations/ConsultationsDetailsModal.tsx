@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { X, MapPin } from 'lucide-react'
 import { type ConsultationRecord } from './ConsultationsPage'
+import { Button } from '@/components/ui/button'
 
 interface ConsultationsDetailsModalProps {
   isOpen: boolean
@@ -139,19 +140,19 @@ const ConsultationsDetailsModal = ({
         {/* Footer Actions */}
         <div className="border-t border-slate-100 p-4 bg-slate-50/50 flex items-center justify-between gap-3 shrink-0 select-none">
           {/* Approve Button */}
-          <button
+          <Button
             type="button"
             onClick={() => onApprove(responseText)}
-            className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg cursor-pointer transition-colors text-center select-none shadow-sm"
+            className='w-1/2'
           >
             Approve
-          </button>
+          </Button>
 
           {/* Reject Button */}
           <button
             type="button"
             onClick={() => onReject(responseText)}
-            className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg cursor-pointer transition-colors text-center select-none shadow-sm"
+            className="flex-1 py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg cursor-pointer transition-colors text-center select-none shadow-sm"
           >
             Reject
           </button>
