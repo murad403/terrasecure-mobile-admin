@@ -1,78 +1,227 @@
-import React from 'react'
-import { Info, Globe, Shield, Users } from 'lucide-react'
+"use client"
+import React, { useState } from 'react'
+import { Pencil, Trash2, Save, Plus } from 'lucide-react'
+
+interface AboutSection {
+    id: string
+    title: string
+    content: string
+}
+
+const initialSections: AboutSection[] = [
+    {
+        id: '1',
+        title: 'Our Mission',
+        content: 'To become the leading digital land governance platform in Central Africa, ensuring every citizen has clear, verified, and protected land rights.',
+    },
+    {
+        id: '2',
+        title: 'Our Vision',
+        content: 'To become the leading digital land governance platform in Central Africa, ensuring every citizen has clear, verified, and protected land rights.',
+    },
+    {
+        id: '3',
+        title: 'Contact',
+        content: 'Ministry of Land Affairs, Yaounde, Cameroon Email: support@landsecure.cm Phone: +237 222 123 456',
+    },
+]
 
 const AboutUsPage = () => {
-  return (
-    <div className="space-y-6">
-      {/* Platform Description Card */}
-      <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm space-y-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-emerald-50 text-[#1b4332] rounded-xl flex items-center justify-center font-black text-lg border border-emerald-100">
-            LS
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-gray-900 leading-tight">LandSecure Platform</h2>
-            <p className="text-[10px] text-gray-400 font-light mt-0.5">
-              Cameroon GIS Land Tenure & Registration Management System
-            </p>
-          </div>
-        </div>
+    const [sections, setSections] = useState<AboutSection[]>(initialSections)
+    const [editingId, setEditingId] = useState<string | null>(null)
+    const [editContent, setEditContent] = useState<string>('')
 
-        <p className="text-xs text-gray-500 leading-relaxed pt-2 border-t border-gray-50">
-          LandSecure is a state-of-the-art geographical information system (GIS) and land registration portal designed for Cameroonian land registrars, supervisors, surveyors, and clients. It provides reliable boundary check validations, automated title deed authentication, consultation requests tracking, and custom security workflows to secure land property ownership across regions.
-        </p>
-      </div>
+    // New section inputs
+    const [showNewForm, setShowNewForm] = useState<boolean>(false)
+    const [newTitle, setNewTitle] = useState<string>('')
+    const [newContent, setNewContent] = useState<string>('')
 
-      {/* Details Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Version Info */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex flex-col justify-between min-h-[90px]">
-          <div className="text-gray-400">
-            <Info size={16} />
-          </div>
-          <div>
-            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">App Version</p>
-            <p className="text-xs font-semibold text-gray-900 mt-0.5">v2.4.1 (Stable Build)</p>
-          </div>
-        </div>
+    const [toastMessage, setToastMessage] = useState<string | null>(null)
 
-        {/* Secured Coverage */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex flex-col justify-between min-h-[90px]">
-          <div className="text-emerald-600">
-            <Shield size={16} />
-          </div>
-          <div>
-            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Encryption Security</p>
-            <p className="text-xs font-semibold text-gray-900 mt-0.5">AES-256 Protected</p>
-          </div>
-        </div>
+    const showToast = (msg: string) => {
+        setToastMessage(msg)
+        setTimeout(() => {
+            setToastMessage(null)
+        }, 3000)
+    }
 
-        {/* Global GIS Sync */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex flex-col justify-between min-h-[90px]">
-          <div className="text-blue-500">
-            <Globe size={16} />
-          </div>
-          <div>
-            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Map Service</p>
-            <p className="text-xs font-semibold text-gray-900 mt-0.5">QField & Leaflet Connected</p>
-          </div>
-        </div>
-      </div>
+    const startEditing = (section: AboutSection) => {
+        setEditingId(section.id)
+        setEditContent(section.content)
+    }
 
-      {/* Developer & Legal Details */}
-      <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm space-y-4">
-        <h3 className="text-xs font-bold text-gray-800 leading-none">Developer & License</h3>
-        <div className="text-xs text-gray-500 space-y-2 leading-relaxed">
-          <p>
-            Developed by the <span className="font-semibold text-gray-850">Terrasecure Development Team</span> in collaboration with local Cameroon municipal land registration authorities.
-          </p>
-          <p>
-            © 2026 Terrasecure Cameroon Admin. All rights reserved. Registered under Cameroonian land policy codes.
-          </p>
+    const handleSave = (id: string) => {
+        if (!editContent.trim()) {
+            showToast('Content cannot be empty!')
+            return
+        }
+        setSections(prev =>
+            prev.map(sec => (sec.id === id ? { ...sec, content: editContent } : sec))
+        )
+        setEditingId(null)
+        setEditContent('')
+        showToast('Section updated successfully!')
+    }
+
+    const handleCancelEdit = () => {
+        setEditingId(null)
+        setEditContent('')
+    }
+
+    const handleDelete = (id: string) => {
+        if (confirm('Are you sure you want to delete this section?')) {
+            setSections(prev => prev.filter(sec => sec.id !== id))
+            showToast('Section deleted successfully!')
+        }
+    }
+
+    const handleAddSection = () => {
+        if (!newTitle.trim() || !newContent.trim()) {
+            showToast('Please fill out both the title and content!')
+            return
+        }
+        const newSec: AboutSection = {
+            id: Date.now().toString(),
+            title: newTitle.trim(),
+            content: newContent.trim(),
+        }
+        setSections(prev => [...prev, newSec])
+        setNewTitle('')
+        setNewContent('')
+        setShowNewForm(false)
+        showToast('New section added successfully!')
+    }
+
+    return (
+        <div className="space-y-6 relative">
+            {/* Toast Notification */}
+            {toastMessage && (
+                <div className="fixed top-4 right-4 bg-gray-900 text-white text-xs px-4 py-2.5 rounded-lg shadow-md z-50 animate-bounce">
+                    {toastMessage}
+                </div>
+            )}
+
+            {/* Header Row */}
+            <div className="flex items-center justify-between pb-1">
+                <h2 className="text-sm font-bold text-gray-900">About Us</h2>
+                <button
+                    onClick={() => setShowNewForm(true)}
+                    className="bg-button-color hover:bg-[#3574dd] text-white text-xs font-semibold px-3.5 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                >
+                    <Plus size={14} />
+                    Add Section
+                </button>
+            </div>
+
+            {/* List of Sections */}
+            <div className="space-y-5">
+                {sections.map(section => (
+                    <div key={section.id}>
+                        {editingId === section.id ? (
+                            // Edit Mode Card
+                            <div className="bg-white rounded-xl border border-gray-150 p-5 shadow-sm space-y-4">
+                                <h3 className="text-xs md:text-sm font-bold text-slate-800">
+                                    {section.title}
+                                </h3>
+                                <textarea
+                                    value={editContent}
+                                    onChange={e => setEditContent(e.target.value)}
+                                    className="w-full min-h-[100px] bg-slate-50/20 border border-slate-200 rounded-lg px-4 py-3 text-xs md:text-sm text-slate-750 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-colors leading-relaxed font-normal resize-y"
+                                    placeholder="Edit section content..."
+                                />
+                                <div className="flex items-center space-x-2">
+                                    <button
+                                        onClick={() => handleSave(section.id)}
+                                        className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                                    >
+                                        <Save size={13} className="shrink-0" />
+                                        Save
+                                    </button>
+                                    <button
+                                        onClick={handleCancelEdit}
+                                        className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            // Display Mode Card
+                            <div className="bg-white rounded-xl border border-gray-150 p-5 shadow-sm hover:border-gray-200 transition-colors relative">
+                                <div className="flex items-start justify-between">
+                                    <h3 className="text-xs md:text-sm font-bold text-slate-800">
+                                        {section.title}
+                                    </h3>
+                                    <div className="flex items-center space-x-1">
+                                        <button
+                                            onClick={() => startEditing(section)}
+                                            className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                                            title="Edit Section"
+                                        >
+                                            <Pencil size={14} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(section.id)}
+                                            className="text-red-500 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                                            title="Delete Section"
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <p className="text-xs md:text-sm text-slate-500 font-normal leading-relaxed mt-3.5 whitespace-pre-line">
+                                    {section.content}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                ))}
+
+                {/* New Section Card */}
+                {showNewForm && (
+                    <div className="bg-white rounded-xl border border-emerald-500/30 p-5 shadow-sm space-y-4">
+                        <h3 className="text-xs md:text-sm font-bold text-slate-800">
+                            New Section
+                        </h3>
+                        <div className="space-y-3">
+                            <input
+                                type="text"
+                                placeholder="Section title"
+                                value={newTitle}
+                                onChange={e => setNewTitle(e.target.value)}
+                                className="w-full bg-slate-50/20 border border-slate-200 rounded-lg px-4 py-2.5 text-xs md:text-sm text-slate-750 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-colors placeholder:text-slate-400 font-semibold"
+                            />
+                            <textarea
+                                placeholder="Section content..."
+                                value={newContent}
+                                onChange={e => setNewContent(e.target.value)}
+                                className="w-full min-h-[100px] bg-slate-50/20 border border-slate-200 rounded-lg px-4 py-3 text-xs md:text-sm text-slate-750 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-colors placeholder:text-slate-400 font-normal resize-y"
+                            />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <button
+                                onClick={handleAddSection}
+                                className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                            >
+                                <Plus size={14} className="shrink-0" />
+                                Add
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowNewForm(false)
+                                    setNewTitle('')
+                                    setNewContent('')
+                                }}
+                                className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
-      </div>
-    </div>
-  )
+    )
 }
 
 export default AboutUsPage
