@@ -65,7 +65,8 @@ const AdminSidebar = ({
             title: 'ANALYTICS',
             items: [
                 { name: 'Reports', href: '/reports', icon: FileBarChart },
-                { name: 'Audit Logs', href: '/audit-logs', icon: History }
+                { name: 'Audit Logs', href: '/audit-logs', icon: History },
+                { name: 'Reliability Score', href: '/reliability-score', icon: Shield },
             ]
         },
         {
