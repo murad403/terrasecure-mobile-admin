@@ -14,6 +14,7 @@ import AddOwnerModal from '@/components/app/parcels/AddOwnerModal'
 
 // Import custom pagination
 import CustomPagination from '@/components/shared/CustomPagination'
+import { Button } from '@/components/ui/button'
 
 export interface Owner {
   name: string
@@ -578,19 +579,19 @@ const ParcelsPage = () => {
           <div className="flex items-center gap-3 w-full xl:w-auto shrink-0 justify-end">
             <button
               onClick={() => alert('Exporting data as CSV...')}
-              className="flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg transition-all cursor-pointer shadow-sm"
+              className="flex items-center justify-center gap-1.5 px-4 py-3 text-sm font-semibold border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg transition-all cursor-pointer shadow-sm"
             >
               <Download className="w-4 h-4" />
               <span>Export</span>
             </button>
 
-            <button
+            <Button
               onClick={() => handleOpenModal('add')}
-              className="flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold bg-button-color hover:bg-button-color/90 text-white rounded-lg transition-all cursor-pointer shadow-sm"
+              className='w-auto'
             >
               <Plus className="w-4.5 h-4.5" />
               <span>Add Parcel</span>
-            </button>
+            </Button>
           </div>
         </div>
 

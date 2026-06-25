@@ -242,7 +242,7 @@ const EditParcelModal = ({ isOpen, onClose, parcel, onUpdate }: EditParcelModalP
             <button
               type="button"
               onClick={onClose}
-              className="px-4 w-1/2 py-4 border border-slate-400 text-xs font-semibold text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+              className="px-4 w-1/2 py-3 border border-slate-400 text-xs font-semibold text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
             >
               Cancel
             </button>
