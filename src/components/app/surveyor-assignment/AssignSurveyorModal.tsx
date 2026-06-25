@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { type SurveyorRecord } from './SurveyorCard'
 
 interface AssignSurveyorModalProps {
@@ -94,13 +101,12 @@ const AssignSurveyorModal = ({
 
           {/* Parcel ID */}
           <div className="space-y-1.5">
-            <Label htmlFor="parcelIdInput" className="text-xs font-bold text-slate-700">Parcel ID *</Label>
+            <Label htmlFor="parcelIdInput">Parcel ID *</Label>
             <Input
               id="parcelIdInput"
               placeholder="e.g. CM-2849"
               value={parcelId}
               onChange={(e) => setParcelId(e.target.value)}
-              className="font-semibold text-xs h-10 px-3.5 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-0 focus:outline-none transition-none"
             />
           </div>
 
@@ -152,43 +158,42 @@ const AssignSurveyorModal = ({
           {/* Visit Type & Priority */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="visitTypeSelect" className="text-xs font-bold text-slate-700">Visit Type</Label>
-              <select
-                id="visitTypeSelect"
-                value={visitType}
-                onChange={(e) => setVisitType(e.target.value)}
-                className="w-full h-10 px-3 border border-slate-200 bg-white rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-0 transition-none font-semibold cursor-pointer"
-              >
-                <option value="Initial Survey">Initial Survey</option>
-                <option value="Verification Visit">Verification Visit</option>
-                <option value="Dispute Investigation">Dispute Investigation</option>
-                <option value="Re-survey">Re-survey</option>
-              </select>
+              <Label htmlFor="visitTypeSelect">Visit Type</Label>
+              <Select value={visitType} onValueChange={setVisitType}>
+                <SelectTrigger id="visitTypeSelect" className="w-full">
+                  <SelectValue placeholder="Select Visit Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Initial Survey">Initial Survey</SelectItem>
+                  <SelectItem value="Verification Visit">Verification Visit</SelectItem>
+                  <SelectItem value="Dispute Investigation">Dispute Investigation</SelectItem>
+                  <SelectItem value="Re-survey">Re-survey</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="prioritySelect" className="text-xs font-bold text-slate-700">Priority</Label>
-              <select
-                id="prioritySelect"
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as 'Low' | 'Medium' | 'High')}
-                className="w-full h-10 px-3 border border-slate-200 bg-white rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-0 transition-none font-semibold cursor-pointer"
-              >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-              </select>
+              <Label htmlFor="prioritySelect">Priority</Label>
+              <Select value={priority} onValueChange={(val) => setPriority(val as 'Low' | 'Medium' | 'High')}>
+                <SelectTrigger id="prioritySelect" className="w-full">
+                  <SelectValue placeholder="Select Priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Low">Low</SelectItem>
+                  <SelectItem value="Medium">Medium</SelectItem>
+                  <SelectItem value="High">High</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           {/* Scheduled Date & Time */}
           <div className="space-y-1.5">
-            <Label htmlFor="dateTimeInput" className="text-xs font-bold text-slate-700">Scheduled Date & Time *</Label>
+            <Label htmlFor="dateTimeInput">Scheduled Date & Time *</Label>
             <Input
               id="dateTimeInput"
               type="datetime-local"
               value={scheduledDateTime}
               onChange={(e) => setScheduledDateTime(e.target.value)}
-              className="font-semibold text-xs h-10 px-3.5 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-0 focus:outline-none transition-none"
             />
           </div>
 
@@ -200,7 +205,7 @@ const AssignSurveyorModal = ({
               placeholder="Special instructions for the surveyor..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full border border-slate-200 bg-white rounded-xl p-3 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-0 transition-none font-semibold min-h-[80px] leading-relaxed resize-none"
+              className="flex py-3 w-full rounded-lg border border-slate-200 bg-slate-50/40 px-4 text-sm text-title transition-all placeholder:text-subtitle focus:border-button-color focus:bg-white focus:outline-none focus:ring-2 focus:ring-button-color/20 disabled:cursor-not-allowed disabled:opacity-50 min-h-24"
             />
           </div>
 
@@ -225,13 +230,13 @@ const AssignSurveyorModal = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="flex-1 h-10 bg-white border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl cursor-pointer"
+              className="px-4 w-1/2 py-3 border border-slate-400 text-xs font-semibold text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="flex-1 h-10 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center gap-2 border-none shadow-none"
+              className='w-1/2'
             >
               <ClipboardCheck className="w-3.5 h-3.5" />
               Create Assignment

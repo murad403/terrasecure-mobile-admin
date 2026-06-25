@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { X, Upload } from 'lucide-react'
 import { createPortal } from 'react-dom'
+import { Button } from '@/components/ui/button'
 
 interface ImportGISModalProps {
   isOpen: boolean
@@ -73,7 +74,7 @@ const ImportGISModal = ({ isOpen, onClose, defaultTab = 'geojson' }: ImportGISMo
               onClick={() => handleTabChange('geojson')}
               className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                 activeTab === 'geojson'
-                  ? 'bg-[#1b5e20] text-white'
+                  ? 'bg-button-color text-white'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -83,7 +84,7 @@ const ImportGISModal = ({ isOpen, onClose, defaultTab = 'geojson' }: ImportGISMo
               onClick={() => handleTabChange('shp')}
               className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                 activeTab === 'shp'
-                  ? 'bg-[#1b5e20] text-white'
+                  ? 'bg-button-color text-white'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -130,20 +131,15 @@ const ImportGISModal = ({ isOpen, onClose, defaultTab = 'geojson' }: ImportGISMo
         <div className="flex items-center gap-3 px-6 pb-6">
           <button
             onClick={onClose}
-            className="flex-1 h-10 rounded-xl border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
+            className="flex-1 py-3 w-1/2 rounded-lg border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
           >
             Cancel
           </button>
-          <button
-            disabled={!file}
-            className={`flex-1 h-10 rounded-xl text-sm font-semibold transition-colors ${
-              file
-                ? 'bg-[#1b5e20] text-white hover:bg-[#145218] cursor-pointer'
-                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-            }`}
+          <Button
+          className='w-1/2'
           >
             Confirm Import
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

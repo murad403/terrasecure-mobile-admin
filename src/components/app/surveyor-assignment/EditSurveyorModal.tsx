@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { type SurveyorRecord } from './SurveyorCard'
 
 export interface AssignmentRecord {
@@ -105,19 +112,18 @@ const EditSurveyorModal = ({
 
           {/* Parcel ID */}
           <div className="space-y-1.5">
-            <Label htmlFor="editParcelId" className="text-xs font-bold text-slate-700">Parcel ID *</Label>
+            <Label htmlFor="editParcelId">Parcel ID *</Label>
             <Input
               id="editParcelId"
               placeholder="e.g. CM-2849"
               value={parcelId}
               onChange={(e) => setParcelId(e.target.value)}
-              className="font-semibold text-xs h-10 px-3.5 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-0 focus:outline-none transition-none"
             />
           </div>
 
           {/* Select Surveyor List */}
           <div className="space-y-2">
-            <Label className="text-xs font-bold text-slate-700">Select Surveyor *</Label>
+            <Label>Select Surveyor *</Label>
             <div className="space-y-2 max-h-[230px] overflow-y-auto pr-0.5">
               {surveyors.map((surveyor) => {
                 const isSelected = selectedSurveyorId === surveyor.id
@@ -163,55 +169,54 @@ const EditSurveyorModal = ({
           {/* Visit Type & Priority */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="editVisitType" className="text-xs font-bold text-slate-700">Visit Type</Label>
-              <select
-                id="editVisitType"
-                value={visitType}
-                onChange={(e) => setVisitType(e.target.value)}
-                className="w-full h-10 px-3 border border-slate-200 bg-white rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-0 transition-none font-semibold cursor-pointer"
-              >
-                <option value="Initial Survey">Initial Survey</option>
-                <option value="Verification Visit">Verification Visit</option>
-                <option value="Dispute Investigation">Dispute Investigation</option>
-                <option value="Re-survey">Re-survey</option>
-              </select>
+              <Label htmlFor="editVisitType">Visit Type</Label>
+              <Select value={visitType} onValueChange={setVisitType}>
+                <SelectTrigger id="editVisitType" className="w-full">
+                  <SelectValue placeholder="Select Visit Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Initial Survey">Initial Survey</SelectItem>
+                  <SelectItem value="Verification Visit">Verification Visit</SelectItem>
+                  <SelectItem value="Dispute Investigation">Dispute Investigation</SelectItem>
+                  <SelectItem value="Re-survey">Re-survey</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="editPriority" className="text-xs font-bold text-slate-700">Priority</Label>
-              <select
-                id="editPriority"
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as 'Low' | 'Medium' | 'High')}
-                className="w-full h-10 px-3 border border-slate-200 bg-white rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-0 transition-none font-semibold cursor-pointer"
-              >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-              </select>
+              <Label htmlFor="editPriority">Priority</Label>
+              <Select value={priority} onValueChange={(val) => setPriority(val as 'Low' | 'Medium' | 'High')}>
+                <SelectTrigger id="editPriority" className="w-full">
+                  <SelectValue placeholder="Select Priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Low">Low</SelectItem>
+                  <SelectItem value="Medium">Medium</SelectItem>
+                  <SelectItem value="High">High</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           {/* Scheduled Date & Time */}
           <div className="space-y-1.5">
-            <Label htmlFor="editDateTime" className="text-xs font-bold text-slate-700">Scheduled Date & Time *</Label>
+            <Label htmlFor="editDateTime">Scheduled Date & Time *</Label>
             <Input
               id="editDateTime"
               type="datetime-local"
               value={scheduledDateTime}
               onChange={(e) => setScheduledDateTime(e.target.value)}
-              className="font-semibold text-xs h-10 px-3.5 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-0 focus:outline-none transition-none"
             />
           </div>
 
           {/* Notes / Instructions */}
           <div className="space-y-1.5">
-            <Label htmlFor="editNotes" className="text-xs font-bold text-slate-700">Notes / Instructions</Label>
+            <Label htmlFor="editNotes">Notes / Instructions</Label>
             <textarea
               id="editNotes"
               placeholder="Special instructions for the surveyor..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full border border-slate-200 bg-white rounded-xl p-3 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-0 transition-none font-semibold min-h-[80px] leading-relaxed resize-none"
+              className="flex py-3 w-full rounded-lg border border-slate-200 bg-slate-50/40 px-4 text-sm text-title transition-all placeholder:text-subtitle focus:border-button-color focus:bg-white focus:outline-none focus:ring-2 focus:ring-button-color/20 disabled:cursor-not-allowed disabled:opacity-50 min-h-24"
             />
           </div>
 

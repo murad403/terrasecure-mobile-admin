@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import 'leaflet/dist/leaflet.css';
+import { Button } from '@/components/ui/button';
 
 interface LatLng { lat: number; lng: number }
 interface Parcel { id: string; coords: LatLng[] }
@@ -135,13 +136,13 @@ const EditPolygonModal = ({ isOpen, onClose, onSave }: EditPolygonModalProps) =>
         </div>
 
         <div className="px-6 py-4 flex justify-between border-t">
-          <button onClick={() => selectedParcelId && drawParcel(MOCK_PARCELS.find(p => p.id === selectedParcelId)!)} className="px-4 py-2 text-sm font-bold text-rose-500 bg-rose-50 rounded-lg">Reset</button>
+          <button onClick={() => selectedParcelId && drawParcel(MOCK_PARCELS.find(p => p.id === selectedParcelId)!)} className="px-4 py-3 rounded-lg text-sm font-semibold text-rose-500 bg-rose-50">Reset</button>
           <div className="flex gap-3">
-            <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-600">Cancel</button>
-            <button onClick={() => { onSave(selectedParcelId!, coords); onClose(); }} disabled={!selectedParcelId}
-              className="px-6 py-2 text-sm font-bold bg-orange-500 text-white rounded-lg disabled:bg-slate-300">
+            <button onClick={onClose} className="px-4 py-3 border rounded-lg text-sm font-semibold text-slate-600">Cancel</button>
+            <Button onClick={() => { onSave(selectedParcelId!, coords); onClose(); }} disabled={!selectedParcelId}
+              className='w-auto'>
               Save Changes
-            </button>
+            </Button>
           </div>
         </div>
       </div>

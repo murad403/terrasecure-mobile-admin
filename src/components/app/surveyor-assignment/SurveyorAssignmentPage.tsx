@@ -6,6 +6,7 @@ import SurveyorRoster from './SurveyorRoster'
 import AssignSurveyorModal from './AssignSurveyorModal'
 import EditSurveyorModal, { type AssignmentRecord } from './EditSurveyorModal'
 import { type SurveyorRecord } from './SurveyorCard'
+import { Button } from '@/components/ui/button'
 
 /* ─── Static surveyor roster ─────────────────────────────── */
 const INITIAL_SURVEYORS: SurveyorRecord[] = [
@@ -149,9 +150,9 @@ const SurveyorAssignmentPage = () => {
               key={tab}
               onClick={() => setActiveFilter(tab)}
               className={cn(
-                "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer",
+                "px-4 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer",
                 activeFilter === tab
-                  ? "bg-[#1b5e20] text-white"
+                  ? "bg-button-color text-white"
                   : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
               )}
             >
@@ -160,13 +161,13 @@ const SurveyorAssignmentPage = () => {
           ))}
         </div>
 
-        <button
+        <Button
           onClick={() => setIsAssignOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer shadow-sm"
+          className='w-auto'
         >
           <Plus className="w-3.5 h-3.5" />
           Assign Surveyor
-        </button>
+        </Button>
       </div>
 
       {/* Assignment Cards */}

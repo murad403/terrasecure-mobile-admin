@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Plus, Pencil, Trash2, Check, MapPin, Calendar, Ruler, Layers } from 'lucide-react';
 import { Zone } from './GisMapPage';
+import { Button } from '@/components/ui/button';
 
 interface ManageZoneModalProps {
   isOpen: boolean;
@@ -95,7 +96,7 @@ const ManageZoneModal = ({
                 onClick={() => setActiveFilter('All')}
                 className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border cursor-pointer ${
                   activeFilter === 'All'
-                    ? 'bg-[#14532d] border-[#14532d] text-white'
+                    ? 'bg-button-color border-button-color text-white'
                     : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                 }`}
               >
@@ -149,13 +150,13 @@ const ManageZoneModal = ({
             </div>
 
             {/* Add Zone Button */}
-            <button
+            <Button
               onClick={onOpenAddZone}
-              className="bg-[#14532d] hover:bg-[#166534] text-white px-3 py-1.5 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+              className='w-auto py-2'
             >
               <Plus className="w-3.5 h-3.5" />
               Add Zone
-            </button>
+            </Button>
           </div>
 
           {/* Zones List */}
@@ -269,12 +270,12 @@ const ManageZoneModal = ({
 
         {/* Footer */}
         <div className="px-6 py-4 flex justify-center border-t border-slate-100 bg-white shrink-0">
-          <button
+          <Button
             onClick={onClose}
-            className="w-full max-w-[200px] bg-[#14532d] hover:bg-[#166534] text-white py-2.5 rounded-lg text-sm font-bold shadow-sm transition-colors cursor-pointer text-center"
+          className='w-full'
           >
             Done
-          </button>
+          </Button>
         </div>
 
       </div>

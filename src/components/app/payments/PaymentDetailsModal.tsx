@@ -1,4 +1,4 @@
-"use client"
+ "use client"
 import React, { useEffect } from 'react'
 import { X, Download, RotateCcw, FileText, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -159,13 +159,13 @@ const PaymentDetailsModal = ({
               <p className="text-xs font-bold text-slate-800">Payment Receipt</p>
               <p className="text-[10px] text-slate-400 font-semibold">PDF preview available</p>
             </div>
-            <button
+            <Button
               onClick={() => alert(`Downloading receipt invoice_${payment.id}.pdf...`)}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-4 py-2 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm border-none"
+              className='rounded-2xl py-2 w-auto'
             >
               <Download className="w-3.5 h-3.5" />
               Download Receipt
-            </button>
+            </Button>
           </div>
 
           {/* Payment History List */}
@@ -199,7 +199,7 @@ const PaymentDetailsModal = ({
           <Button
             type="button"
             onClick={onVerify}
-            className="flex-1 h-11 text-white text-xs font-bold shadow-sm rounded-xl cursor-pointer flex items-center justify-center gap-2 border-none bg-blue-600 hover:bg-blue-700 transition-colors"
+            className='w-1/2'
           >
             <CheckCircle2 className="w-4 h-4" />
             Verify Payment
@@ -209,7 +209,7 @@ const PaymentDetailsModal = ({
             type="button"
             variant="outline"
             onClick={() => alert(`Downloading receipt invoice_${payment.id}.pdf...`)}
-            className="flex-1 h-11 bg-slate-100 border-none hover:bg-slate-200 text-slate-700 text-xs font-bold shadow-sm rounded-xl cursor-pointer flex items-center justify-center gap-2"
+            className="flex-1 py-3.5 bg-slate-100 border-none hover:bg-slate-200 text-slate-700 text-xs font-bold shadow-sm rounded-lg cursor-pointer flex items-center justify-center gap-2"
           >
             <Download className="w-4 h-4" />
             Receipt

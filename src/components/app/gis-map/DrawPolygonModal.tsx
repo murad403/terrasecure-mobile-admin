@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, RotateCcw, Hexagon, Save } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import 'leaflet/dist/leaflet.css';
+import { Button } from '@/components/ui/button';
 
 interface LatLng { lat: number; lng: number }
 
@@ -125,12 +126,12 @@ const DrawPolygonModal = ({ isOpen, onClose, onSave }: DrawPolygonModalProps) =>
 
         <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
           <div className="flex gap-2">
-            <button onClick={handleReset} className="px-4 py-2 text-sm font-semibold text-rose-500 bg-rose-50 rounded-lg hover:bg-rose-100">Reset</button>
-            <button onClick={handleClosePolygon} disabled={points.length < 3 || closed} className="px-4 py-2 text-sm font-semibold text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 disabled:opacity-50">Close Polygon</button>
+            <button onClick={handleReset} className="px-4 py-3 text-sm font-semibold text-rose-500 bg-rose-50 rounded-lg hover:bg-rose-100">Reset</button>
+            <button onClick={handleClosePolygon} disabled={points.length < 3 || closed} className="px-4 py-3 text-sm font-semibold text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 disabled:opacity-50">Close Polygon</button>
           </div>
           <div className="flex gap-3">
-            <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800">Cancel</button>
-            <button onClick={handleSave} disabled={!closed} className={`px-6 py-2 text-sm font-semibold rounded-lg ${closed ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-500 cursor-not-allowed'}`}>Save Polygon</button>
+            <button onClick={onClose} className="px-4 py-3 text-sm border rounded-lg font-semibold text-slate-600 hover:text-slate-800">Cancel</button>
+            <Button onClick={handleSave} disabled={!closed} className='w-auto'>Save Polygon</Button>
           </div>
         </div>
       </div>
