@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { Camera, Save } from 'lucide-react'
 
 const GenerateSettingsPage = () => {
@@ -10,8 +10,10 @@ const GenerateSettingsPage = () => {
     platformName: 'LandSecure Admin — Cameroon',
   })
 
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [language, setLanguage] = useState('French / English')
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const showToast = (msg: string) => {
     setToastMessage(msg)
@@ -30,6 +32,24 @@ const GenerateSettingsPage = () => {
     showToast('Platform preferences saved successfully!')
   }
 
+  const triggerUpload = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setAvatarUrl(event.target.result as string)
+          showToast('Profile photo updated successfully!')
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   return (
     <div className="space-y-6 relative">
       {/* Toast Notification */}
@@ -39,22 +59,45 @@ const GenerateSettingsPage = () => {
         </div>
       )}
 
+      {/* Hidden File Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        className="hidden"
+      />
+
       {/* Edit Profile Card */}
       <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm space-y-5">
         <h3 className="text-xs font-bold text-gray-900 leading-none">Edit Profile</h3>
 
         {/* Profile Avatar and Meta info */}
         <div className="flex items-center space-x-4">
-          <div className="w-14 h-14 rounded-full bg-[#1b4332] text-white flex items-center justify-center font-bold text-lg relative shrink-0">
-            JA
-            <button className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-emerald-700 border-2 border-white flex items-center justify-center text-white cursor-pointer hover:bg-emerald-800">
+          <div className="relative shrink-0 w-14 h-14">
+            <div className="w-full h-full rounded-full bg-[#1b4332] text-white flex items-center justify-center font-bold text-lg overflow-hidden border border-gray-100 shadow-inner">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                "JA"
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={triggerUpload}
+              className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-emerald-700 border-2 border-white flex items-center justify-center text-white cursor-pointer hover:bg-emerald-800 shadow transition-colors"
+            >
               <Camera size={10} />
             </button>
           </div>
           <div>
             <h4 className="text-xs font-bold text-gray-900">{profile.fullName}</h4>
             <p className="text-[10px] text-gray-400 font-light mt-0.5">Super Admin</p>
-            <button className="mt-2 border border-gray-200 hover:bg-gray-55 text-gray-700 text-[10px] font-bold px-2.5 py-1 rounded-lg transition-colors cursor-pointer">
+            <button
+              type="button"
+              onClick={triggerUpload}
+              className="mt-2 border border-gray-200 hover:bg-gray-55 text-gray-700 text-[10px] font-bold px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+            >
               Change Photo
             </button>
           </div>
@@ -77,17 +120,12 @@ const GenerateSettingsPage = () => {
             {/* City */}
             <div className="space-y-1">
               <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">City</label>
-              <select
+              <input
+                type="text"
                 value={profile.city}
                 onChange={(e) => setProfile({ ...profile, city: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
-              >
-                <option value="Jean Alima">Jean Alima</option>
-                <option value="Yaoundé">Yaoundé</option>
-                <option value="Douala">Douala</option>
-                <option value="Garoua">Garoua</option>
-                <option value="Bamenda">Bamenda</option>
-              </select>
+                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
+              />
             </div>
 
             {/* Timezone */}
@@ -96,7 +134,7 @@ const GenerateSettingsPage = () => {
               <select
                 value={profile.timezone}
                 onChange={(e) => setProfile({ ...profile, timezone: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
+                className="w-full h-[32px] border border-gray-200 rounded-lg px-2 text-xs text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
               >
                 <option value="Africa/Douala (UTC+1)">Africa/Douala (UTC+1)</option>
                 <option value="Africa/Lagos (UTC+1)">Africa/Lagos (UTC+1)</option>
@@ -137,7 +175,7 @@ const GenerateSettingsPage = () => {
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
+              className="w-full h-[32px] border border-gray-200 rounded-lg px-2 text-xs text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
             >
               <option value="French / English">French / English</option>
               <option value="English">English</option>
