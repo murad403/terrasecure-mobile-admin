@@ -34,13 +34,15 @@ const PromotionalBannerForm = ({ banner, onUpdate }: BannerFormProps) => {
 
   // Keep form in sync if external banner state changes
   useEffect(() => {
-    reset({
-      labelPill: banner.labelPill,
-      subtitle: banner.subtitle,
-      title: banner.title,
-      isActive: banner.isActive,
-    })
-  }, [banner, reset])
+    if (!isDirty) {
+      reset({
+        labelPill: banner.labelPill,
+        subtitle: banner.subtitle,
+        title: banner.title,
+        isActive: banner.isActive,
+      })
+    }
+  }, [banner, reset, isDirty])
 
   const isActive = watch('isActive')
 
@@ -56,11 +58,14 @@ const PromotionalBannerForm = ({ banner, onUpdate }: BannerFormProps) => {
 
   const handleToggle = () => {
     const nextVal = !isActive
-    setValue('isActive', nextVal, { shouldDirty: true })
-    onUpdate({
-      ...banner,
+    const currentValues = {
+      labelPill: watch('labelPill'),
+      subtitle: watch('subtitle'),
+      title: watch('title'),
       isActive: nextVal,
-    })
+    }
+    onUpdate(currentValues)
+    reset(currentValues)
   }
 
   const handleCancel = () => {
@@ -113,11 +118,10 @@ const PromotionalBannerForm = ({ banner, onUpdate }: BannerFormProps) => {
         {/* Row 1: Label Pill & Subtitle */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label htmlFor="labelPill" className="text-xs text-gray-500">Label pill</Label>
+            <Label htmlFor="labelPill">Label pill</Label>
             <Input
               id="labelPill"
               placeholder="e.g. Limited Time"
-              className="text-xs py-1.5 focus:border-[#1b4332]"
               {...register('labelPill')}
             />
             {errors.labelPill && (
@@ -126,11 +130,10 @@ const PromotionalBannerForm = ({ banner, onUpdate }: BannerFormProps) => {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="subtitle" className="text-xs text-gray-500">Subtitle</Label>
+            <Label htmlFor="subtitle">Subtitle</Label>
             <Input
               id="subtitle"
               placeholder="e.g. Explore parcels at no cost!"
-              className="text-xs py-1.5 focus:border-[#1b4332]"
               {...register('subtitle')}
             />
             {errors.subtitle && (
@@ -141,11 +144,10 @@ const PromotionalBannerForm = ({ banner, onUpdate }: BannerFormProps) => {
 
         {/* Row 2: Title */}
         <div className="space-y-1.5">
-          <Label htmlFor="title" className="text-xs text-gray-500">Title</Label>
+          <Label htmlFor="title">Title</Label>
           <Input
             id="title"
             placeholder="e.g. Free Access During Launch Period"
-            className="text-xs py-1.5 focus:border-[#1b4332]"
             {...register('title')}
           />
           {errors.title && (
@@ -153,19 +155,19 @@ const PromotionalBannerForm = ({ banner, onUpdate }: BannerFormProps) => {
           )}
         </div>
 
-        {/* Actions - Show if form is dirty/edited */}
-        {isDirty && (
+        {/* Actions */}
+        {isActive && (
           <div className="flex items-center gap-2 pt-1">
             <Button
               type="submit"
-              className="bg-[#1b4332] hover:bg-[#143426] text-white font-semibold text-xs py-1.5 rounded-lg w-auto px-4 cursor-pointer"
+              className="w-auto py-2"
             >
               Save
             </Button>
             <button
               type="button"
               onClick={handleCancel}
-              className="px-4 py-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors border border-gray-100 cursor-pointer"
+              className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-4 py-3 rounded-lg transition-colors cursor-pointer"
             >
               Cancel
             </button>

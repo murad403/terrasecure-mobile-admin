@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Criterion } from './ReliabilityScorePage'
 import { Check, X, Pencil, Save } from 'lucide-react'
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface CriteriaTabProps {
   criteria: Criterion[];
@@ -111,13 +113,13 @@ const ScoringCriteriaTab = ({ criteria, onUpdateCriterion }: CriteriaTabProps) =
             Weights must sum to 100%. Click the edit icon to adjust.
           </p>
         </div>
-        <button
+        <Button
           onClick={handleGlobalSave}
-          className="bg-[#1b4332] hover:bg-[#143426] text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2 self-start sm:self-auto transition-colors shadow-sm cursor-pointer"
+          className='w-auto py-2'
         >
           <Save size={14} />
           Save
-        </button>
+        </Button>
       </div>
 
       {/* Categories and List */}
@@ -150,22 +152,20 @@ const ScoringCriteriaTab = ({ criteria, onUpdateCriterion }: CriteriaTabProps) =
                       >
                         {/* Name Input */}
                         <div className="w-full md:w-1/4">
-                          <input
+                          <Input
                             type="text"
                             value={editName}
                             onChange={(e) => setEditName(e.target.value)}
-                            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
                             placeholder="Name"
                           />
                         </div>
 
                         {/* Description Input */}
                         <div className="flex-1">
-                          <input
+                          <Input
                             type="text"
                             value={editDesc}
                             onChange={(e) => setEditDesc(e.target.value)}
-                            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
                             placeholder="Description"
                           />
                         </div>
@@ -173,11 +173,10 @@ const ScoringCriteriaTab = ({ criteria, onUpdateCriterion }: CriteriaTabProps) =
                         {/* Weight & Action Panel */}
                         <div className="flex items-center space-x-3 self-end md:self-auto min-w-[120px] justify-end">
                           <div className="flex items-center space-x-1">
-                            <input
+                            <Input
                               type="number"
                               value={editWeight}
                               onChange={(e) => setEditWeight(Number(e.target.value) || 0)}
-                              className="w-12 border border-gray-200 rounded-lg px-2 py-1.5 text-center text-xs font-semibold text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
                             />
                             <span className="text-xs text-gray-500 font-medium">%</span>
                           </div>
@@ -224,7 +223,7 @@ const ScoringCriteriaTab = ({ criteria, onUpdateCriterion }: CriteriaTabProps) =
                       <div className="flex items-center justify-between sm:justify-end space-x-4 min-w-[150px]">
                         {/* Progress Bar */}
                         <div className="flex items-center space-x-2 flex-1 sm:flex-none">
-                          <div className="w-20 md:w-28 bg-gray-100 h-1 rounded-full overflow-hidden">
+                          <div className="w-20 md:w-28 bg-gray-100 h-1.5 rounded-full overflow-hidden">
                             <div
                               className={`h-full ${styles.progressBar} rounded-full transition-all duration-500`}
                               style={{ width: `${criterion.weight}%` }}

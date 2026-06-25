@@ -136,9 +136,9 @@ const NotificationsPage = () => {
                 <button
                   key={filter}
                   onClick={() => setActiveFilter(filter)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer border ${
+                  className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer border ${
                     activeFilter === filter
-                      ? 'bg-[#1b4332] text-white border-transparent'
+                      ? 'bg-button-color text-white border-transparent'
                       : 'bg-white text-gray-600 border-gray-150 hover:bg-gray-50'
                   }`}
                 >

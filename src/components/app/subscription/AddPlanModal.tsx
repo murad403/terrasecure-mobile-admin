@@ -9,6 +9,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { SubscriptionPlan } from './SubscriptionPage'
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
 interface AddPlanModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -70,6 +78,8 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
   const selectedIcon = watch('icon')
   const selectedColor = watch('badgeColor')
   const isActive = watch('isActive')
+  const currencyValue = watch('currency')
+  const periodValue = watch('period')
 
   // Lock body scroll
   useEffect(() => {
@@ -119,7 +129,7 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
           <div className="p-6 space-y-4 overflow-y-auto">
             {/* Plan Icon Select */}
             <div className="space-y-1.5">
-              <Label className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Plan Icon</Label>
+              <Label>Plan Icon</Label>
               <div className="flex flex-wrap gap-2">
                 {iconList.map((item) => (
                   <button
@@ -143,11 +153,10 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
 
             {/* Plan Name */}
             <div className="space-y-1.5">
-              <Label htmlFor="name" className="text-xs text-gray-500">Plan Name *</Label>
+              <Label htmlFor="name">Plan Name *</Label>
               <Input
                 id="name"
                 placeholder="e.g. Weekly, Monthly..."
-                className="text-xs py-1.5 focus:border-[#1b4332]"
                 {...register('name')}
               />
               {errors.name && (
@@ -157,11 +166,10 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
 
             {/* Unlocks Description */}
             <div className="space-y-1.5">
-              <Label htmlFor="unlocksDescription" className="text-xs text-gray-500">Unlocks Description</Label>
+              <Label htmlFor="unlocksDescription">Unlocks Description</Label>
               <Input
                 id="unlocksDescription"
                 placeholder="e.g. 20 unlocks per week"
-                className="text-xs py-1.5 focus:border-[#1b4332]"
                 {...register('unlocksDescription')}
               />
               {errors.unlocksDescription && (
@@ -172,41 +180,48 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
             {/* Pricing Details Row */}
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="price" className="text-xs text-gray-500">Price *</Label>
+                <Label htmlFor="price">Price *</Label>
                 <Input
                   id="price"
                   type="number"
                   placeholder="e.g. 2500"
-                  className="text-xs py-1.5 focus:border-[#1b4332]"
                   {...register('price')}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="currency" className="text-xs text-gray-500">Currency</Label>
-                <select
-                  id="currency"
-                  {...register('currency')}
-                  className="w-full h-[34px] px-2.5 border border-slate-200 bg-white rounded-lg text-xs text-gray-800 focus:outline-none focus:border-[#1b4332] transition-colors"
+                <Label htmlFor="currency">Currency</Label>
+                <Select
+                  value={currencyValue}
+                  onValueChange={(val) => setValue('currency', val as any, { shouldValidate: true, shouldDirty: true })}
                 >
-                  <option value="XAF">XAF</option>
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                </select>
+                  <SelectTrigger id="currency" className="w-full">
+                    <SelectValue placeholder="Select Currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="XAF">XAF</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="period" className="text-xs text-gray-500">Period</Label>
-                <select
-                  id="period"
-                  {...register('period')}
-                  className="w-full h-[34px] px-2.5 border border-slate-200 bg-white rounded-lg text-xs text-gray-800 focus:outline-none focus:border-[#1b4332] transition-colors"
+                <Label htmlFor="period">Period</Label>
+                <Select
+                  value={periodValue}
+                  onValueChange={(val) => setValue('period', val as any, { shouldValidate: true, shouldDirty: true })}
                 >
-                  <option value="Daily">Daily</option>
-                  <option value="Weekly">Weekly</option>
-                  <option value="Monthly">Monthly</option>
-                  <option value="Yearly">Yearly</option>
-                </select>
+                  <SelectTrigger id="period" className="w-full">
+                    <SelectValue placeholder="Select Period" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Daily">Daily</SelectItem>
+                    <SelectItem value="Weekly">Weekly</SelectItem>
+                    <SelectItem value="Monthly">Monthly</SelectItem>
+                    <SelectItem value="Yearly">Yearly</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             {(errors.price || errors.currency || errors.period) && (
@@ -218,17 +233,16 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
             {/* Badge Info Row */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="badgeLabel" className="text-xs text-gray-500">Badge Label (optional)</Label>
+                <Label htmlFor="badgeLabel">Badge Label (optional)</Label>
                 <Input
                   id="badgeLabel"
                   placeholder="e.g. MOST POPULAR"
-                  className="text-xs py-1.5 focus:border-[#1b4332]"
                   {...register('badgeLabel')}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs text-gray-500">Badge Color</Label>
+                <Label>Badge Color</Label>
                 <div className="flex items-center space-x-2 h-[34px]">
                   {colorList.map((item) => (
                     <button
@@ -250,11 +264,11 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
             {/* Plan Features with add/remove */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label className="text-xs text-gray-500">Plan Features</Label>
+                <Label>Plan Features</Label>
                 <button
                   type="button"
                   onClick={() => append({ text: '', enabled: true })}
-                  className="text-emerald-700 hover:text-emerald-800 text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                  className="text-button-color text-sm font-bold flex items-center gap-1 cursor-pointer"
                 >
                   <Plus size={12} strokeWidth={3} />
                   Add feature
@@ -271,7 +285,7 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
                     />
                     <Input
                       placeholder="Feature description..."
-                      className="text-xs py-1 flex-1 focus:border-[#1b4332]"
+                      className="flex-1"
                       {...register(`features.${index}.text` as const)}
                     />
                     <button
@@ -292,13 +306,12 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
             {/* Display Order */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="displayOrder" className="text-xs text-gray-500">Display Order</Label>
+                <Label htmlFor="displayOrder">Display Order</Label>
                 <span className="text-[10px] text-gray-400">Lower number = shown first</span>
               </div>
               <Input
                 id="displayOrder"
                 type="number"
-                className="text-xs py-1.5 focus:border-[#1b4332]"
                 {...register('displayOrder')}
               />
               {errors.displayOrder && (
@@ -318,7 +331,7 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
                 type="button"
                 onClick={() => setValue('isActive', !isActive)}
                 className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  isActive ? 'bg-[#1b4332]' : 'bg-gray-200'
+                  isActive ? 'bg-button-color' : 'bg-gray-200'
                 }`}
               >
                 <span
@@ -331,20 +344,20 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
           </div>
 
           {/* Action Footer */}
-          <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end gap-3 shrink-0">
+          <div className="px-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between py-4 gap-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors border border-gray-150 bg-white cursor-pointer"
+              className="px-4 w-1/2 py-3 border border-slate-400 text-xs font-semibold text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
             >
               Cancel
             </button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-[#1b4332] hover:bg-[#143426] text-white font-semibold text-xs py-2 rounded-lg w-auto px-5 cursor-pointer"
+              className='w-1/2'
             >
-              Create Plan
+              {isSubmitting ? 'Creating...' : 'Create Plan'}
             </Button>
           </div>
         </form>

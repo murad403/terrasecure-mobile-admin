@@ -12,9 +12,9 @@ const SubscriptionTabs = ({ activeTab, setActiveTab }: TabsProps) => {
       {/* Subscription Plans Tab */}
       <button
         onClick={() => setActiveTab('plans')}
-        className={`px-4 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${
+        className={`px-4 py-2.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${
           activeTab === 'plans'
-            ? 'bg-[#1b4332] text-white shadow-sm'
+            ? 'bg-button-color text-white shadow-sm'
             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
         }`}
       >
@@ -25,9 +25,9 @@ const SubscriptionTabs = ({ activeTab, setActiveTab }: TabsProps) => {
       {/* Payment Controls & Feature Flags Tab */}
       <button
         onClick={() => setActiveTab('controls')}
-        className={`px-4 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${
+        className={`px-4 py-2.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${
           activeTab === 'controls'
-            ? 'bg-[#1b4332] text-white shadow-sm'
+            ? 'bg-button-color text-white shadow-sm'
             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
         }`}
       >

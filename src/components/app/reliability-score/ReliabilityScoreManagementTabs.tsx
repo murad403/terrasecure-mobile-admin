@@ -10,9 +10,9 @@ const ReliabilityScoreManagementTabs = ({ activeTab, setActiveTab }: TabsProps) 
     <div className="flex items-center space-x-2">
       <button
         onClick={() => setActiveTab('scoring-criteria')}
-        className={`px-4 py-2 text-xs font-semibold rounded-lg transition-colors ${
+        className={`px-4 py-2.5 text-xs font-semibold rounded-lg transition-colors ${
           activeTab === 'scoring-criteria'
-            ? 'bg-[#1b4332] text-white'
+            ? 'bg-button-color text-white'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }`}
       >
@@ -20,9 +20,9 @@ const ReliabilityScoreManagementTabs = ({ activeTab, setActiveTab }: TabsProps) 
       </button>
       <button
         onClick={() => setActiveTab('parcel-scores')}
-        className={`px-4 py-2 text-xs font-semibold rounded-lg transition-colors ${
+        className={`px-4 py-2.5 text-xs font-semibold rounded-lg transition-colors ${
           activeTab === 'parcel-scores'
-            ? 'bg-[#1b4332] text-white'
+            ? 'bg-button-color text-white'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }`}
       >

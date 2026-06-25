@@ -1,6 +1,16 @@
 "use client"
 import React, { useState, useRef } from 'react'
 import { Camera, Save } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 const GenerateSettingsPage = () => {
   const [profile, setProfile] = useState({
@@ -75,7 +85,7 @@ const GenerateSettingsPage = () => {
         {/* Profile Avatar and Meta info */}
         <div className="flex items-center space-x-4">
           <div className="relative shrink-0 w-14 h-14">
-            <div className="w-full h-full rounded-full bg-[#1b4332] text-white flex items-center justify-center font-bold text-lg overflow-hidden border border-gray-100 shadow-inner">
+            <div className="w-full h-full rounded-full bg-button-color text-white flex items-center justify-center font-bold text-lg overflow-hidden border border-gray-150 shadow-inner">
               {avatarUrl ? (
                 <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
@@ -96,7 +106,7 @@ const GenerateSettingsPage = () => {
             <button
               type="button"
               onClick={triggerUpload}
-              className="mt-2 border border-gray-200 hover:bg-gray-55 text-gray-700 text-[10px] font-bold px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+              className="mt-2 border border-gray-200 hover:bg-gray-50 text-gray-700 text-[10px] font-bold px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
             >
               Change Photo
             </button>
@@ -107,60 +117,64 @@ const GenerateSettingsPage = () => {
         <form onSubmit={handleProfileSave} className="space-y-4 pt-2 border-t border-gray-50">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Full Name */}
-            <div className="space-y-1">
-              <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Full Name</label>
-              <input
+            <div className="space-y-1.5">
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
                 type="text"
                 value={profile.fullName}
                 onChange={(e) => setProfile({ ...profile, fullName: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
               />
             </div>
 
             {/* City */}
-            <div className="space-y-1">
-              <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">City</label>
-              <input
+            <div className="space-y-1.5">
+              <Label htmlFor="city">City</Label>
+              <Input
+                id="city"
                 type="text"
                 value={profile.city}
                 onChange={(e) => setProfile({ ...profile, city: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
               />
             </div>
 
             {/* Timezone */}
-            <div className="space-y-1">
-              <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Timezone</label>
-              <select
+            <div className="space-y-1.5">
+              <Label htmlFor="timezone">Timezone</Label>
+              <Select
                 value={profile.timezone}
-                onChange={(e) => setProfile({ ...profile, timezone: e.target.value })}
-                className="w-full h-[32px] border border-gray-200 rounded-lg px-2 text-xs text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
+                onValueChange={(val) => setProfile({ ...profile, timezone: val })}
               >
-                <option value="Africa/Douala (UTC+1)">Africa/Douala (UTC+1)</option>
-                <option value="Africa/Lagos (UTC+1)">Africa/Lagos (UTC+1)</option>
-                <option value="UTC (UTC+0)">UTC (UTC+0)</option>
-              </select>
+                <SelectTrigger id="timezone" className="w-full">
+                  <SelectValue placeholder="Select Timezone" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Africa/Douala (UTC+1)">Africa/Douala (UTC+1)</SelectItem>
+                  <SelectItem value="Africa/Lagos (UTC+1)">Africa/Lagos (UTC+1)</SelectItem>
+                  <SelectItem value="UTC (UTC+0)">UTC (UTC+0)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Platform Name */}
-            <div className="space-y-1">
-              <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Platform Name</label>
-              <input
+            <div className="space-y-1.5">
+              <Label htmlFor="platformName">Platform Name</Label>
+              <Input
+                id="platformName"
                 type="text"
                 value={profile.platformName}
                 onChange={(e) => setProfile({ ...profile, platformName: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
               />
             </div>
           </div>
 
-          <button
+          <Button
             type="submit"
-            className="bg-[#1b4332] hover:bg-[#143426] text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+            className="w-auto py-2"
           >
             <Save size={13} />
             Save Profile
-          </button>
+          </Button>
         </form>
       </div>
 
@@ -170,30 +184,34 @@ const GenerateSettingsPage = () => {
 
         <form onSubmit={handlePlatformSave} className="space-y-4 pt-1">
           {/* Default Language */}
-          <div className="space-y-1 max-w-sm">
-            <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Default Language</label>
-            <select
+          <div className="space-y-1.5 max-w-sm">
+            <Label htmlFor="language">Default Language</Label>
+            <Select
               value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="w-full h-[32px] border border-gray-200 rounded-lg px-2 text-xs text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
+              onValueChange={setLanguage}
             >
-              <option value="French / English">French / English</option>
-              <option value="English">English</option>
-              <option value="French">French</option>
-            </select>
+              <SelectTrigger id="language" className="w-full">
+                <SelectValue placeholder="Select Language" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="French / English">French / English</SelectItem>
+                <SelectItem value="English">English</SelectItem>
+                <SelectItem value="French">French</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <button
+          <Button
             type="submit"
-            className="bg-[#1b4332] hover:bg-[#143426] text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+            className="w-auto py-2"
           >
             <Save size={13} />
             Save Settings
-          </button>
+          </Button>
         </form>
       </div>
     </div>
   )
 }
 
-export default GenerateSettingsPage
+export default GenerateSettingsPage;

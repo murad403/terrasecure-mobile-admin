@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import { Pencil, Trash2, Save, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface AboutSection {
     id: string
@@ -104,13 +105,13 @@ const AboutUsPage = () => {
             {/* Header Row */}
             <div className="flex items-center justify-between pb-1">
                 <h2 className="text-sm font-bold text-gray-900">About Us</h2>
-                <button
+                <Button
                     onClick={() => setShowNewForm(true)}
-                    className="bg-button-color hover:bg-[#3574dd] text-white text-xs font-semibold px-3.5 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                    className="w-auto py-2"
                 >
                     <Plus size={14} />
                     Add Section
-                </button>
+                </Button>
             </div>
 
             {/* List of Sections */}
@@ -199,20 +200,20 @@ const AboutUsPage = () => {
                             />
                         </div>
                         <div className="flex items-center space-x-2">
-                            <button
+                            <Button
                                 onClick={handleAddSection}
-                                className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                                className="w-auto"
                             >
                                 <Plus size={14} className="shrink-0" />
                                 Add
-                            </button>
+                            </Button>
                             <button
                                 onClick={() => {
                                     setShowNewForm(false)
                                     setNewTitle('')
                                     setNewContent('')
                                 }}
-                                className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer"
+                                className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-4 py-3.5 rounded-lg transition-colors cursor-pointer"
                             >
                                 Cancel
                             </button>

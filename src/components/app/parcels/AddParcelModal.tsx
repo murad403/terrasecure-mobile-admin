@@ -198,7 +198,7 @@ const AddParcelModal = ({ isOpen, onClose, onAdd }: AddParcelModalProps) => {
                   rows={3}
                   placeholder="Describe the boundaries, landmarks or usage..."
                   {...register('description')}
-                  className="w-full p-3 border border-slate-200 bg-slate-50/40 rounded-lg text-xs md:text-sm text-title placeholder:text-slate-400 focus:border-button-color focus:bg-white focus:outline-none transition-all resize-none font-medium"
+                  className="flex py-3 w-full rounded-lg border border-slate-200 bg-slate-50/40 px-4 text-sm text-title transition-all placeholder:text-subtitle focus:border-button-color focus:bg-white focus:outline-none focus:ring-2 focus:ring-button-color/20 disabled:cursor-not-allowed disabled:opacity-50 min-h-24"
                 />
               </div>
 

@@ -3,6 +3,7 @@ import { SubscriptionPlan, PromoBanner } from './SubscriptionPage'
 import PromotionalBannerForm from './PromotionalBannerForm'
 import SubscriptionPlanCard from './SubscriptionPlanCard'
 import { Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface PlansTabProps {
   plans: SubscriptionPlan[];
@@ -38,13 +39,13 @@ const SubscriptionPlansTab = ({
             {activePlansCount} active · displayed in this order to clients
           </p>
         </div>
-        <button
+        <Button
           onClick={onAddClick}
-          className="bg-[#1b4332] hover:bg-[#143426] text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1.5 self-start sm:self-auto transition-colors shadow-sm cursor-pointer"
+          className='w-auto'
         >
           <Plus size={14} />
           Add Plan
-        </button>
+        </Button>
       </div>
 
       {/* Plans Grid */}

@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'
+import { Button } from '@/components/ui/button';
 
 interface ReportsFilterProps {
   onGenerateReport?: (filters: { startDate: string; endDate: string; city: string; district: string }) => void
@@ -69,13 +70,13 @@ const ReportsFilter = ({ onGenerateReport }: ReportsFilterProps) => {
       </div>
 
       {/* Generate Report Button */}
-      <button
+      <Button
         type="button"
         onClick={handleGenerate}
-        className="h-10 px-6 bg-[#1b5e20] hover:bg-[#123f16] text-white text-xs font-bold rounded-lg transition-colors cursor-pointer w-full md:w-auto shrink-0 shadow-sm"
+        className='w-auto py-2'
       >
         Generate Report
-      </button>
+      </Button>
     </div>
   )
 }

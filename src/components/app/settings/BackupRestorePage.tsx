@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import { Database, Download, Check, X, ChevronDown } from 'lucide-react'
+import { Button } from '@/components/ui/button';
 
 interface BackupLog {
   id: string;
@@ -217,13 +218,13 @@ const BackupRestorePage = () => {
 
         {/* Trigger Button */}
         <div>
-          <button
+          <Button
             onClick={handleCreateBackup}
-            className="bg-[#1b4332] hover:bg-[#143426] text-white text-xs font-semibold px-4 py-2.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm border border-transparent"
+            className='w-auto'
           >
             <Database size={13} />
             Trigger Manual Backup
-          </button>
+          </Button>
         </div>
       </div>
 

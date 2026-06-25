@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import { Pencil, Save } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 const defaultContent = `1. Agreement to Terms
 By accessing or using the LandSecure platform, you agree to be bound by these Terms & Conditions. If you disagree with any part of the terms, you may not access the service.
@@ -110,16 +111,16 @@ const TermsConditionsPage = () => {
         <div className="flex items-center space-x-2 shrink-0">
           {isEditing ? (
             <>
-              <button
+              <Button
                 onClick={handleSave}
-                className="bg-[#1b4332] hover:bg-[#143426] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm border border-transparent"
+                className='w-auto py-2'
               >
                 <Save size={13} />
                 Save
-              </button>
+              </Button>
               <button
                 onClick={handleCancel}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-3 rounded-lg transition-colors cursor-pointer"
               >
                 Cancel
               </button>

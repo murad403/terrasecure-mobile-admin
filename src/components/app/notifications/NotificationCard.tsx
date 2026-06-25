@@ -109,7 +109,7 @@ const NotificationCard = ({ notification, onMarkRead, onDelete }: CardProps) => 
         {notification.isUnread && (
           <button
             onClick={() => onMarkRead(notification.id)}
-            className="text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 text-[10px] font-bold px-2 py-1 rounded transition-colors cursor-pointer"
+            className="text-button-color hover:bg-emerald-50 text-[10px] font-bold px-2 py-1 rounded transition-colors cursor-pointer"
           >
             Mark read
           </button>

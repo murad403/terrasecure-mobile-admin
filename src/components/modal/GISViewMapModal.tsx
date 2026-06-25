@@ -185,7 +185,7 @@ const GISViewMapModal = ({
             <Button
               type="button"
               onClick={onConfirm}
-              className="w-auto px-5 py-2 bg-[#2e7d32] hover:bg-[#1b5e20] text-white text-xs font-bold shadow-sm rounded-lg cursor-pointer"
+              className='w-auto'
             >
               Confirm GIS Data
             </Button>

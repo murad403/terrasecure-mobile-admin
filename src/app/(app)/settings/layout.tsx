@@ -83,7 +83,7 @@ const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
                 <span className={isActive ? 'text-[#1b4332]' : 'text-gray-400'}>
                   {item.icon}
                 </span>
-                <span>{item.name}</span>
+                <span className='text-sm'>{item.name}</span>
               </Link>
             )
           })}

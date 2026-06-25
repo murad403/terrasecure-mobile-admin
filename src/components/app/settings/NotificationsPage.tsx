@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import { Save } from 'lucide-react'
+import { Button } from '@/components/ui/button';
 
 interface PreferenceItem {
   id: string;
@@ -77,7 +78,7 @@ const NotificationsPage = () => {
                   type="checkbox"
                   checked={pref.sms}
                   onChange={() => handleToggle(pref.id, 'sms')}
-                  className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 accent-slate-900 cursor-pointer"
+                  className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
                 />
                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">SMS</span>
               </label>
@@ -88,7 +89,7 @@ const NotificationsPage = () => {
                   type="checkbox"
                   checked={pref.push}
                   onChange={() => handleToggle(pref.id, 'push')}
-                  className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 accent-slate-900 cursor-pointer"
+                  className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
                 />
                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Push</span>
               </label>
@@ -99,7 +100,7 @@ const NotificationsPage = () => {
                   type="checkbox"
                   checked={pref.email}
                   onChange={() => handleToggle(pref.id, 'email')}
-                  className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 accent-slate-900 cursor-pointer"
+                  className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
                 />
                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Email</span>
               </label>
@@ -110,13 +111,13 @@ const NotificationsPage = () => {
 
       {/* Save Button */}
       <div className="pt-2">
-        <button
+        <Button
           onClick={handleSave}
-          className="bg-[#1b4332] hover:bg-[#143426] text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+          className='w-auto'
         >
           <Save size={13} />
           Save Preferences
-        </button>
+        </Button>
       </div>
     </div>
   )

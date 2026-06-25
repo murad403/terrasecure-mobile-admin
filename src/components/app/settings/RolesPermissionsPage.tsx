@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import { Save } from 'lucide-react'
+import { Button } from '@/components/ui/button';
 
 const roles = ['Super Admin', 'Admin', 'Supervisor', 'Surveyor', 'Field Agent', 'Client']
 
@@ -99,11 +100,10 @@ const RolesPermissionsPage = () => {
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => setSelectedRoleFilter('All Roles')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer border ${
-              selectedRoleFilter === 'All Roles'
-                ? 'bg-[#1b4332] text-white border-transparent'
+            className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer border ${selectedRoleFilter === 'All Roles'
+                ? 'bg-button-color text-white border-transparent'
                 : 'bg-white text-gray-600 border-gray-150 hover:bg-gray-50'
-            }`}
+              }`}
           >
             All Roles
           </button>
@@ -111,11 +111,10 @@ const RolesPermissionsPage = () => {
             <button
               key={role}
               onClick={() => setSelectedRoleFilter(role)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer border ${
-                selectedRoleFilter === role
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer border ${selectedRoleFilter === role
                   ? 'bg-[#1b4332] text-white border-transparent'
                   : 'bg-white text-gray-600 border-gray-150 hover:bg-gray-55'
-              }`}
+                }`}
             >
               {role}
             </button>
@@ -145,9 +144,8 @@ const RolesPermissionsPage = () => {
                       return (
                         <th
                           key={role}
-                          className={`px-3 py-3 text-[10px] font-bold text-center uppercase tracking-wider transition-colors ${
-                            isHighlighted ? 'text-gray-900 bg-emerald-50/5' : 'text-gray-400'
-                          }`}
+                          className={`px-3 py-3 text-[10px] font-bold text-center uppercase tracking-wider transition-colors ${isHighlighted ? 'text-gray-900 bg-emerald-50/5' : 'text-gray-400'
+                            }`}
                         >
                           {role}
                         </th>
@@ -165,15 +163,14 @@ const RolesPermissionsPage = () => {
                         return (
                           <td
                             key={role}
-                            className={`px-3 py-2 text-center transition-colors ${
-                              isHighlighted ? 'bg-emerald-50/20' : ''
-                            }`}
+                            className={`px-3 py-2 text-center transition-colors ${isHighlighted ? 'bg-emerald-50/20' : ''
+                              }`}
                           >
                             <input
                               type="checkbox"
                               checked={isChecked}
                               onChange={() => handleToggle(item, role)}
-                              className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 accent-slate-900 cursor-pointer"
+                              className="w-4 h-4 rounded border-slate-350 text-slate-900 focus:ring-slate-900 cursor-pointer"
                             />
                           </td>
                         )
@@ -188,13 +185,13 @@ const RolesPermissionsPage = () => {
       </div>
 
       {/* Action Trigger */}
-      <button
+      <Button
         onClick={handleSave}
-        className="bg-[#1b4332] hover:bg-[#143426] text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+        className='w-auto'
       >
         <Save size={13} />
         Save Permissions
-      </button>
+      </Button>
     </div>
   )
 }
