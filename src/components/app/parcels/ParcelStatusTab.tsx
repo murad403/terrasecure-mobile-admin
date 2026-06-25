@@ -29,7 +29,7 @@ const ParcelStatusTab = ({ parcel, onUpdateStatus }: ParcelStatusTabProps) => {
           disabled={locked}
           value={status}
           onChange={(e) => handleStatusChange(e.target.value)}
-          className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 bg-white focus:outline-none focus:border-button-color transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 bg-white focus:outline-none focus:border-button-color cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <option value="Published">Published</option>
           <option value="Pending">Pending</option>

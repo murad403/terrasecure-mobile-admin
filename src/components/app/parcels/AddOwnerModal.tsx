@@ -7,6 +7,13 @@ import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface AddOwnerModalProps {
   isOpen: boolean
@@ -18,6 +25,8 @@ const AddOwnerModal = ({ isOpen, onClose, onAddOwner }: AddOwnerModalProps) => {
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
     reset
   } = useForm<OwnerFormValues>({
@@ -29,6 +38,8 @@ const AddOwnerModal = ({ isOpen, onClose, onAddOwner }: AddOwnerModalProps) => {
       role: 'Co-Owner'
     }
   })
+
+  const roleValue = watch('role')
 
   // Lock scroll
   useEffect(() => {
@@ -117,15 +128,19 @@ const AddOwnerModal = ({ isOpen, onClose, onAddOwner }: AddOwnerModalProps) => {
             {/* Role select */}
             <div className="space-y-1.5">
               <Label htmlFor="role">Owner Role</Label>
-              <select
-                id="role"
-                {...register('role')}
-                className="w-full px-3 py-2 border border-slate-200 bg-slate-50/40 rounded-lg text-sm text-title focus:outline-none focus:border-button-color transition-colors"
+              <Select
+                value={roleValue}
+                onValueChange={(val) => setValue('role', val as any, { shouldValidate: true, shouldDirty: true })}
               >
-                <option value="Primary Owner">Primary Owner</option>
-                <option value="Co-Owner">Co-Owner</option>
-                <option value="Stakeholder">Stakeholder</option>
-              </select>
+                <SelectTrigger id="role" className="w-full">
+                  <SelectValue placeholder="Select Role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Primary Owner">Primary Owner</SelectItem>
+                  <SelectItem value="Co-Owner">Co-Owner</SelectItem>
+                  <SelectItem value="Stakeholder">Stakeholder</SelectItem>
+                </SelectContent>
+              </Select>
               {errors.role && (
                 <p className="text-xs text-destructive font-medium mt-1">{errors.role.message}</p>
               )}
@@ -134,18 +149,18 @@ const AddOwnerModal = ({ isOpen, onClose, onAddOwner }: AddOwnerModalProps) => {
           </div>
 
           {/* Action Footer */}
-          <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end gap-3">
+          <div className="px-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between py-4 gap-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+             className="px-4 w-1/2 py-4 border border-slate-400 text-xs font-semibold text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
             >
               Cancel
             </button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs py-2 rounded-lg w-auto px-5"
+              className="w-1/2"
             >
               {isSubmitting ? 'Adding...' : 'Add Owner'}
             </Button>

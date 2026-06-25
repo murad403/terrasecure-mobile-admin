@@ -7,34 +7,61 @@ import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Parcel } from '@/components/app/parcels/ParcelsPage'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
-interface AddParcelModalProps {
+interface EditParcelModalProps {
   isOpen: boolean
   onClose: () => void
-  onAdd: (data: ParcelFormValues) => void
+  parcel: Parcel
+  onUpdate: (data: Partial<Parcel> & { location?: string }) => void
 }
 
-const AddParcelModal = ({ isOpen, onClose, onAdd }: AddParcelModalProps) => {
+const EditParcelModal = ({ isOpen, onClose, parcel, onUpdate }: EditParcelModalProps) => {
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
     reset
   } = useForm<ParcelFormValues>({
     resolver: zodResolver(parcelSchema) as any,
     defaultValues: {
-      name: '',
-      location: '',
-      area: '' as any,
-      description: '',
-      latitude: '' as any,
-      longitude: '' as any,
-      status: 'Pending',
-      ownerName: ''
+      name: parcel.name,
+      location: `${parcel.city} / ${parcel.district}`,
+      area: parcel.area,
+      description: parcel.description || '',
+      latitude: parcel.latitude,
+      longitude: parcel.longitude,
+      status: parcel.status,
+      ownerName: parcel.ownerName
     }
   })
 
-  // Lock scroll when open
+  const statusValue = watch('status')
+
+  // Sync form data when selected parcel changes
+  useEffect(() => {
+    reset({
+      name: parcel.name,
+      location: `${parcel.city} / ${parcel.district}`,
+      area: parcel.area,
+      description: parcel.description || '',
+      latitude: parcel.latitude,
+      longitude: parcel.longitude,
+      status: parcel.status,
+      ownerName: parcel.ownerName
+    })
+  }, [parcel, reset])
+
+  // Lock scroll
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -49,12 +76,20 @@ const AddParcelModal = ({ isOpen, onClose, onAdd }: AddParcelModalProps) => {
   if (!isOpen) return null
 
   const onSubmit = (data: ParcelFormValues) => {
-    onAdd(data)
-    reset()
+    onUpdate({
+      name: data.name,
+      location: data.location,
+      area: data.area,
+      description: data.description,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      status: data.status,
+      ownerName: data.ownerName
+    })
   }
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-[1px] p-4 overflow-y-auto animate-in fade-in duration-200"
       onClick={onClose}
     >
@@ -65,7 +100,7 @@ const AddParcelModal = ({ isOpen, onClose, onAdd }: AddParcelModalProps) => {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-          <h2 className="text-base font-bold text-title">Add New Parcel</h2>
+          <h2 className="text-base font-bold text-title">Edit Parcel — {parcel.id}</h2>
           <button
             onClick={onClose}
             className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors"
@@ -79,7 +114,7 @@ const AddParcelModal = ({ isOpen, onClose, onAdd }: AddParcelModalProps) => {
           <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
             {/* Grid fields */}
             <div className="grid grid-cols-2 gap-4">
-              
+
               {/* Parcel Name */}
               <div className="col-span-2 space-y-1.5">
                 <Label htmlFor="name">Parcel Name</Label>
@@ -122,18 +157,23 @@ const AddParcelModal = ({ isOpen, onClose, onAdd }: AddParcelModalProps) => {
 
               {/* Status */}
               <div className="space-y-1.5">
-                <Label htmlFor="status">Initial Status</Label>
-                <select
-                  id="status"
-                  {...register('status')}
-                  className="w-full px-3 py-2 border border-slate-200 bg-slate-50/40 rounded-lg text-sm text-title focus:outline-none focus:border-button-color transition-colors"
+                <Label htmlFor="status">Land Status</Label>
+                <Select
+                  value={statusValue}
+                  onValueChange={(val) => setValue('status', val as any, { shouldValidate: true, shouldDirty: true })}
                 >
-                  <option value="Approved">Approved</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Disputed">Disputed</option>
-                  <option value="Reserved">Reserved</option>
-                  <option value="Validated">Validated</option>
-                </select>
+                  <SelectTrigger id="status" className="w-full">
+                    <SelectValue placeholder="Select Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Approved">Approved</SelectItem>
+                    <SelectItem value="Pending">Pending</SelectItem>
+                    <SelectItem value="Disputed">Disputed</SelectItem>
+                    <SelectItem value="Reserved">Reserved</SelectItem>
+                    <SelectItem value="Validated">Validated</SelectItem>
+                    <SelectItem value="Blocked">Blocked</SelectItem>
+                  </SelectContent>
+                </Select>
                 {errors.status && (
                   <p className="text-xs text-destructive font-medium mt-1">{errors.status.message}</p>
                 )}
@@ -198,20 +238,20 @@ const AddParcelModal = ({ isOpen, onClose, onAdd }: AddParcelModalProps) => {
           </div>
 
           {/* Action Footer */}
-          <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end gap-3">
+          <div className="px-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between py-4 gap-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+              className="px-4 w-1/2 py-4 border border-slate-400 text-xs font-semibold text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
             >
               Cancel
             </button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs py-2 rounded-lg w-auto px-5"
+              className='w-1/2'
             >
-              {isSubmitting ? 'Creating...' : 'Add Parcel'}
+              {isSubmitting ? 'Updating...' : 'Update Parcel'}
             </Button>
           </div>
         </form>
@@ -220,4 +260,4 @@ const AddParcelModal = ({ isOpen, onClose, onAdd }: AddParcelModalProps) => {
   )
 }
 
-export default AddParcelModal
+export default EditParcelModal

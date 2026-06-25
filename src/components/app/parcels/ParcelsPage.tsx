@@ -5,12 +5,12 @@ import { Plus, Search, Pencil, Eye, ShieldAlert, Trash2, Download, ChevronDown, 
 import { cn } from '@/lib/utils'
 
 // Import modals
-import AddParcelModal from '@/components/modal/AddParcelModal'
-import EditParcelModal from '@/components/modal/EditParcelModal'
+import AddParcelModal from '@/components/app/parcels/AddParcelModal'
+import EditParcelModal from '@/components/app/parcels/EditParcelModal'
 import BlockParcelModal from '@/components/modal/BlockParcelModal'
 import DeleteParcelModal from '@/components/modal/DeleteParcelModal'
 import ParcelDetailsModal from '@/components/modal/ParcelDetailsModal'
-import AddOwnerModal from '@/components/modal/AddOwnerModal'
+import AddOwnerModal from '@/components/app/parcels/AddOwnerModal'
 
 // Import custom pagination
 import CustomPagination from '@/components/shared/CustomPagination'
