@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import { type UserRecord } from './UsersPage'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'
+import { Button } from '@/components/ui/button'
 
 interface UsersTableProps {
   users: UserRecord[]
@@ -166,20 +167,20 @@ const UsersTable = ({
           <button
             type="button"
             onClick={handleExport}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-sm font-semibold text-slate-700 rounded-lg transition-all cursor-pointer shadow-sm"
+            className="flex items-center justify-center gap-1.5 px-4 py-3 border border-slate-200 bg-white hover:bg-slate-50 text-sm font-semibold text-slate-700 rounded-lg transition-all cursor-pointer shadow-sm"
           >
             <Download className="w-4 h-4 text-slate-500 shrink-0" />
             <span>Export</span>
           </button>
 
-          <button
+          <Button
             type="button"
             onClick={onOpenAddModal}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold bg-button-color hover:bg-button-color/90 text-white rounded-lg transition-all cursor-pointer shadow-sm border border-transparent"
+            className='w-auto'
           >
             <Plus className="w-4.5 h-4.5" />
             <span>Add User</span>
-          </button>
+          </Button>
         </div>
       </div>
 

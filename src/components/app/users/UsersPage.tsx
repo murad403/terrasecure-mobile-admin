@@ -2,8 +2,8 @@
 import React, { useState } from 'react'
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout'
 import UsersTable from './UsersTable'
-import AddUserModal from '@/components/modal/AddUserModal'
-import EditUserModal from '@/components/modal/EditUserModal'
+import AddUserModal from '@/components/app/users/AddUserModal'
+import EditUserModal from '@/components/app/users/EditUserModal'
 import UserDetailsModal from '@/components/modal/UserDetailsModal'
 
 export interface ActivityItem {
@@ -147,7 +147,7 @@ const initialUsers: UserRecord[] = [
 const UsersPage = () => {
   const [users, setUsers] = useState<UserRecord[]>(initialUsers)
   const [selectedUser, setSelectedUser] = useState<UserRecord | null>(null)
-  
+
   const [addOpen, setAddOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [detailsOpen, setDetailsOpen] = useState(false)
@@ -177,7 +177,7 @@ const UsersPage = () => {
 
   const handleEditUser = (data: any) => {
     if (!selectedUser) return
-    
+
     setUsers((prev) =>
       prev.map((usr) => {
         if (usr.id === selectedUser.id) {
@@ -242,7 +242,7 @@ const UsersPage = () => {
   // Filter logic
   const filteredUsers = users.filter((usr) => {
     const query = searchQuery.toLowerCase()
-    const matchesSearch = 
+    const matchesSearch =
       usr.fullName.toLowerCase().includes(query) ||
       usr.email.toLowerCase().includes(query) ||
       usr.phone.includes(query)
@@ -254,8 +254,8 @@ const UsersPage = () => {
   })
 
   return (
-    <DashboardChildrenLayout 
-      title="User Management" 
+    <DashboardChildrenLayout
+      title="User Management"
       subtitle="Manage admin and client user accounts"
     >
       <UsersTable

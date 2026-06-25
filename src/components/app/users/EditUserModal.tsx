@@ -7,7 +7,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { X } from 'lucide-react'
-import { UserRecord } from '../app/users/UsersPage'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { UserRecord } from './UsersPage'
 
 interface EditUserModalProps {
   isOpen: boolean
@@ -20,6 +27,8 @@ const EditUserModal = ({ isOpen, onClose, user, onEdit }: EditUserModalProps) =>
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
     reset
   } = useForm<UserFormValues>({
@@ -33,6 +42,8 @@ const EditUserModal = ({ isOpen, onClose, user, onEdit }: EditUserModalProps) =>
       status: user?.status === 'Active'
     }
   })
+
+  const roleValue = watch('role')
 
   useEffect(() => {
     if (isOpen && user) {
@@ -79,7 +90,7 @@ const EditUserModal = ({ isOpen, onClose, user, onEdit }: EditUserModalProps) =>
 
         {/* Form Body */}
         <form onSubmit={handleSubmit(onEdit)} className="p-6 space-y-4">
-          
+
           {/* Full Name */}
           <div className="space-y-1.5">
             <Label htmlFor="fullName">Full Name</Label>
@@ -137,18 +148,22 @@ const EditUserModal = ({ isOpen, onClose, user, onEdit }: EditUserModalProps) =>
           {/* Role selection */}
           <div className="space-y-1.5">
             <Label htmlFor="role">Role</Label>
-            <select
-              id="role"
-              {...register('role')}
-              className="w-full px-3.5 py-2.5 border border-slate-200 bg-white rounded-lg text-xs md:text-sm text-title focus:outline-none focus:border-button-color focus:ring-2 focus:ring-button-color/20 transition-none font-semibold leading-relaxed cursor-pointer"
+            <Select
+              value={roleValue}
+              onValueChange={(val) => setValue('role', val as any, { shouldValidate: true, shouldDirty: true })}
             >
-              <option value="Super Admin">Super Admin</option>
-              <option value="Admin">Admin</option>
-              <option value="Surveyor">Surveyor</option>
-              <option value="Field Agent">Field Agent</option>
-              <option value="Supervisor">Supervisor</option>
-              <option value="Client">Client</option>
-            </select>
+              <SelectTrigger id="role" className="w-full">
+                <SelectValue placeholder="Select Role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Super Admin">Super Admin</SelectItem>
+                <SelectItem value="Admin">Admin</SelectItem>
+                <SelectItem value="Surveyor">Surveyor</SelectItem>
+                <SelectItem value="Field Agent">Field Agent</SelectItem>
+                <SelectItem value="Supervisor">Supervisor</SelectItem>
+                <SelectItem value="Client">Client</SelectItem>
+              </SelectContent>
+            </Select>
             {errors.role && (
               <p className="text-xs text-destructive font-semibold mt-1">{errors.role.message}</p>
             )}
@@ -169,19 +184,18 @@ const EditUserModal = ({ isOpen, onClose, user, onEdit }: EditUserModalProps) =>
           </div>
 
           {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-2 pt-2">
-            <Button
+          <div className="px-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between py-4 gap-4">
+             <button
               type="button"
-              variant="outline"
               onClick={onClose}
-              className="px-5 py-2.5 bg-slate-100 border-none hover:bg-slate-200 text-slate-700 text-xs font-bold shadow-sm rounded-lg cursor-pointer"
+              className="px-4 w-1/2 py-3 border border-slate-400 text-xs font-semibold text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
             >
               Cancel
-            </Button>
+            </button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm rounded-lg cursor-pointer"
+              className="w-1/2"
             >
               {isSubmitting ? 'Saving...' : 'Create User'}
             </Button>
