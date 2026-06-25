@@ -6,6 +6,7 @@ import { step3AssignSchema, type Step3AssignFormValues } from '@/validation/regi
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface AssignSurveyorStepProps {
     registration: any
@@ -14,17 +15,14 @@ interface AssignSurveyorStepProps {
 }
 
 const AssignSurveyorStep = ({ registration, onUpdate, onCompleteStep }: AssignSurveyorStepProps) => {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting },
-        reset
-    } = useForm<Step3AssignFormValues>({
+    const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting }, reset } = useForm<Step3AssignFormValues>({
         resolver: zodResolver(step3AssignSchema) as any,
         defaultValues: {
             surveyorName: registration?.surveyorName || 'Published'
         }
     })
+
+    const surveyorNameValue = watch('surveyorName')
 
     useEffect(() => {
         reset({
@@ -68,17 +66,20 @@ const AssignSurveyorStep = ({ registration, onUpdate, onCompleteStep }: AssignSu
             {/* Surveyor Dropdown */}
             <div className="space-y-2">
                 <Label htmlFor="surveyorName" className="text-xs font-bold text-slate-700">Select Surveyor</Label>
-                <select
-                    id="surveyorName"
-                    {...register('surveyorName')}
-                    className="w-full px-3.5 py-2.5 border border-slate-200 bg-white rounded-lg text-xs md:text-sm text-title focus:outline-none focus:border-button-color focus:ring-2 focus:ring-button-color/20 transition-none font-semibold leading-relaxed cursor-pointer"
+                <Select
+                    value={surveyorNameValue}
+                    onValueChange={(val) => setValue('surveyorName', val as any, { shouldValidate: true, shouldDirty: true })}
                 >
-                    <option value="Published">Published</option>
-                    <option value="Jean Alima">Jean Alima (Senior Surveyor)</option>
-                    <option value="Sarah Admin">Sarah Admin (GIS Specialist)</option>
-                    <option value="Supervisor Paul">Supervisor Paul (District Chief)</option>
-                </select>
-                {errors.surveyorName && (
+                    <SelectTrigger id="surveyorName" className="w-full">
+                        <SelectValue placeholder="Select Surveyor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="Published">Published</SelectItem>
+                        <SelectItem value="Jean Alima">Jean Alima (Senior Surveyor)</SelectItem>
+                        <SelectItem value="Sarah Admin">Sarah Admin (GIS Specialist)</SelectItem>
+                        <SelectItem value="Supervisor Paul">Supervisor Paul (District Chief)</SelectItem>
+                    </SelectContent>
+                </Select>                {errors.surveyorName && (
                     <p className="text-xs text-destructive font-semibold mt-1">{errors.surveyorName.message}</p>
                 )}
             </div>
@@ -88,7 +89,7 @@ const AssignSurveyorStep = ({ registration, onUpdate, onCompleteStep }: AssignSu
                 <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm rounded-lg w-fit cursor-pointer"
+                    className='w-auto'
                 >
                     {isSubmitting ? 'Assigning...' : 'Assign Surveyor'}
                 </Button>

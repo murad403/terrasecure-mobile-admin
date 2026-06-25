@@ -5,6 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { step6ApproveSchema, type Step6ApproveFormValues } from '@/validation/registration.validation'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
 
 interface ApproveRejectStepProps {
   registration: any
@@ -17,6 +19,7 @@ const ApproveRejectStep = ({ registration, onUpdate, onCompleteStep }: ApproveRe
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors, isSubmitting },
     reset
   } = useForm<Step6ApproveFormValues>({
@@ -26,6 +29,8 @@ const ApproveRejectStep = ({ registration, onUpdate, onCompleteStep }: ApproveRe
       comments: registration?.comments || ''
     }
   })
+
+  const reliabilityScoreValue = watch('reliabilityScore')
 
   useEffect(() => {
     reset({
@@ -75,16 +80,20 @@ const ApproveRejectStep = ({ registration, onUpdate, onCompleteStep }: ApproveRe
       {/* Reliability Score */}
       <div className="space-y-2">
         <Label htmlFor="reliabilityScore" className="text-xs font-bold text-slate-700">Reliability Score</Label>
-        <select
-          id="reliabilityScore"
-          {...register('reliabilityScore')}
-          className="w-full px-3.5 py-2.5 border border-slate-200 bg-white rounded-lg text-xs md:text-sm text-title focus:outline-none focus:border-button-color focus:ring-2 focus:ring-button-color/20 transition-none font-semibold leading-relaxed cursor-pointer"
+        <Select
+          value={reliabilityScoreValue}
+          onValueChange={(val) => setValue('reliabilityScore', val as any, { shouldValidate: true, shouldDirty: true })}
         >
-          <option value="Very High">Very High</option>
-          <option value="High">High</option>
-          <option value="Medium">Medium</option>
-          <option value="Low">Low</option>
-        </select>
+          <SelectTrigger id="reliabilityScore" className="w-full">
+            <SelectValue placeholder="Select Reliability Score" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Very High">Very High</SelectItem>
+            <SelectItem value="High">High</SelectItem>
+            <SelectItem value="Medium">Medium</SelectItem>
+            <SelectItem value="Low">Low</SelectItem>
+          </SelectContent>
+        </Select>
         {errors.reliabilityScore && (
           <p className="text-xs text-destructive font-semibold mt-1">{errors.reliabilityScore.message}</p>
         )}
@@ -92,19 +101,19 @@ const ApproveRejectStep = ({ registration, onUpdate, onCompleteStep }: ApproveRe
 
       {/* Approve / Reject Actions Grid */}
       <div className="grid grid-cols-2 gap-3 pt-2">
-        <button
+        <Button
           type="button"
           disabled={isSubmitting}
           onClick={() => handleDecisionSubmit('Approved')}
-          className="flex items-center justify-center gap-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-[11px] shadow-sm cursor-pointer transition-colors whitespace-nowrap"
+          className="w-auto"
         >
           ✓ Approve Registration
-        </button>
+        </Button>
         <button
           type="button"
           disabled={isSubmitting}
           onClick={() => handleDecisionSubmit('Rejected')}
-          className="flex items-center justify-center gap-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold text-[11px] shadow-sm cursor-pointer transition-colors whitespace-nowrap"
+          className="flex items-center justify-center gap-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold text-sm shadow-sm cursor-pointer transition-colors whitespace-nowrap"
         >
           ✗ Reject Registration
         </button>

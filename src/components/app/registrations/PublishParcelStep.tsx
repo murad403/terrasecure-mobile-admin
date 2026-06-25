@@ -78,7 +78,6 @@ const PublishParcelStep = ({ registration, onUpdate, onCompleteStep }: PublishPa
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm rounded-lg flex items-center justify-center gap-1.5 cursor-pointer"
         >
           <Globe className="w-4 h-4 shrink-0" />
           <span>Publish Parcel to Platform</span>

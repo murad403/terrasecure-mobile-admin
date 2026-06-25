@@ -96,13 +96,13 @@ const ScheduleFieldVisitStep = ({ registration, onUpdate, onCompleteStep }: Sche
                 <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm rounded-lg w-fit cursor-pointer"
+                    className='w-auto'
                 >
                     {isSubmitting ? 'Scheduling...' : 'Schedule Visit'}
                 </Button>
                 <Button
                     type="button"
-                    className="px-6 py-2.5 w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 border-none text-xs font-bold shadow-sm rounded-lg cursor-pointer"
+                    className="px-6 py-3.5 w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 border-none text-xs font-bold shadow-sm rounded-lg cursor-pointer"
                     onClick={() => alert("Notification sent to surveyor!")}
                 >
                     Notify Surveyor

@@ -55,13 +55,13 @@ const ReceiveGISDataStep = ({ registration, onUpdate, onCompleteStep }: ReceiveG
         </div>
 
         {/* View on Map Button */}
-        <button
+        <Button
           type="button"
           onClick={() => setMapOpen(true)}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-extrabold shadow-sm rounded-lg cursor-pointer whitespace-nowrap"
+          className='py-2 w-auto'
         >
           View on Map
-        </button>
+        </Button>
       </div>
 
       {/* Map Dialog Popup */}

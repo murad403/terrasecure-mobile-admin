@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout'
 import RegistrationsTable, { type Registration } from './RegistrationsTable'
 import RegistrationSteps from './RegistrationSteps'
-import AddRegistrationModal from '@/components/modal/AddRegistrationModal'
+import AddRegistrationModal from '@/components/app/registrations/AddRegistrationModal'
 
 const initialRegistrations: Registration[] = [
   {

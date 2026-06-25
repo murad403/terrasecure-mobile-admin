@@ -91,7 +91,7 @@ const ReviewSubmissionStep = ({ registration, onUpdate, onCompleteStep }: Review
         <Button
           type="button"
           onClick={handleMarkReviewed}
-          className="w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-750 hover:bg-blue-700 text-white text-xs font-bold shadow-sm rounded-lg"
+          className='w-auto'
         >
           Mark as Reviewed
         </Button>

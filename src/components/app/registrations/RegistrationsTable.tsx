@@ -4,6 +4,7 @@ import { Plus, Search, Eye, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'
+import { Button } from '@/components/ui/button'
 
 export interface Registration {
   id: string
@@ -127,14 +128,14 @@ const RegistrationsTable = ({ registrations, onOpenAddModal, onViewDetails }: Re
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3 w-full xl:w-auto shrink-0 justify-end">
-          <button
+          <Button
+          className='w-auto'
             type="button"
             onClick={onOpenAddModal}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold bg-button-color hover:bg-button-color/90 text-white rounded-lg transition-all cursor-pointer shadow-sm border border-transparent"
           >
             <Plus className="w-4.5 h-4.5" />
             <span>New Registration</span>
-          </button>
+          </Button>
         </div>
       </div>
 
