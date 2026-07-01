@@ -9,12 +9,14 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import Link from 'next/link'
 import { Eye, EyeOff, Lock } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
@@ -33,8 +35,8 @@ const SignInPage = () => {
     console.log('Sign in submitted:', data)
     // Simulate API call
     setTimeout(() => {
-      setIsLoading(false)
-      alert('Sign in successful (mocked)!')
+      setIsLoading(false);
+      router.push('/');
     }, 1500)
   }
 
