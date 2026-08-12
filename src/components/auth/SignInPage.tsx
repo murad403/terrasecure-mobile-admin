@@ -73,7 +73,7 @@ const SignInPage = () => {
           <Input
             id='email'
             type='email'
-            placeholder='admin@landmonitor.com'
+            placeholder='info@gmail.com'
             {...register('email')}
           />
           {errors.email && (

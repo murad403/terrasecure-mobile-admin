@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { forgotPasswordSchema, type ForgotPasswordFormValues } from '@/validation/auth.validation'
@@ -62,7 +61,7 @@ const ForgotPasswordPage = () => {
           <Input
             id='email'
             type='email'
-            placeholder='shaishab316@gmail.com'
+            placeholder='info@gmail.com'
             {...register('email')}
           />
           {errors.email && (
