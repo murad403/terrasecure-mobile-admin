@@ -1,12 +1,5 @@
 import baseApi from "@/redux/api/api";
-import type {
-    ApiResponse,
-    SignInRequest,
-    SignInResponseData,
-    ForgotPasswordRequest,
-    VerifyOtpRequest,
-    ResetPasswordRequest
-} from "@/types/auth.types";
+import type { ApiResponse, SignInRequest, SignInResponseData, ForgotPasswordRequest, VerifyOtpRequest, ResetPasswordRequest } from "@/types/auth.types";
 
 const authApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
@@ -47,4 +40,4 @@ export const {
     useForgotPasswordMutation,
     useVerifyOtpMutation,
     useResetPasswordMutation
-} = authApi;
+} = authApi;
