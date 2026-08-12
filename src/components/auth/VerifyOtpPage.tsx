@@ -6,14 +6,20 @@ import { verifyOtpSchema, type VerifyOtpFormValues } from '@/validation/auth.val
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { ArrowLeft, Lock } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useVerifyOtpMutation, useForgotPasswordMutation } from '@/redux/features/auth/auth.api'
+import { toast } from 'sonner'
 
 const VerifyOtpPage = () => {
-  const [isLoading, setIsLoading] = useState(false)
-  const [resending, setResending] = useState(false)
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''))
   const inputsRef = useRef<(HTMLInputElement | null)[]>([])
-  const router = useRouter();
+  
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const email = searchParams.get('email') || ''
+
+  const [verifyOtp, { isLoading }] = useVerifyOtpMutation()
+  const [resendOtp, { isLoading: isResending }] = useForgotPasswordMutation()
 
   const { register, handleSubmit, setValue, trigger, formState: { errors } } = useForm<VerifyOtpFormValues>({
     resolver: zodResolver(verifyOtpSchema),
@@ -84,35 +90,58 @@ const VerifyOtpPage = () => {
     inputsRef.current[focusIndex]?.focus()
   }
 
-  const onSubmit = (data: VerifyOtpFormValues) => {
-    setIsLoading(true)
-    console.log('OTP submitted:', data)
-    // Simulate verification
-    setTimeout(() => {
-      setIsLoading(false)
-      // Go to reset password page
-      router.push('/auth/reset-password')
-    }, 1500)
+  const onSubmit = async (data: VerifyOtpFormValues) => {
+    if (!email) {
+      toast.warning('Missing email address. Please start from Forgot Password.')
+      return
+    }
+
+    try {
+      const res = await verifyOtp({
+        email,
+        otp: data.otp,
+      }).unwrap()
+
+      toast.success(res?.message || 'Account verified successfully')
+      router.push(`/auth/reset-password?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(data.otp)}`)
+    } catch (err: any) {
+      const message =
+        err?.data?.message ||
+        err?.error ||
+        err?.message ||
+        'OTP verification failed. Please check the code and try again.'
+      toast.error(message)
+    }
   }
 
-  const handleResend = () => {
-    setResending(true)
-    console.log('Resending OTP code...')
-    setTimeout(() => {
-      setResending(false)
-      alert('A new 6-digit OTP has been sent to your email!')
-    }, 1200)
+  const handleResend = async () => {
+    if (!email) {
+      toast.warning('Missing email address. Please start from Forgot Password.')
+      return
+    }
+
+    try {
+      const res = await resendOtp({ email }).unwrap()
+      toast.success(res?.message || 'A new 6-digit OTP has been sent to your email.')
+    } catch (err: any) {
+      const message =
+        err?.data?.message ||
+        err?.error ||
+        err?.message ||
+        'Failed to resend OTP code. Please try again.'
+      toast.error(message)
+    }
   }
 
   return (
-    <div className='w-full max-w-md px-6 md:px-0 flex flex-col justify-between min-h-[500px] py-10 font-sans'>
+    <div className='w-full'>
       {/* Title & Subtitle */}
       <div className='mb-8 text-center md:text-left'>
         <h1 className='text-3xl font-bold text-title tracking-tight mb-2'>
           Verify OTP
         </h1>
         <p className='text-sm text-subtitle font-light'>
-          Enter the 6-digit verification code sent to your email
+          Enter the 6-digit verification code sent to {email ? <span className='font-medium text-title'>{email}</span> : 'your email'}
         </p>
       </div>
 
@@ -120,7 +149,7 @@ const VerifyOtpPage = () => {
       <form onSubmit={handleSubmit(onSubmit)} className='space-y-6 grow'>
         {/* 6-box OTP Input Fields */}
         <div className='space-y-4'>
-          <div className='flex justify-between items-center'>
+          <div className='flex justify-between items-center gap-2'>
             {otp.map((digit, index) => (
               <input
                 key={index}
@@ -165,10 +194,10 @@ const VerifyOtpPage = () => {
             <button
               type='button'
               onClick={handleResend}
-              disabled={resending}
+              disabled={isResending}
               className='text-button-color hover:underline font-semibold focus:outline-none disabled:opacity-50'
             >
-              {resending ? 'Resending...' : 'Resend Code'}
+              {isResending ? 'Resending...' : 'Resend Code'}
             </button>
           </p>
 

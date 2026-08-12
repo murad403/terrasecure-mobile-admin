@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { forgotPasswordSchema, type ForgotPasswordFormValues } from '@/validation/auth.validation'
@@ -9,10 +9,12 @@ import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { ArrowLeft, Lock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useForgotPasswordMutation } from '@/redux/features/auth/auth.api'
+import { toast } from 'sonner'
 
 const ForgotPasswordPage = () => {
-  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation()
 
   const {
     register,
@@ -25,15 +27,19 @@ const ForgotPasswordPage = () => {
     },
   })
 
-  const onSubmit = (data: ForgotPasswordFormValues) => {
-    setIsLoading(true)
-    console.log('Forgot password request submitted for:', data)
-    // Simulate API call and redirect to verify-otp
-    setTimeout(() => {
-      setIsLoading(false)
-      // Go to verify OTP page
-      router.push('/auth/verify-otp')
-    }, 1500)
+  const onSubmit = async (data: ForgotPasswordFormValues) => {
+    try {
+      const res = await forgotPassword({ email: data.email }).unwrap()
+      toast.success(res?.message || 'OTP sent to your email successfully')
+      router.push(`/auth/verify-otp?email=${encodeURIComponent(data.email)}`)
+    } catch (err: any) {
+      const message =
+        err?.data?.message ||
+        err?.error ||
+        err?.message ||
+        'Failed to process forgot password request. Please try again.'
+      toast.error(message)
+    }
   }
 
   return (
@@ -56,7 +62,7 @@ const ForgotPasswordPage = () => {
           <Input
             id='email'
             type='email'
-            placeholder='admin@landsecure.com'
+            placeholder='shaishab316@gmail.com'
             {...register('email')}
           />
           {errors.email && (

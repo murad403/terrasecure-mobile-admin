@@ -10,13 +10,14 @@ import { Checkbox } from '@/components/ui/checkbox'
 import Link from 'next/link'
 import { Eye, EyeOff, Lock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-
-
+import { useSignInMutation } from '@/redux/features/auth/auth.api'
+import { saveToken } from '@/lib/auth'
+import { toast } from 'sonner'
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter();
+  const router = useRouter()
+  const [signIn, { isLoading }] = useSignInMutation()
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
@@ -26,18 +27,30 @@ const SignInPage = () => {
       rememberMe: false,
     },
   })
-  const rememberMeValue = watch('rememberMe');
+  const rememberMeValue = watch('rememberMe')
 
+  const onSubmit = async (data: SignInFormValues) => {
+    try {
+      const res = await signIn({
+        email: data.email,
+        password: data.password,
+      }).unwrap()
 
-
-  const onSubmit = (data: SignInFormValues) => {
-    setIsLoading(true)
-    console.log('Sign in submitted:', data)
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      router.push('/');
-    }, 1500)
+      if (res?.data?.tokens?.accessToken) {
+        await saveToken(res.data.tokens.accessToken)
+        toast.success(res?.message || 'Login successfully')
+        router.push('/')
+      } else {
+        toast.error('Authentication succeeded but access token was missing.')
+      }
+    } catch (err: any) {
+      const message =
+        err?.data?.message ||
+        err?.error ||
+        err?.message ||
+        'Failed to sign in. Please check your credentials.'
+      toast.error(message)
+    }
   }
 
   return (
@@ -60,7 +73,7 @@ const SignInPage = () => {
           <Input
             id='email'
             type='email'
-            placeholder='admin@landsecure.com'
+            placeholder='admin@landmonitor.com'
             {...register('email')}
           />
           {errors.email && (

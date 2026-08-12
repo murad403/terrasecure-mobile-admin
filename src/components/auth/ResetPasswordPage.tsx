@@ -8,13 +8,20 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { ArrowLeft, Lock, Eye, EyeOff } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useResetPasswordMutation } from '@/redux/features/auth/auth.api'
+import { toast } from 'sonner'
 
 const ResetPasswordPage = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const email = searchParams.get('email') || ''
+  const otp = searchParams.get('otp') || ''
+
+  const [resetPassword, { isLoading }] = useResetPasswordMutation()
 
   const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
@@ -24,16 +31,29 @@ const ResetPasswordPage = () => {
     },
   })
 
-  const onSubmit = (data: ResetPasswordFormValues) => {
-    setIsLoading(true)
-    console.log('Reset password request submitted:', data)
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      alert('Password has been reset successfully!')
-      // Redirect to sign in page
+  const onSubmit = async (data: ResetPasswordFormValues) => {
+    if (!email || !otp) {
+      toast.warning('Missing email or OTP verification code. Please start over from Forgot Password.')
+      return
+    }
+
+    try {
+      const res = await resetPassword({
+        email,
+        otp,
+        newPassword: data.password,
+      }).unwrap()
+
+      toast.success(res?.message || 'Password reset successfully. Please sign in.')
       router.push('/auth/sign-in')
-    }, 1500)
+    } catch (err: any) {
+      const message =
+        err?.data?.message ||
+        err?.error ||
+        err?.message ||
+        'Failed to reset password. Please try again.'
+      toast.error(message)
+    }
   }
 
   return (
