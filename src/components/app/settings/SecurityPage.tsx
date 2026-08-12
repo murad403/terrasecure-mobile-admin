@@ -1,9 +1,10 @@
 "use client"
 import React, { useState } from 'react'
-import { Laptop, Smartphone, Monitor, LogOut } from 'lucide-react'
+import { Laptop, Smartphone, Monitor, LogOut, Eye, EyeOff } from 'lucide-react'
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface SessionItem {
   id: string;
@@ -47,36 +48,42 @@ const initialSessions: SessionItem[] = [
 
 const SecurityPage = () => {
   const [sessions, setSessions] = useState<SessionItem[]>(initialSessions)
-  const [toastMessage, setToastMessage] = useState<string | null>(null)
   
+  // Password visibility states
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
   // Password inputs
   const [passwords, setPasswords] = useState({
-    current: 'password123',
-    new: 'newpass123',
-    confirm: 'newpass123',
+    current: '',
+    new: '',
+    confirm: '',
   })
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg)
-    setTimeout(() => {
-      setToastMessage(null)
-    }, 3000)
-  }
 
   const handleUpdatePassword = (e: React.FormEvent) => {
     e.preventDefault()
-    showToast('Password updated successfully!')
+    if (!passwords.current || !passwords.new || !passwords.confirm) {
+      toast.warning('Please fill in all password fields.')
+      return
+    }
+    if (passwords.new !== passwords.confirm) {
+      toast.error('New password and confirmation do not match.')
+      return
+    }
+    toast.success('Password updated successfully!')
+    setPasswords({ current: '', new: '', confirm: '' })
   }
 
   const handleRevoke = (id: string, name: string) => {
     setSessions((prev) => prev.filter((s) => s.id !== id))
-    showToast(`Session on "${name}" has been revoked.`)
+    toast.success(`Session on "${name}" has been revoked.`)
   }
 
   const handleLogoutAll = () => {
     if (confirm('Are you sure you want to log out of all other sessions?')) {
       setSessions((prev) => prev.filter((s) => s.isCurrent))
-      showToast('Logged out of all other active sessions.')
+      toast.success('Logged out of all other active sessions.')
     }
   }
 
@@ -94,13 +101,6 @@ const SecurityPage = () => {
 
   return (
     <div className="space-y-6 relative">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-4 right-4 bg-gray-900 text-white text-xs px-4 py-2 rounded-lg shadow-md z-50 animate-bounce">
-          {toastMessage}
-        </div>
-      )}
-
       {/* Change Password Card */}
       <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm space-y-4">
         <h3 className="text-xs font-bold text-gray-900 leading-none">Change Password</h3>
@@ -109,41 +109,86 @@ const SecurityPage = () => {
           <div className="space-y-3 max-w-sm">
             {/* Current Password */}
             <div className="space-y-1">
-              <Label>
+              <Label htmlFor="current-password">
                 Current Password
               </Label>
-              <Input
-                type="password"
-                value={passwords.current}
-                onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
-                
-              />
+              <div className="relative">
+                <Input
+                  id="current-password"
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={passwords.current}
+                  placeholder="••••••••"
+                  onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                >
+                  {showCurrentPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* New Password */}
             <div className="space-y-1">
-              <Label>
+              <Label htmlFor="new-password">
                 New Password
               </Label>
-              <Input
-                type="password"
-                value={passwords.new}
-                onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
-                
-              />
+              <div className="relative">
+                <Input
+                  id="new-password"
+                  type={showNewPassword ? "text" : "password"}
+                  value={passwords.new}
+                  placeholder="••••••••"
+                  onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                >
+                  {showNewPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Confirm New Password */}
             <div className="space-y-1">
-              <Label>
+              <Label htmlFor="confirm-password">
                 Confirm New Password
               </Label>
-              <Input
-                type="password"
-                value={passwords.confirm}
-                onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
-                
-              />
+              <div className="relative">
+                <Input
+                  id="confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={passwords.confirm}
+                  placeholder="••••••••"
+                  onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
