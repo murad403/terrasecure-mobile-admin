@@ -1,7 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 
 interface ReviewSubmissionStepProps {

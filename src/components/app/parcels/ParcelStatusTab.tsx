@@ -55,7 +55,7 @@ const ParcelStatusTab = ({ parcel, onUpdateStatus }: ParcelStatusTabProps) => {
             checked={locked}
             onChange={(e) => setLocked(e.target.checked)}
           />
-          <div className="w-10 h-5.5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500" />
+          <div className="w-10 h-5.5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.75 after:left-0.75 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500" />
         </label>
       </div>
     </div>

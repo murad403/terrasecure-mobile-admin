@@ -1,5 +1,3 @@
-import React from 'react'
-import { Map } from 'lucide-react'
 import Image from 'next/image'
 import logo from "@/assets/logo/logo.png";
 

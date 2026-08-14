@@ -38,7 +38,7 @@ const MonthlyRevenueChart = () => {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col h-full min-h-[380px]">
+    <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col h-full min-h-95">
       {/* Chart Header */}
       <div className="flex items-center justify-between gap-4 mb-6">
         <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -65,7 +65,7 @@ const MonthlyRevenueChart = () => {
       </div>
 
       {/* Chart Body */}
-      <div className="flex-1 min-h-[260px] w-full">
+      <div className="flex-1 min-h-65 w-full">
         {mounted ? (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart

@@ -102,7 +102,7 @@ const EditZoneModal = ({ isOpen, onClose, zone, onSave }: EditZoneModalProps) =>
 
   return createPortal(
     <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 p-4 font-sans">
-      <div className="bg-white rounded-[20px] w-full max-w-[550px] shadow-2xl flex flex-col overflow-hidden border border-slate-200 max-h-[90vh]">
+      <div className="bg-white rounded-[20px] w-full max-w-137.5 shadow-2xl flex flex-col overflow-hidden border border-slate-200 max-h-[90vh]">
 
         {/* Header */}
         <div className="px-6 pt-5 pb-4 flex items-center justify-between border-b border-slate-100 shrink-0">

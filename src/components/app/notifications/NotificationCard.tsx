@@ -104,7 +104,7 @@ const NotificationCard = ({ notification, onMarkRead, onDelete }: CardProps) => 
       </div>
 
       {/* Right Controls Column */}
-      <div className="flex items-center justify-end space-x-3.5 shrink-0 self-end md:self-auto min-w-[160px]">
+      <div className="flex items-center justify-end space-x-3.5 shrink-0 self-end md:self-auto min-w-40">
         {/* Mark read button */}
         {notification.isUnread && (
           <button

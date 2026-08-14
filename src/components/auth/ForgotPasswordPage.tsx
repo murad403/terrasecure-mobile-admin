@@ -15,11 +15,7 @@ const ForgotPasswordPage = () => {
   const router = useRouter()
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation()
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ForgotPasswordFormValues>({
+  const { register, handleSubmit, formState: { errors } } = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: '',

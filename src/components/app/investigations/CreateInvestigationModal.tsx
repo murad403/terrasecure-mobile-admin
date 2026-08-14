@@ -94,7 +94,7 @@ const CreateInvestigationModal = ({
       onClick={onClose}
     >
       <div
-        className="bg-white border border-slate-200 rounded-2xl w-full max-w-[500px] shadow-2xl flex flex-col overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200 max-h-[90vh]"
+        className="bg-white border border-slate-200 rounded-2xl w-full max-w-125 shadow-2xl flex flex-col overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200 max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -212,7 +212,7 @@ const CreateInvestigationModal = ({
               placeholder="Describe the dispute or issue that requires investigation..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full border border-slate-200 bg-white rounded-xl p-3 text-xs md:text-sm text-title placeholder:text-slate-400 focus:outline-none focus:border-button-color focus:ring-2 focus:ring-button-color/20 transition-all font-semibold min-h-[90px] leading-relaxed resize-none"
+              className="w-full border border-slate-200 bg-white rounded-xl p-3 text-xs md:text-sm text-title placeholder:text-slate-400 focus:outline-none focus:border-button-color focus:ring-2 focus:ring-button-color/20 transition-all font-semibold min-h-22.5 leading-relaxed resize-none"
             />
           </div>
 

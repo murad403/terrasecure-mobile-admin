@@ -138,13 +138,13 @@ const TermsConditionsPage = () => {
       </div>
 
       {/* Scrollable Container containing list of items */}
-      <div className="border border-gray-200 rounded-xl p-5 max-h-[550px] overflow-y-auto bg-white">
+      <div className="border border-gray-200 rounded-xl p-5 max-h-137.5 overflow-y-auto bg-white">
         {isEditing ? (
-          <div className="min-h-[400px]">
+          <div className="min-h-100">
             <textarea
               value={tempContent}
               onChange={(e) => setTempContent(e.target.value)}
-              className="w-full min-h-[400px] bg-slate-50/20 border border-slate-200 rounded-xl p-4 text-xs text-slate-750 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors leading-relaxed font-normal resize-y"
+              className="w-full min-h-100 bg-slate-50/20 border border-slate-200 rounded-xl p-4 text-xs text-slate-750 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors leading-relaxed font-normal resize-y"
               placeholder="Write terms and conditions content here..."
             />
           </div>

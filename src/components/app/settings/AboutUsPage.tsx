@@ -127,7 +127,7 @@ const AboutUsPage = () => {
                                 <textarea
                                     value={editContent}
                                     onChange={e => setEditContent(e.target.value)}
-                                    className="w-full min-h-[100px] bg-slate-50/20 border border-slate-200 rounded-lg px-4 py-3 text-xs md:text-sm text-slate-750 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-colors leading-relaxed font-normal resize-y"
+                                    className="w-full min-h-25 bg-slate-50/20 border border-slate-200 rounded-lg px-4 py-3 text-xs md:text-sm text-slate-750 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-colors leading-relaxed font-normal resize-y"
                                     placeholder="Edit section content..."
                                 />
                                 <div className="flex items-center space-x-2">
@@ -196,7 +196,7 @@ const AboutUsPage = () => {
                                 placeholder="Section content..."
                                 value={newContent}
                                 onChange={e => setNewContent(e.target.value)}
-                                className="w-full min-h-[100px] bg-slate-50/20 border border-slate-200 rounded-lg px-4 py-3 text-xs md:text-sm text-slate-750 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-colors placeholder:text-slate-400 font-normal resize-y"
+                                className="w-full min-h-25 bg-slate-50/20 border border-slate-200 rounded-lg px-4 py-3 text-xs md:text-sm text-slate-750 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-colors placeholder:text-slate-400 font-normal resize-y"
                             />
                         </div>
                         <div className="flex items-center space-x-2">

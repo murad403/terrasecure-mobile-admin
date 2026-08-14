@@ -164,7 +164,7 @@ const PaymentControlsFeatureFlagsTab = ({
               </div>
 
               {/* Action Button & Toggle Status */}
-              <div className="flex items-center justify-between sm:justify-end space-x-4 shrink-0 self-end sm:self-auto min-w-[140px]">
+              <div className="flex items-center justify-between sm:justify-end space-x-4 shrink-0 self-end sm:self-auto min-w-35">
                 <button
                   onClick={() => handleConfigure(pm.name)}
                   className="border border-gray-200 hover:bg-gray-55 text-gray-700 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
@@ -224,7 +224,7 @@ const PaymentControlsFeatureFlagsTab = ({
               </div>
 
               {/* Action Button & Toggle Status */}
-              <div className="flex items-center justify-between sm:justify-end space-x-4 shrink-0 self-end sm:self-auto min-w-[140px]">
+              <div className="flex items-center justify-between sm:justify-end space-x-4 shrink-0 self-end sm:self-auto min-w-35">
                 <button
                   onClick={() => handleConfigure(fee.name)}
                   className="border border-gray-200 hover:bg-gray-55 text-gray-700 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
@@ -285,7 +285,7 @@ const PaymentControlsFeatureFlagsTab = ({
               </div>
 
               {/* Action Button & Toggle Status */}
-              <div className="flex items-center justify-between sm:justify-end space-x-4 shrink-0 self-end sm:self-auto min-w-[140px]">
+              <div className="flex items-center justify-between sm:justify-end space-x-4 shrink-0 self-end sm:self-auto min-w-35">
                 <button
                   onClick={() => handleConfigure(tier.name)}
                   className="border border-gray-200 hover:bg-gray-55 text-gray-700 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"

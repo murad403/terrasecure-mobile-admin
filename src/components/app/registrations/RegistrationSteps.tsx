@@ -108,7 +108,7 @@ const RegistrationSteps = ({ isOpen, onClose, registration, onUpdateRegistration
             />
 
             {/* Slide-out Drawer Panel */}
-            <div className="relative w-full sm:w-[500px] md:w-[560px] h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-350 ease-out border-l border-slate-100 z-50">
+            <div className="relative w-full sm:w-125 md:w-140 h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-350 ease-out border-l border-slate-100 z-50">
 
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">

@@ -12,7 +12,7 @@ const data = [
 
 const ParcelsByStatusChart = () => {
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col justify-between h-[380px]">
+    <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col justify-between h-95">
       {/* Chart Header */}
       <div className="flex items-center justify-between border-b border-slate-50 pb-3">
         <span className="font-semibold text-title text-sm">Parcels by Status</span>
@@ -20,7 +20,7 @@ const ParcelsByStatusChart = () => {
       </div>
 
       {/* Donut Chart Container */}
-      <div className="relative flex-1 flex items-center justify-center my-2 h-[180px]">
+      <div className="relative flex-1 flex items-center justify-center my-2 h-45">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Tooltip

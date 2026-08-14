@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import { Parcel } from '@/components/app/parcels/ParcelsPage'
 
 interface ParcelInfoTabProps {

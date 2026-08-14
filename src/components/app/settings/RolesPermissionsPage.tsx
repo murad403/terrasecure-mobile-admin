@@ -133,7 +133,7 @@ const RolesPermissionsPage = () => {
 
             {/* Table Matrix */}
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[700px]">
+              <table className="w-full text-left border-collapse min-w-175">
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-50/10">
                     <th className="px-4 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-1/3">

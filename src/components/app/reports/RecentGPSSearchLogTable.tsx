@@ -44,7 +44,7 @@ const RecentGPSSearchLogTable = () => {
 
       {/* Table */}
       <div className="overflow-x-auto rounded-xl border border-slate-100 bg-white">
-        <table className="w-full text-left border-collapse min-w-[700px]">
+        <table className="w-full text-left border-collapse min-w-175">
           <thead>
             <tr className="bg-slate-50/60 border-b border-slate-100">
               <th className="py-3.5 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">QUERY</th>

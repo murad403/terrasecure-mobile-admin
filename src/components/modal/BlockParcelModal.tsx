@@ -16,12 +16,7 @@ interface BlockParcelModalProps {
 }
 
 const BlockParcelModal = ({ isOpen, onClose, parcel, onBlock }: BlockParcelModalProps) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset
-  } = useForm<BlockFormValues>({
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<BlockFormValues>({
     resolver: zodResolver(blockSchema),
     defaultValues: {
       reason: ''

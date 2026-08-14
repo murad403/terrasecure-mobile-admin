@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import { Owner } from '@/components/app/parcels/ParcelsPage'
 import { Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'

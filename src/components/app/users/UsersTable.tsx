@@ -1,6 +1,6 @@
 "use client"
-import React, { useState, useEffect, useRef } from 'react'
-import { Search, ChevronDown, Download, Plus, Eye, Pencil, UserRound, Trash2 } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Search, Download, Plus, Eye, Pencil, UserRound, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import { type UserRecord } from './UsersPage'
@@ -186,7 +186,7 @@ const UsersTable = ({
 
       {/* Main Users List Table */}
       <div className="overflow-x-auto rounded-xl border border-slate-100 bg-white">
-        <table className="w-full text-left border-collapse min-w-[900px]">
+        <table className="w-full text-left border-collapse min-w-225">
           <thead>
             <tr className="bg-slate-50/60 border-b border-slate-100">
               <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">NAME</th>

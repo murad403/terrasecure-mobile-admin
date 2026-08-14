@@ -53,7 +53,7 @@ const ImportGISModal = ({ isOpen, onClose, defaultTab = 'geojson' }: ImportGISMo
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-[420px] shadow-2xl animate-in zoom-in-95 duration-200"
+        className="bg-white rounded-2xl w-full max-w-105 shadow-2xl animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

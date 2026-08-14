@@ -72,7 +72,7 @@ const AuditLogDetailsModal = ({ isOpen, onClose, log }: AuditLogDetailsModalProp
       />
 
       {/* Slide-out Drawer Panel */}
-      <div className="relative w-full sm:w-[420px] md:w-[460px] h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-350 ease-out border-l border-slate-100 z-50 p-6">
+      <div className="relative w-full sm:w-105 md:w-115 h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-350 ease-out border-l border-slate-100 z-50 p-6">
         
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">

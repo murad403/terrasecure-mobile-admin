@@ -28,7 +28,7 @@ const actions = [
 
 const QuickActions = () => {
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col justify-between h-[270px] w-full">
+        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col justify-between h-67.5 w-full">
             {/* Title */}
             <div className="border-b border-slate-50 pb-2 mb-3">
                 <span className="font-semibold text-title text-sm">Quick Actions</span>

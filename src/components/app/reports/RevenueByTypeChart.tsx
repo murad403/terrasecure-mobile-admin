@@ -18,14 +18,14 @@ const RevenueByTypeChart = () => {
   }, [])
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col h-full min-h-[380px]">
+    <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col h-full min-h-95">
       <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-4">
         Revenue by Type
       </h3>
 
       <div className="flex-1 flex flex-col items-center justify-center">
         {/* Donut Chart */}
-        <div className="w-full h-[180px] relative">
+        <div className="w-full h-45 relative">
           {mounted ? (
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -62,7 +62,7 @@ const RevenueByTypeChart = () => {
         </div>
 
         {/* Legend */}
-        <div className="w-full mt-4 space-y-2 max-h-[160px] overflow-y-auto">
+        <div className="w-full mt-4 space-y-2 max-h-40 overflow-y-auto">
           {data.map((item, index) => (
             <div key={index} className="flex items-center justify-between gap-4 text-xs font-semibold">
               <div className="flex items-center gap-2">

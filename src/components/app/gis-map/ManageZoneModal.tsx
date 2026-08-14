@@ -46,7 +46,7 @@ const ManageZoneModal = ({
       />
       
       {/* Right Drawer */}
-      <div className="fixed inset-y-0 right-0 w-full max-w-[620px] bg-white z-9999 shadow-2xl flex flex-col overflow-hidden border-l border-slate-100 font-sans transition-transform duration-300 ease-out transform translate-x-0">
+      <div className="fixed inset-y-0 right-0 w-full max-w-155 bg-white z-9999 shadow-2xl flex flex-col overflow-hidden border-l border-slate-100 font-sans transition-transform duration-300 ease-out transform translate-x-0">
         
         {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b border-slate-100 flex items-start justify-between shrink-0">

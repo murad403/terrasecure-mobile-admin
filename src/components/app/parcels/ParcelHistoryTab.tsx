@@ -62,7 +62,7 @@ const ParcelHistoryTab = ({ history }: ParcelHistoryTabProps) => {
             {/* Timeline icon node */}
             <div
               className={cn(
-                "absolute left-[-43px] w-8 h-8 rounded-full border flex items-center justify-center bg-white shadow-sm shrink-0 select-none",
+                "absolute -left-10.75 w-8 h-8 rounded-full border flex items-center justify-center bg-white shadow-sm shrink-0 select-none",
                 item.iconBg
               )}
             >

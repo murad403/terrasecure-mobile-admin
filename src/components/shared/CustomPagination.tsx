@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -11,13 +10,7 @@ interface CustomPaginationProps {
   pageSize: number
 }
 
-const CustomPagination = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-  totalEntries,
-  pageSize
-}: CustomPaginationProps) => {
+const CustomPagination = ({ currentPage, totalPages, onPageChange, totalEntries, pageSize }: CustomPaginationProps) => {
   const startEntry = totalEntries === 0 ? 0 : (currentPage - 1) * pageSize + 1
   const endEntry = Math.min(currentPage * pageSize, totalEntries)
 

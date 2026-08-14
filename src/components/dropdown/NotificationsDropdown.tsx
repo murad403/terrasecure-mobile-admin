@@ -79,7 +79,7 @@ const NotificationsDropdown = ({ isOpen, onClose, className }: NotificationsDrop
       </div>
 
       {/* Notification List */}
-      <div className="max-h-[300px] overflow-y-auto divide-y divide-slate-50">
+      <div className="max-h-75 overflow-y-auto divide-y divide-slate-50">
         {notifications.map((item) => {
           const IconComponent = item.icon
           return (

@@ -143,7 +143,7 @@ const AdminSidebar = ({
                                         {item.badge && (
                                             <span
                                                 className={cn(
-                                                    "flex items-center justify-center text-[10px] font-bold bg-[#EF4444] text-white rounded-full min-w-[16px] h-4 px-1 shrink-0",
+                                                    "flex items-center justify-center text-[10px] font-bold bg-[#EF4444] text-white rounded-full min-w-4 h-4 px-1 shrink-0",
                                                     collapsed ? "absolute -top-1.5 -right-1.5 border border-[#111827]" : ""
                                                 )}
                                             >

@@ -49,7 +49,7 @@ const AdminTopbar = ({ setMobileOpen }: AdminTopbarProps) => {
             title="Notifications"
           >
             <Bell className="w-6 h-6" />
-            <span className="absolute top-1.5 right-1.5 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-[#EF4444] text-[9px] font-bold text-white border border-white">
+            <span className="absolute top-1.5 right-1.5 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-[#EF4444] text-[9px] font-bold text-white border border-white">
               7
             </span>
           </button>

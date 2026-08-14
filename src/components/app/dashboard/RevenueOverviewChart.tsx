@@ -23,7 +23,7 @@ const data = [
 
 const RevenueOverviewChart = () => {
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col justify-between h-[380px] w-full">
+        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col justify-between h-95 w-full">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-50 pb-3 mb-2">
                 <span className="font-semibold text-title text-sm">Revenue Overview</span>
@@ -31,7 +31,7 @@ const RevenueOverviewChart = () => {
             </div>
 
             {/* Recharts Bar Chart */}
-            <div className="flex-1 w-full h-[260px] mt-2">
+            <div className="flex-1 w-full h-65 mt-2">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={data}

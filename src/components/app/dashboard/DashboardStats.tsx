@@ -1,16 +1,6 @@
 "use client"
-import React from 'react'
 import StatsCard from '@/components/shared/StatsCard'
-import {
-  Map,
-  Users,
-  Shield,
-  MessageSquare,
-  Globe,
-  AlertTriangle,
-  Bookmark,
-  TrendingUp
-} from 'lucide-react'
+import { Map, Users, Shield, MessageSquare, Globe, AlertTriangle, Bookmark, TrendingUp } from 'lucide-react'
 
 const DashboardStats = () => {
   const stats = [

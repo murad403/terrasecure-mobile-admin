@@ -171,7 +171,7 @@ const ScoringCriteriaTab = ({ criteria, onUpdateCriterion }: CriteriaTabProps) =
                         </div>
 
                         {/* Weight & Action Panel */}
-                        <div className="flex items-center space-x-3 self-end md:self-auto min-w-[120px] justify-end">
+                        <div className="flex items-center space-x-3 self-end md:self-auto min-w-30 justify-end">
                           <div className="flex items-center space-x-1">
                             <Input
                               type="number"
@@ -220,7 +220,7 @@ const ScoringCriteriaTab = ({ criteria, onUpdateCriterion }: CriteriaTabProps) =
                       </div>
 
                       {/* Right: Progress bar & edit button */}
-                      <div className="flex items-center justify-between sm:justify-end space-x-4 min-w-[150px]">
+                      <div className="flex items-center justify-between sm:justify-end space-x-4 min-w-37.5">
                         {/* Progress Bar */}
                         <div className="flex items-center space-x-2 flex-1 sm:flex-none">
                           <div className="w-20 md:w-28 bg-gray-100 h-1.5 rounded-full overflow-hidden">

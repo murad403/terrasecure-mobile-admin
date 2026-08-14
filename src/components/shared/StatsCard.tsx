@@ -13,17 +13,9 @@ interface StatsCardProps {
   iconColor: string
 }
 
-const StatsCard = ({
-  title,
-  value,
-  trend,
-  isPositive,
-  icon: Icon,
-  iconBg,
-  iconColor
-}: StatsCardProps) => {
+const StatsCard = ({ title, value, trend, isPositive, icon: Icon, iconBg, iconColor }: StatsCardProps) => {
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-[120px]">
+    <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-30">
       {/* Top section: Icon & Trend badge */}
       <div className="flex items-center justify-between">
         {/* Circular Icon background */}

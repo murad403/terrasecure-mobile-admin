@@ -70,7 +70,7 @@ const AddUserModal = ({ isOpen, onClose, onAdd }: AddUserModalProps) => {
       onClick={onClose}
     >
       <div
-        className="bg-white border border-slate-200 rounded-2xl w-full max-w-[440px] shadow-2xl flex flex-col overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200"
+        className="bg-white border border-slate-200 rounded-2xl w-full max-w-110 shadow-2xl flex flex-col overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -177,7 +177,7 @@ const AddUserModal = ({ isOpen, onClose, onAdd }: AddUserModalProps) => {
                 {...register('status')}
                 className="sr-only peer"
               />
-              <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-350 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-slate-350 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
             </label>
           </div>
 

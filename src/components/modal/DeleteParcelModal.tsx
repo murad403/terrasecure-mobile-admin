@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect } from 'react'
-import { X, Trash2, AlertTriangle } from 'lucide-react'
+import { X, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Parcel } from '@/components/app/parcels/ParcelsPage'
 

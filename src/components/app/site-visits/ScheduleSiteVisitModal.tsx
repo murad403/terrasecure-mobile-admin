@@ -95,7 +95,7 @@ const ScheduleSiteVisitModal = ({
       onClick={onClose}
     >
       <div
-        className="bg-white border border-slate-200 rounded-3xl w-full max-w-[460px] shadow-2xl flex flex-col overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200 p-6"
+        className="bg-white border border-slate-200 rounded-3xl w-full max-w-115 shadow-2xl flex flex-col overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200 p-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -186,7 +186,7 @@ const ScheduleSiteVisitModal = ({
               placeholder="Special instructions for the surveyor..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full border border-slate-200 bg-white rounded-xl p-3 text-xs md:text-sm text-title placeholder:text-slate-400 focus:outline-none focus:border-button-color focus:ring-0 transition-none font-semibold min-h-[90px] leading-relaxed resize-none"
+              className="w-full border border-slate-200 bg-white rounded-xl p-3 text-xs md:text-sm text-title placeholder:text-slate-400 focus:outline-none focus:border-button-color focus:ring-0 transition-none font-semibold min-h-22.5 leading-relaxed resize-none"
             />
           </div>
 

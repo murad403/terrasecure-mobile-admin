@@ -243,7 +243,7 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
 
               <div className="space-y-1.5">
                 <Label>Badge Color</Label>
-                <div className="flex items-center space-x-2 h-[34px]">
+                <div className="flex items-center space-x-2 h-8.5">
                   {colorList.map((item) => (
                     <button
                       key={item.name}
@@ -275,7 +275,7 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
                 </button>
               </div>
 
-              <div className="space-y-2 max-h-[140px] overflow-y-auto pr-1">
+              <div className="space-y-2 max-h-35 overflow-y-auto pr-1">
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex items-center gap-2 animate-in slide-in-from-top-1 duration-150">
                     <input

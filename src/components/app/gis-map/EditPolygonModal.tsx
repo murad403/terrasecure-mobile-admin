@@ -112,7 +112,7 @@ const EditPolygonModal = ({ isOpen, onClose, onSave }: EditPolygonModalProps) =>
 
   return createPortal(
     <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-[20px] w-full max-w-[600px] shadow-2xl flex flex-col overflow-hidden border border-slate-200">
+      <div className="bg-white rounded-[20px] w-full max-w-150 shadow-2xl flex flex-col overflow-hidden border border-slate-200">
 
         <div className="px-6 pt-5 pb-4 border-b">
           <h2 className="text-[18px] font-bold text-slate-900">Edit Polygon</h2>
@@ -128,7 +128,7 @@ const EditPolygonModal = ({ isOpen, onClose, onSave }: EditPolygonModalProps) =>
           </div>
         </div>
 
-        <div className="relative mx-6 my-4 h-[350px] bg-green-50 rounded-lg border border-green-200 overflow-hidden">
+        <div className="relative mx-6 my-4 h-87.5 bg-green-50 rounded-lg border border-green-200 overflow-hidden">
           <div className="absolute top-3 left-3 bg-white px-3 py-1 rounded shadow text-xs font-bold z-1000">
             Area: {area} sq km
           </div>

@@ -110,7 +110,7 @@ const InvestigationsTable = ({
 
       {/* Main Table Grid */}
       <div className="overflow-x-auto rounded-xl border border-slate-100 bg-white">
-        <table className="w-full text-left border-collapse min-w-[900px]">
+        <table className="w-full text-left border-collapse min-w-225">
           <thead>
             <tr className="bg-slate-50/60 border-b border-slate-100">
               <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">CASE ID</th>
@@ -138,7 +138,7 @@ const InvestigationsTable = ({
                   </td>
 
                   {/* Title */}
-                  <td className="py-4 px-5 text-sm font-semibold text-slate-700 max-w-[280px] truncate" title={item.title}>
+                  <td className="py-4 px-5 text-sm font-semibold text-slate-700 max-w-70 truncate" title={item.title}>
                     {item.title}
                   </td>
 

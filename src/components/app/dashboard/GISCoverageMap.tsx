@@ -1,17 +1,16 @@
 "use client"
-import React from 'react'
 import { Map as MapIcon } from 'lucide-react'
 
 const GISCoverageMap = () => {
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col justify-between h-[210px] w-full">
+        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col justify-between h-52.5 w-full">
             {/* Title */}
             <div className="border-b border-slate-50 pb-2 mb-2">
                 <span className="font-semibold text-title text-sm">GIS Coverage</span>
             </div>
 
             {/* Map Illustration area */}
-            <div className="relative flex-1 bg-[#E6F4EA]/80 rounded-xl overflow-hidden border border-emerald-50 flex items-center justify-center h-[90px]">
+            <div className="relative flex-1 bg-[#E6F4EA]/80 rounded-xl overflow-hidden border border-emerald-50 flex items-center justify-center h-22.5">
                 {/* Abstract Map Roads / Paths SVG */}
                 <svg className="absolute inset-0 w-full h-full text-white/50 stroke-current stroke-2" fill="none">
                     <path d="M-10,20 C30,40 50,-10 90,30 C120,60 160,20 210,50 C240,70 280,30 320,60" />

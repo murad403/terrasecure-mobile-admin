@@ -77,7 +77,7 @@ const AssignSurveyorModal = ({
       onClick={onClose}
     >
       <div
-        className="bg-white border border-slate-200 rounded-2xl w-full max-w-[500px] shadow-2xl flex flex-col overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200 max-h-[92vh]"
+        className="bg-white border border-slate-200 rounded-2xl w-full max-w-125 shadow-2xl flex flex-col overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200 max-h-[92vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -113,7 +113,7 @@ const AssignSurveyorModal = ({
           {/* Select Surveyor List */}
           <div className="space-y-2">
             <Label className="text-xs font-bold text-slate-700">Select Surveyor *</Label>
-            <div className="space-y-2 max-h-[230px] overflow-y-auto pr-0.5">
+            <div className="space-y-2 max-h-57.5 overflow-y-auto pr-0.5">
               {surveyors.map((surveyor) => {
                 const isSelected = selectedSurveyorId === surveyor.id
                 const avatarCls = cn(

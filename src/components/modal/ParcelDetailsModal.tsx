@@ -16,16 +16,7 @@ interface ParcelDetailsModalProps {
   onDelete: () => void
 }
 
-const ParcelDetailsModal = ({
-  isOpen,
-  onClose,
-  parcel,
-  onAddOwner,
-  onUpdateStatus,
-  onEdit,
-  onBlock,
-  onDelete
-}: ParcelDetailsModalProps) => {
+const ParcelDetailsModal = ({ isOpen, onClose, parcel, onAddOwner, onUpdateStatus, onEdit, onBlock, onDelete }: ParcelDetailsModalProps) => {
 
   useEffect(() => {
     if (isOpen) {

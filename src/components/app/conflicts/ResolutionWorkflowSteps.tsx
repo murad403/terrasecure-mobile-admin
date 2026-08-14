@@ -153,7 +153,7 @@ const ResolutionWorkflowSteps = ({
       />
       
       {/* Right Drawer */}
-      <div className="fixed inset-y-0 right-0 w-full max-w-[620px] bg-white z-9999 shadow-2xl flex flex-col overflow-hidden border-l border-slate-100 font-sans transition-transform duration-300 ease-out transform translate-x-0">
+      <div className="fixed inset-y-0 right-0 w-full max-w-155 bg-white z-9999 shadow-2xl flex flex-col overflow-hidden border-l border-slate-100 font-sans transition-transform duration-300 ease-out transform translate-x-0">
         
         {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b border-slate-100 flex items-start justify-between shrink-0">
@@ -180,7 +180,7 @@ const ResolutionWorkflowSteps = ({
         <div className="px-6 py-5 border-b border-slate-50 bg-[#fafafa]/50 shrink-0">
           <div className="flex items-start justify-between w-full relative">
             {/* Connecting line */}
-            <div className="absolute top-4 left-6 right-6 h-[2px] bg-slate-200 z-0" />
+            <div className="absolute top-4 left-6 right-6 h-0.5 bg-slate-200 z-0" />
             
             {stepLabels.map((s, idx) => {
               const stepNum = s.num;

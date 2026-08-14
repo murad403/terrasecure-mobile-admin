@@ -31,7 +31,7 @@ const DocumentsTable = ({
 
   return (
     <div className="overflow-x-auto rounded-xl border border-slate-100 bg-white select-none">
-      <table className="w-full text-left border-collapse min-w-[900px]">
+      <table className="w-full text-left border-collapse min-w-225">
         <thead>
           <tr className="bg-slate-50/60 border-b border-slate-100">
             {/* Checkbox Header */}

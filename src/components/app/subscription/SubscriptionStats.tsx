@@ -19,7 +19,7 @@ const SubscriptionStats = ({
       {/* 4 Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Active Plans */}
-        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-[100px]">
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-25">
           <div>
             <span className="text-xl md:text-2xl font-bold text-violet-600 tracking-tight">
               {activePlans}
@@ -31,7 +31,7 @@ const SubscriptionStats = ({
         </div>
 
         {/* Card 2: Feature Flags On */}
-        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-[100px]">
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-25">
           <div>
             <span className="text-xl md:text-2xl font-bold text-emerald-600 tracking-tight">
               {activeFlags}
@@ -43,7 +43,7 @@ const SubscriptionStats = ({
         </div>
 
         {/* Card 3: Payment Methods Active */}
-        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-[100px]">
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-25">
           <div>
             <span className="text-xl md:text-2xl font-bold text-blue-600 tracking-tight">
               {activePayments}
@@ -55,7 +55,7 @@ const SubscriptionStats = ({
         </div>
 
         {/* Card 4: Promo Banner */}
-        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-[100px]">
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-25">
           <div>
             <span className="text-xl md:text-2xl font-bold text-amber-600 tracking-tight">
               {promoBannerVisible}

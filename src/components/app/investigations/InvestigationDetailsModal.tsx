@@ -79,7 +79,7 @@ const InvestigationDetailsModal = ({
       />
 
       {/* Slide-out Drawer Panel */}
-      <div className="relative w-full sm:w-[450px] md:w-[480px] h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-350 ease-out border-l border-slate-100 z-50">
+      <div className="relative w-full sm:w-112.5 md:w-120 h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-350 ease-out border-l border-slate-100 z-50">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
@@ -229,7 +229,7 @@ const InvestigationDetailsModal = ({
                 placeholder="Investigation notes..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="w-full border border-slate-200 bg-white rounded-xl p-4 text-xs md:text-sm text-title placeholder:text-slate-400 focus:outline-none focus:border-button-color focus:ring-2 focus:ring-button-color/20 transition-all font-semibold min-h-[90px] leading-relaxed resize-none block"
+                className="w-full border border-slate-200 bg-white rounded-xl p-4 text-xs md:text-sm text-title placeholder:text-slate-400 focus:outline-none focus:border-button-color focus:ring-2 focus:ring-button-color/20 transition-all font-semibold min-h-22.5 leading-relaxed resize-none block"
               />
 
               {/* Action upload button */}

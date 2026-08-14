@@ -14,16 +14,7 @@ interface GISViewMapModalProps {
   onConfirm: () => void
 }
 
-const GISViewMapModal = ({
-  isOpen,
-  onClose,
-  latitude,
-  longitude,
-  parcelName,
-  area,
-  registrationId,
-  onConfirm
-}: GISViewMapModalProps) => {
+const GISViewMapModal = ({ isOpen, onClose, latitude, longitude, parcelName, area, registrationId, onConfirm }: GISViewMapModalProps) => {
 
   useEffect(() => {
     if (isOpen) {
@@ -66,8 +57,8 @@ const GISViewMapModal = ({
         </div>
 
         {/* Map Body (High-fidelity custom SVG topographic map) */}
-        <div className="relative flex-1 bg-[#eaf4ec] min-h-[400px] flex items-center justify-center overflow-hidden select-none">
-          
+        <div className="relative flex-1 bg-[#eaf4ec] min-h-100 flex items-center justify-center overflow-hidden select-none">
+
           <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
             {/* Topographic contours */}
             <path d="M -50,50 C 100,20 200,80 300,10 C 400,-60 500,40 650,20" fill="none" stroke="#d5e8dc" strokeWidth="1.5" />
@@ -76,7 +67,7 @@ const GISViewMapModal = ({
             <path d="M -50,230 C 130,200 230,260 330,190 C 430,120 530,220 650,200" fill="none" stroke="#d5e8dc" strokeWidth="1.5" />
             <path d="M -50,290 C 140,260 240,320 340,250 C 440,180 540,280 650,260" fill="none" stroke="#d5e8dc" strokeWidth="1.5" />
             <path d="M -50,350 C 150,320 250,380 350,310 C 450,240 550,340 650,320" fill="none" stroke="#d5e8dc" strokeWidth="1.5" />
-            
+
             {/* Shaded forest zones */}
             <path d="M 0,0 C 100,50 150,10 250,80 L 250,0 Z" fill="#d2ebd9" fillOpacity="0.4" />
             <path d="M 400,0 C 480,60 520,30 650,100 L 650,0 Z" fill="#d2ebd9" fillOpacity="0.4" />
@@ -85,7 +76,7 @@ const GISViewMapModal = ({
             {/* A winding blue river */}
             <path d="M 380,-20 Q 360,120 400,210 T 350,420" fill="none" stroke="#badcfc" strokeWidth="5.5" strokeLinecap="round" />
             <path d="M 380,-20 Q 360,120 400,210 T 350,420" fill="none" stroke="#cbe3fc" strokeWidth="2" strokeLinecap="round" />
-            
+
             {/* Minor streams */}
             <path d="M 400,210 Q 480,240 550,230" fill="none" stroke="#badcfc" strokeWidth="2.5" strokeLinecap="round" />
 
@@ -106,7 +97,7 @@ const GISViewMapModal = ({
             {/* Map Labels */}
             <text x="440" y="330" fill="#2d6a4f" fontSize="7.5" fontWeight="bold" fontFamily="sans-serif">Restaurant</text>
             <text x="440" y="340" fill="#2d6a4f" fontSize="7.5" fontWeight="bold" fontFamily="sans-serif">Ecologique de Yoko</text>
-            
+
             <circle cx="432" cy="334" r="2.5" fill="#2d6a4f" />
 
             <text x="520" y="270" fill="#52b788" fontSize="10" fontWeight="extrabold" letterSpacing="1" fontFamily="sans-serif" opacity="0.6">Yoko</text>
@@ -180,7 +171,7 @@ const GISViewMapModal = ({
             </div>
             <span>Collected: 3 Jun 2025 14:30</span>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Button
               type="button"

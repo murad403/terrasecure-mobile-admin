@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import { cn } from '@/lib/utils'
 
 const regions = [
@@ -13,7 +12,7 @@ const regions = [
 
 const GISCoverage = () => {
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col justify-between h-[380px] w-full">
+        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col justify-between h-95 w-full">
             {/* Header */}
             <div className="border-b border-slate-50 pb-3 mb-2">
                 <span className="font-semibold text-title text-sm">GIS Coverage</span>

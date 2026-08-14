@@ -157,7 +157,7 @@ const ReviewOnMapModal = ({
 
   return createPortal(
     <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50 p-4 font-sans">
-      <div className="bg-white rounded-[24px] w-full max-w-[720px] shadow-2xl flex flex-col overflow-hidden border border-slate-100">
+      <div className="bg-white rounded-[24px] w-full max-w-180 shadow-2xl flex flex-col overflow-hidden border border-slate-100">
         
         {/* Header */}
         <div className="px-6 py-5 border-b border-slate-100 flex items-start justify-between shrink-0">
@@ -184,7 +184,7 @@ const ReviewOnMapModal = ({
         </div>
 
         {/* Map Container with Absolute Overlays */}
-        <div className="relative mx-6 my-4 h-[380px] bg-green-50 rounded-2xl border border-slate-100 overflow-hidden shrink-0">
+        <div className="relative mx-6 my-4 h-95 bg-green-50 rounded-2xl border border-slate-100 overflow-hidden shrink-0">
           {/* Leaflet Map DOM Element */}
           <div ref={mapContainerRef} className="w-full h-full z-10" />
 

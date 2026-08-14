@@ -18,7 +18,7 @@ const ReliabilityScoreManagementStats = ({
       {/* 4 Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Total Weight */}
-        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-[110px]">
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-27.5">
           <div>
             <span className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">{totalWeight}%</span>
           </div>
@@ -29,7 +29,7 @@ const ReliabilityScoreManagementStats = ({
         </div>
 
         {/* Card 2: Criteria Count */}
-        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-[110px]">
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-27.5">
           <div>
             <span className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">{criteriaCount}</span>
           </div>
@@ -40,7 +40,7 @@ const ReliabilityScoreManagementStats = ({
         </div>
 
         {/* Card 3: Very High Parcels */}
-        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-[110px]">
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-27.5">
           <div>
             <span className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
               {veryHighCount.toLocaleString()}
@@ -53,7 +53,7 @@ const ReliabilityScoreManagementStats = ({
         </div>
 
         {/* Card 4: Low Reliability */}
-        <div className="bg-white p-5 rounded-xl border border-red-200/80 shadow-sm flex flex-col justify-between min-h-[110px]">
+        <div className="bg-white p-5 rounded-xl border border-red-200/80 shadow-sm flex flex-col justify-between min-h-27.5">
           <div>
             <span className="text-3xl md:text-4xl font-bold text-red-600 tracking-tight">
               {lowCount.toLocaleString()}

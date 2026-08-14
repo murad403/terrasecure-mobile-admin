@@ -108,7 +108,7 @@ const DrawPolygonModal = ({ isOpen, onClose, onSave }: DrawPolygonModalProps) =>
 
   return createPortal(
     <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-[20px] w-full max-w-[600px] shadow-2xl flex flex-col overflow-hidden border border-slate-200">
+      <div className="bg-white rounded-[20px] w-full max-w-150 shadow-2xl flex flex-col overflow-hidden border border-slate-200">
         <div className="px-6 pt-5 pb-4">
           <h2 className="text-[18px] font-bold text-slate-900 flex items-center gap-2">
             <div className="w-2 h-2 rounded-full border-2 border-green-700 bg-white" />
@@ -117,7 +117,7 @@ const DrawPolygonModal = ({ isOpen, onClose, onSave }: DrawPolygonModalProps) =>
           <p className="text-sm text-slate-500 mt-1">Click on the map to place vertices · 3+ points needed to close</p>
         </div>
 
-        <div className="relative mx-6 mb-4 h-[350px] bg-green-50 rounded-lg border border-green-100 overflow-hidden">
+        <div className="relative mx-6 mb-4 h-87.5 bg-green-50 rounded-lg border border-green-100 overflow-hidden">
           <div className="absolute top-3 left-3 bg-white/90 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-700 shadow-sm border border-slate-200">
             {points.length} point(s) placed — {closed ? "Polygon closed" : "close when ready"}
           </div>
