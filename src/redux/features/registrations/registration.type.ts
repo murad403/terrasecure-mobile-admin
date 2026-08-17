@@ -206,6 +206,7 @@ export interface AttachDocumentPayload {
 }
 
 export interface CreateRegistrationPayload {
+  location?: RegistrationLocation;
   areaSqm?: number;
   notes?: string;
   submittedAt?: string;

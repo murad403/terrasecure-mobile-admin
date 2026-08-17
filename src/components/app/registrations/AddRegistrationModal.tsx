@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCreateRegistrationMutation } from '@/redux/features/registrations/registration.api'
 import { toast } from 'sonner'
 import formatFileSize from '@/utils/formatFileSize'
+import LocationPicker, { type LocationValue } from '@/components/shared/LocationPicker'
 import type {
   LandParcelOwnershipType,
   LandParcelOwnershipStatus,
@@ -48,6 +49,8 @@ const documentTypeOptions: { label: string; value: LandParcelDocumentType }[] = 
 
 const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onClose }) => {
   const [createRegistration, { isLoading }] = useCreateRegistrationMutation()
+
+  const [location, setLocation] = useState<LocationValue>({})
 
   const [areaSqm, setAreaSqm] = useState<string>('')
   const [notes, setNotes] = useState<string>('')
@@ -171,7 +174,34 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
         docType: doc.docType,
       }))
 
+      const hasLocationData = Boolean(
+        location && (
+          location.addressLine1 ||
+          location.addressLine2 ||
+          location.city ||
+          location.state ||
+          location.country ||
+          location.zipCode ||
+          location.latitude !== undefined ||
+          location.longitude !== undefined ||
+          location.remarks ||
+          location.note
+        )
+      )
+
       const payload = {
+        location: hasLocationData ? {
+          remarks: location?.remarks || undefined,
+          latitude: location?.latitude,
+          longitude: location?.longitude,
+          addressLine1: location?.addressLine1 || undefined,
+          addressLine2: location?.addressLine2 || undefined,
+          country: location?.country || undefined,
+          state: location?.state || undefined,
+          city: location?.city || undefined,
+          zipCode: location?.zipCode || undefined,
+          note: location?.note || undefined,
+        } : undefined,
         areaSqm: areaSqm ? Number(areaSqm) : undefined,
         notes: notes ? `<p>${notes}</p>` : undefined,
         submittedAt: new Date(submittedAt).toISOString(),
@@ -199,7 +229,7 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
       onClick={onClose}
     >
       <div
-        className="bg-white border border-slate-200 rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200"
+        className="bg-white border border-slate-200 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -207,7 +237,7 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
           <div>
             <h2 className="text-base font-extrabold text-slate-900">New Registration</h2>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Submit a new land parcel registration with multiple registrants & documents
+              Submit a new land parcel registration with location, registrants & documents
             </p>
           </div>
           <button
@@ -220,10 +250,13 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
 
         {/* Scrollable Form Content */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Location Picker Section at the top */}
+          <LocationPicker value={location} onChange={setLocation} />
+
           {/* General Information Section */}
-          <div className="space-y-4">
+          <div className="space-y-4 pt-2 border-t border-slate-100">
             <h3 className="text-xs font-bold text-slate-500 tracking-wider uppercase">
-              Parcel Information
+              Parcel Details
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
