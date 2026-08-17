@@ -200,10 +200,15 @@ export interface CreateRegistrantPayload {
   status?: LandParcelOwnershipStatus;
 }
 
+export interface AttachDocumentPayload {
+  mediaId: string;
+  docType?: LandParcelDocumentType;
+}
+
 export interface CreateRegistrationPayload {
   areaSqm?: number;
   notes?: string;
   submittedAt?: string;
   registrants?: CreateRegistrantPayload[];
-  documents?: string[];
+  documents?: AttachDocumentPayload[];
 }

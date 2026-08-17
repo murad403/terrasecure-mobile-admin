@@ -1,20 +1,33 @@
 "use client"
 import React, { useState, useEffect } from 'react'
-import { X, Plus, Trash2 } from 'lucide-react'
+import { X, Plus, Trash2, Upload, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useCreateRegistrationMutation } from '@/redux/features/registrations/registration.api'
 import { toast } from 'sonner'
-import type { LandParcelOwnershipType, LandParcelOwnershipStatus } from '@/redux/features/registrations/registration.type'
+import formatFileSize from '@/utils/formatFileSize'
+import type {
+  LandParcelOwnershipType,
+  LandParcelOwnershipStatus,
+  LandParcelDocumentType,
+} from '@/redux/features/registrations/registration.type'
 
 interface RegistrantInput {
   ownerName: string
   ownerPhone: string
-  sharePercentage: number
+  sharePercentage: number | string
   ownershipType: LandParcelOwnershipType
   status: LandParcelOwnershipStatus
+}
+
+interface UploadedDocument {
+  mediaId: string
+  name: string
+  size?: number
+  docType: LandParcelDocumentType
+  file?: File
 }
 
 interface AddRegistrationModalProps {
@@ -22,13 +35,24 @@ interface AddRegistrationModalProps {
   onClose: () => void
 }
 
+const documentTypeOptions: { label: string; value: LandParcelDocumentType }[] = [
+  { label: 'Title Deed', value: 'TITLE_DEED' },
+  { label: 'Survey Plan', value: 'SURVEY_PLAN' },
+  { label: 'National ID', value: 'NATIONAL_ID' },
+  { label: 'Tax Receipt', value: 'TAX_RECEIPT' },
+  { label: 'Court Order', value: 'COURT_ORDER' },
+  { label: 'Consent Letter', value: 'CONSENT_LETTER' },
+  { label: 'Sale Agreement', value: 'SALE_AGREEMENT' },
+  { label: 'Other', value: 'OTHER' },
+]
+
 const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onClose }) => {
   const [createRegistration, { isLoading }] = useCreateRegistrationMutation()
 
   const [areaSqm, setAreaSqm] = useState<string>('')
   const [notes, setNotes] = useState<string>('')
   const [submittedAt, setSubmittedAt] = useState<string>(new Date().toISOString().slice(0, 16))
-  const [mediaIdInput, setMediaIdInput] = useState<string>('')
+  const [uploadedDocs, setUploadedDocs] = useState<UploadedDocument[]>([])
 
   const [registrants, setRegistrants] = useState<RegistrantInput[]>([
     {
@@ -54,12 +78,18 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
   if (!isOpen) return null
 
   const handleAddRegistrant = () => {
+    const currentTotal = registrants.reduce(
+      (sum, reg) => sum + (Number(reg.sharePercentage) || 0),
+      0
+    )
+    const remaining = Math.max(0, 100 - currentTotal)
+
     setRegistrants((prev) => [
       ...prev,
       {
         ownerName: '',
         ownerPhone: '',
-        sharePercentage: 0,
+        sharePercentage: remaining > 0 ? remaining : '',
         ownershipType: 'CO_OWNER',
         status: 'DRAFT',
       },
@@ -89,11 +119,37 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
     0
   )
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    const newDocs: UploadedDocument[] = Array.from(files).map((file) => ({
+      mediaId: 'edfaf66e-fe87-40ab-a02c-0d2f84cec8c2',
+      name: file.name,
+      size: file.size,
+      docType: 'OTHER',
+      file,
+    }))
+
+    setUploadedDocs((prev) => [...prev, ...newDocs])
+    toast.success(`${newDocs.length} file(s) attached.`)
+  }
+
+  const handleDocTypeChange = (index: number, docType: LandParcelDocumentType) => {
+    setUploadedDocs((prev) =>
+      prev.map((doc, i) => (i === index ? { ...doc, docType } : doc))
+    )
+  }
+
+  const handleRemoveDoc = (index: number) => {
+    setUploadedDocs((prev) => prev.filter((_, i) => i !== index))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (totalSharePercentage > 100) {
-      toast.error(`Total share percentage cannot exceed 100%. Current total: ${totalSharePercentage}%`)
+      toast.error(`Total share percentage across all registrants combined (${totalSharePercentage}%) cannot exceed 100%.`)
       return
     }
 
@@ -110,9 +166,10 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
     }
 
     try {
-      const documentsList = mediaIdInput
-        ? mediaIdInput.split(',').map((id) => id.trim()).filter(Boolean)
-        : []
+      const documentsList = uploadedDocs.map((doc) => ({
+        mediaId: doc.mediaId,
+        docType: doc.docType,
+      }))
 
       const payload = {
         areaSqm: areaSqm ? Number(areaSqm) : undefined,
@@ -121,11 +178,11 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
         registrants: registrants.map((r) => ({
           ownerName: r.ownerName,
           ownerPhone: r.ownerPhone,
-          sharePercentage: Number(r.sharePercentage) || 0,
+          sharePercentage: r.sharePercentage === '' ? 0 : Number(r.sharePercentage),
           ownershipType: r.ownershipType,
           status: r.status,
         })),
-        documents: documentsList,
+        documents: documentsList.length > 0 ? documentsList : undefined,
       }
 
       await createRegistration(payload).unwrap()
@@ -150,7 +207,7 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
           <div>
             <h2 className="text-base font-extrabold text-slate-900">New Registration</h2>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Submit a new land parcel registration with multiple registrants
+              Submit a new land parcel registration with multiple registrants & documents
             </p>
           </div>
           <button
@@ -213,18 +270,84 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
               />
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="mediaIdInput" className="text-xs font-bold text-slate-700">
-                Document Media IDs (comma-separated, optional)
+            {/* File Upload Dropzone */}
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-slate-700">
+                Attached Documents
               </Label>
-              <Input
-                id="mediaIdInput"
-                type="text"
-                placeholder="e.g. edfaf66e-fe87-40ab-a02c-0d2f84cec8c2"
-                value={mediaIdInput}
-                onChange={(e) => setMediaIdInput(e.target.value)}
-                className="w-full text-xs font-semibold"
+              <input
+                id="registration-file-upload"
+                type="file"
+                multiple
+                accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
+                onChange={handleFileUpload}
+                className="hidden"
               />
+              <label
+                htmlFor="registration-file-upload"
+                className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 hover:border-button-color rounded-xl bg-slate-50/50 hover:bg-slate-50 transition-all cursor-pointer text-center group"
+              >
+                <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                  <Upload className="w-5 h-5" />
+                </div>
+                <span className="text-xs font-extrabold text-slate-800">
+                  Click to upload documents
+                </span>
+                <span className="text-[10px] text-slate-400 font-semibold mt-1">
+                  Supports PDF, PNG, JPG, DOC (Max 10MB each)
+                </span>
+              </label>
+
+              {/* Uploaded File List with Document Type Selector */}
+              {uploadedDocs.length > 0 && (
+                <div className="space-y-2 pt-2">
+                  {uploadedDocs.map((doc, idx) => (
+                    <div
+                      key={idx}
+                      className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-white border border-slate-200 rounded-lg text-xs gap-3"
+                    >
+                      <div className="flex items-center gap-2.5 truncate flex-1 min-w-0">
+                        <FileText className="w-4 h-4 text-blue-600 shrink-0" />
+                        <span className="font-bold text-slate-800 truncate">{doc.name}</span>
+                        {doc.size && (
+                          <span className="text-[10px] text-slate-400 font-medium shrink-0">
+                            ({formatFileSize(doc.size)})
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-end">
+                        <Select
+                          value={doc.docType}
+                          onValueChange={(val: LandParcelDocumentType) =>
+                            handleDocTypeChange(idx, val)
+                          }
+                        >
+                          <SelectTrigger className="w-36 bg-white text-xs h-8">
+                            <SelectValue placeholder="Doc Type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {documentTypeOptions.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDoc(idx)}
+                          className="text-slate-400 hover:text-red-600 p-1 transition-colors shrink-0"
+                          title="Remove Document"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -322,13 +445,14 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
                         max="100"
                         placeholder="50"
                         value={reg.sharePercentage}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const val = e.target.value
                           handleRegistrantChange(
                             idx,
                             'sharePercentage',
-                            Number(e.target.value)
+                            val === '' ? '' : Number(val)
                           )
-                        }
+                        }}
                         className="text-xs font-semibold bg-white"
                       />
                     </div>
