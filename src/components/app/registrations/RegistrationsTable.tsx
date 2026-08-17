@@ -1,6 +1,6 @@
 "use client"
-import { useState, useEffect, useRef } from 'react'
-import { Plus, Search, Eye, ChevronDown } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Plus, Search, Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'

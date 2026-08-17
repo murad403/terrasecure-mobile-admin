@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import { useState } from 'react'
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout'
 import RegistrationsTable, { type Registration } from './RegistrationsTable'
 import RegistrationSteps from './RegistrationSteps'

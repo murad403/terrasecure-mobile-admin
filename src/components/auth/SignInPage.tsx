@@ -22,8 +22,8 @@ const SignInPage = () => {
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: 'admin@landmonitor.com',
+      password: 'SecureAdminPass123',
       rememberMe: false,
     },
   })
