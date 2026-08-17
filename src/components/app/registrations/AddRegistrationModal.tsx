@@ -1,291 +1,406 @@
 "use client"
-import React, { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { addRegistrationSchema, type AddRegistrationFormValues } from '@/validation/registration.validation'
-import { X, FileText } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { X, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useCreateRegistrationMutation } from '@/redux/features/registrations/registration.api'
+import { toast } from 'sonner'
+import type { LandParcelOwnershipType, LandParcelOwnershipStatus } from '@/redux/features/registrations/registration.type'
 
-interface AddRegistrationModalProps {
-    isOpen: boolean
-    onClose: () => void
-    onAdd: (data: AddRegistrationFormValues) => void
+interface RegistrantInput {
+  ownerName: string
+  ownerPhone: string
+  sharePercentage: number
+  ownershipType: LandParcelOwnershipType
+  status: LandParcelOwnershipStatus
 }
 
-const AddRegistrationModal = ({ isOpen, onClose, onAdd }: AddRegistrationModalProps) => {
-    const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+interface AddRegistrationModalProps {
+  isOpen: boolean
+  onClose: () => void
+}
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting },
-        reset
-    } = useForm<AddRegistrationFormValues>({
-        resolver: zodResolver(addRegistrationSchema) as any,
-        defaultValues: {
-            ownerName: '',
-            nationalId: '',
-            phone: '',
-            city: 'Yaoundé',
-            district: '',
-            area: '' as any,
-            submissionDate: new Date().toISOString().split('T')[0],
-            notes: ''
-        }
-    })
+const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onClose }) => {
+  const [createRegistration, { isLoading }] = useCreateRegistrationMutation()
 
-    // Lock scroll when open
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden'
-        } else {
-            document.body.style.overflow = ''
-        }
-        return () => {
-            document.body.style.overflow = ''
-        }
-    }, [isOpen])
+  const [areaSqm, setAreaSqm] = useState<string>('')
+  const [notes, setNotes] = useState<string>('')
+  const [submittedAt, setSubmittedAt] = useState<string>(new Date().toISOString().slice(0, 16))
+  const [mediaIdInput, setMediaIdInput] = useState<string>('')
 
-    if (!isOpen) return null
+  const [registrants, setRegistrants] = useState<RegistrantInput[]>([
+    {
+      ownerName: '',
+      ownerPhone: '',
+      sharePercentage: 100,
+      ownershipType: 'PRIMARY',
+      status: 'DRAFT',
+    },
+  ])
 
-    const onSubmit = (data: AddRegistrationFormValues) => {
-        onAdd(data)
-        reset()
-        setSelectedFiles([])
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
+  if (!isOpen) return null
+
+  const handleAddRegistrant = () => {
+    setRegistrants((prev) => [
+      ...prev,
+      {
+        ownerName: '',
+        ownerPhone: '',
+        sharePercentage: 0,
+        ownershipType: 'CO_OWNER',
+        status: 'DRAFT',
+      },
+    ])
+  }
+
+  const handleRemoveRegistrant = (index: number) => {
+    if (registrants.length === 1) {
+      toast.error('At least one registrant is required.')
+      return
+    }
+    setRegistrants((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handleRegistrantChange = <K extends keyof RegistrantInput>(
+    index: number,
+    field: K,
+    value: RegistrantInput[K]
+  ) => {
+    setRegistrants((prev) =>
+      prev.map((reg, i) => (i === index ? { ...reg, [field]: value } : reg))
+    )
+  }
+
+  const totalSharePercentage = registrants.reduce(
+    (sum, reg) => sum + (Number(reg.sharePercentage) || 0),
+    0
+  )
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (totalSharePercentage > 100) {
+      toast.error(`Total share percentage cannot exceed 100%. Current total: ${totalSharePercentage}%`)
+      return
     }
 
-    return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-[1px] p-4 overflow-y-auto animate-in fade-in duration-200"
+    for (let i = 0; i < registrants.length; i++) {
+      const reg = registrants[i]
+      if (!reg.ownerName.trim()) {
+        toast.error(`Registrant #${i + 1} owner name is required.`)
+        return
+      }
+      if (!reg.ownerPhone.trim()) {
+        toast.error(`Registrant #${i + 1} phone number is required.`)
+        return
+      }
+    }
+
+    try {
+      const documentsList = mediaIdInput
+        ? mediaIdInput.split(',').map((id) => id.trim()).filter(Boolean)
+        : []
+
+      const payload = {
+        areaSqm: areaSqm ? Number(areaSqm) : undefined,
+        notes: notes ? `<p>${notes}</p>` : undefined,
+        submittedAt: new Date(submittedAt).toISOString(),
+        registrants: registrants.map((r) => ({
+          ownerName: r.ownerName,
+          ownerPhone: r.ownerPhone,
+          sharePercentage: Number(r.sharePercentage) || 0,
+          ownershipType: r.ownershipType,
+          status: r.status,
+        })),
+        documents: documentsList,
+      }
+
+      await createRegistration(payload).unwrap()
+      toast.success('Land parcel registration created successfully!')
+      onClose()
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Failed to create registration.')
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4 animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white border border-slate-200 rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
+          <div>
+            <h2 className="text-base font-extrabold text-slate-900">New Registration</h2>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              Submit a new land parcel registration with multiple registrants
+            </p>
+          </div>
+          <button
             onClick={onClose}
-        >
-            {/* Modal Dialog Card */}
-            <div
-                className="bg-white rounded-2xl border border-slate-100 w-full max-w-lg shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
-                onClick={(e) => e.stopPropagation()}
-            >
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-                    <div>
-                        <h2 className="text-base font-bold text-title">New Registration</h2>
-                        <p className="text-xs font-semibold text-subtitle mt-0.5">Submit a new land registration request</p>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
-
-                {/* Form Body */}
-                <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col overflow-hidden">
-                    <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-
-                        {/* Auto-assigned Banner */}
-                        <div className="bg-emerald-50 border border-emerald-100 p-3 rounded-lg text-xs font-semibold text-emerald-700 leading-relaxed">
-                            A new Registration ID will be auto-assigned upon submission.
-                        </div>
-
-                        {/* Applicant Full Name */}
-                        <div className="space-y-1.5">
-                            <Label htmlFor="ownerName">Applicant Full Name</Label>
-                            <Input
-                                id="ownerName"
-                                placeholder="e.g. Pierre Mballa"
-                                {...register('ownerName')}
-                            />
-                            {errors.ownerName && (
-                                <p className="text-xs text-destructive font-semibold mt-1">{errors.ownerName.message}</p>
-                            )}
-                        </div>
-
-                        {/* Applicant National ID */}
-                        <div className="space-y-1.5">
-                            <Label htmlFor="nationalId">Applicant National ID</Label>
-                            <Input
-                                id="nationalId"
-                                placeholder="e.g. NI-12847291"
-                                {...register('nationalId')}
-                            />
-                            {errors.nationalId && (
-                                <p className="text-xs text-destructive font-semibold mt-1">{errors.nationalId.message}</p>
-                            )}
-                        </div>
-
-                        {/* Phone */}
-                        <div className="space-y-1.5">
-                            <Label htmlFor="phone">Phone</Label>
-                            <Input
-                                id="phone"
-                                placeholder="+237 6XX XXX XXX"
-                                {...register('phone')}
-                            />
-                            {errors.phone && (
-                                <p className="text-xs text-destructive font-semibold mt-1">{errors.phone.message}</p>
-                            )}
-                        </div>
-
-                        {/* City / District row */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                                <Label htmlFor="city">City</Label>
-                                <select
-                                    id="city"
-                                    {...register('city')}
-                                    className="flex py-3 w-full rounded-lg border border-slate-200 bg-slate-50/40 px-4 text-sm text-title transition-all focus:border-button-color focus:bg-white focus:outline-none focus:ring-2 focus:ring-button-color/20 font-semibold cursor-pointer outline-none"
-                                >
-                                    <option value="Yaoundé">Yaoundé</option>
-                                    <option value="Douala">Douala</option>
-                                    <option value="Bamenda">Bamenda</option>
-                                    <option value="Bafoussam">Bafoussam</option>
-                                    <option value="Garoua">Garoua</option>
-                                    <option value="Maroua">Maroua</option>
-                                </select>
-                                {errors.city && (
-                                    <p className="text-xs text-destructive font-semibold mt-1">{errors.city.message}</p>
-                                )}
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <Label htmlFor="district">District</Label>
-                                <Input
-                                    id="district"
-                                    placeholder="e.g. Bastos"
-                                    {...register('district')}
-                                />
-                                {errors.district && (
-                                    <p className="text-xs text-destructive font-semibold mt-1">{errors.district.message}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Area / Submission Date row */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                                <Label htmlFor="area">Declared Area (m²)</Label>
-                                <Input
-                                    id="area"
-                                    type="number"
-                                    placeholder="e.g. 1240"
-                                    {...register('area')}
-                                />
-                                {errors.area && (
-                                    <p className="text-xs text-destructive font-semibold mt-1">{errors.area.message}</p>
-                                )}
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <Label htmlFor="submissionDate">Submission Date</Label>
-                                <Input
-                                    id="submissionDate"
-                                    type="date"
-                                    {...register('submissionDate')}
-                                    className="transition-none"
-                                />
-                                {errors.submissionDate && (
-                                    <p className="text-xs text-destructive font-semibold mt-1">{errors.submissionDate.message}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Real Document Uploader */}
-                        <div className="space-y-1.5">
-                            <Label>Upload Documents</Label>
-                            <input
-                                type="file"
-                                id="modal-file-upload"
-                                multiple
-                                onChange={(e) => {
-                                    if (e.target.files) {
-                                        setSelectedFiles(prev => [...prev, ...Array.from(e.target.files || [])])
-                                    }
-                                }}
-                                className="hidden"
-                            />
-                            <label
-                                htmlFor="modal-file-upload"
-                                className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all hover:bg-slate-50/30 flex flex-col items-center justify-center ${selectedFiles.length > 0 ? 'border-emerald-200 bg-emerald-50/5' : 'border-slate-200 bg-slate-50/10'
-                                    }`}
-                            >
-                                <div className="space-y-1">
-                                    <p className="text-xs font-semibold text-slate-650 text-slate-600">Drop files here or click to browse</p>
-                                    <p className="text-[10px] font-semibold text-slate-400">PDF, JPG, PNG — max 10MB each</p>
-                                </div>
-                            </label>
-
-                            {/* Render File list if selected */}
-                            {selectedFiles.length > 0 && (
-                                <div className="space-y-2 mt-2 max-h-32 overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden">
-                                    {selectedFiles.map((file, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="flex items-center justify-between bg-slate-50 border border-slate-100 p-2.5 rounded-lg text-xs font-semibold text-title"
-                                        >
-                                            <div className="flex items-center gap-2 truncate">
-                                                <FileText className="w-4 h-4 text-button-color shrink-0" />
-                                                <span className="truncate">{file.name}</span>
-                                                <span className="text-[10px] text-slate-400 font-normal shrink-0">
-                                                    ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                                                </span>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    setSelectedFiles(prev => prev.filter((_, i) => i !== idx))
-                                                }}
-                                                className="text-slate-400 hover:text-rose-600 font-bold text-sm leading-none p-1 hover:bg-slate-100 rounded cursor-pointer"
-                                            >
-                                                &times;
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Notes textarea */}
-                        <div className="space-y-1.5">
-                            <Label htmlFor="notes">Notes</Label>
-                            <textarea
-                                id="notes"
-                                rows={3}
-                                placeholder="Additional notes..."
-                                {...register('notes')}
-                                className="w-full p-3 border border-slate-200 bg-slate-50/40 rounded-lg text-xs md:text-sm text-title placeholder:text-slate-400 focus:border-button-color focus:bg-white focus:outline-none transition-all resize-none font-medium"
-                            />
-                            {errors.notes && (
-                                <p className="text-xs text-destructive font-semibold mt-1">{errors.notes.message}</p>
-                            )}
-                        </div>
-
-                    </div>
-
-                    {/* Action Footer */}
-                    <div className="px-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between py-4 gap-4">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 w-1/2 py-3 border border-slate-400 text-xs font-semibold text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-                        >
-                            Cancel
-                        </button>
-                        <Button
-                            className='w-1/2'
-                            type="submit"
-                            disabled={isSubmitting}
-                        >
-                            <span>+</span>
-                            <span>Submit Registration</span>
-                        </Button>
-                    </div>
-                </form>
-            </div>
+            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
-    )
+
+        {/* Scrollable Form Content */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* General Information Section */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold text-slate-500 tracking-wider uppercase">
+              Parcel Information
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="areaSqm" className="text-xs font-bold text-slate-700">
+                  Area (sqm)
+                </Label>
+                <Input
+                  id="areaSqm"
+                  type="number"
+                  step="0.01"
+                  placeholder="e.g. 500.5"
+                  value={areaSqm}
+                  onChange={(e) => setAreaSqm(e.target.value)}
+                  className="w-full text-xs font-semibold"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="submittedAt" className="text-xs font-bold text-slate-700">
+                  Submission Date & Time
+                </Label>
+                <Input
+                  id="submittedAt"
+                  type="datetime-local"
+                  value={submittedAt}
+                  onChange={(e) => setSubmittedAt(e.target.value)}
+                  className="w-full text-xs font-semibold"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="notes" className="text-xs font-bold text-slate-700">
+                Notes
+              </Label>
+              <textarea
+                id="notes"
+                rows={3}
+                placeholder="Land parcel description or notes..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="w-full p-3 border border-slate-200 bg-white rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:border-button-color focus:outline-none focus:ring-2 focus:ring-button-color/20 font-semibold"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="mediaIdInput" className="text-xs font-bold text-slate-700">
+                Document Media IDs (comma-separated, optional)
+              </Label>
+              <Input
+                id="mediaIdInput"
+                type="text"
+                placeholder="e.g. edfaf66e-fe87-40ab-a02c-0d2f84cec8c2"
+                value={mediaIdInput}
+                onChange={(e) => setMediaIdInput(e.target.value)}
+                className="w-full text-xs font-semibold"
+              />
+            </div>
+          </div>
+
+          {/* Registrants Section */}
+          <div className="space-y-4 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-bold text-slate-500 tracking-wider uppercase">
+                  Registrants / Owners
+                </h3>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Total share percentage: {' '}
+                  <span
+                    className={
+                      totalSharePercentage > 100
+                        ? 'text-red-600 font-bold'
+                        : 'text-emerald-600 font-bold'
+                    }
+                  >
+                    {totalSharePercentage}% / 100%
+                  </span>
+                </p>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddRegistrant}
+                className="w-auto flex items-center gap-1.5 text-xs font-bold text-button-color border-button-color/30 hover:bg-button-color/5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Registrant</span>
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {registrants.map((reg, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3 relative"
+                >
+                  <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                    <span className="text-xs font-bold text-slate-700">
+                      Registrant #{idx + 1}
+                    </span>
+                    {registrants.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveRegistrant(idx)}
+                        className="text-slate-400 hover:text-red-600 p-1 transition-colors"
+                        title="Remove Registrant"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-[11px] font-bold text-slate-600">Owner Name *</Label>
+                      <Input
+                        type="text"
+                        placeholder="John Doe"
+                        value={reg.ownerName}
+                        onChange={(e) =>
+                          handleRegistrantChange(idx, 'ownerName', e.target.value)
+                        }
+                        className="text-xs font-semibold bg-white"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-[11px] font-bold text-slate-600">Owner Phone (E.164) *</Label>
+                      <Input
+                        type="text"
+                        placeholder="+1234567890"
+                        value={reg.ownerPhone}
+                        onChange={(e) =>
+                          handleRegistrantChange(idx, 'ownerPhone', e.target.value)
+                        }
+                        className="text-xs font-semibold bg-white"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-[11px] font-bold text-slate-600">Share %</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="100"
+                        placeholder="50"
+                        value={reg.sharePercentage}
+                        onChange={(e) =>
+                          handleRegistrantChange(
+                            idx,
+                            'sharePercentage',
+                            Number(e.target.value)
+                          )
+                        }
+                        className="text-xs font-semibold bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-[11px] font-bold text-slate-600">Ownership Type</Label>
+                      <Select
+                        value={reg.ownershipType}
+                        onValueChange={(val: LandParcelOwnershipType) =>
+                          handleRegistrantChange(idx, 'ownershipType', val)
+                        }
+                      >
+                        <SelectTrigger className="w-full bg-white text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PRIMARY">PRIMARY</SelectItem>
+                          <SelectItem value="CO_OWNER">CO_OWNER</SelectItem>
+                          <SelectItem value="HEIR">HEIR</SelectItem>
+                          <SelectItem value="LEGAL_REPRESENTATIVE">LEGAL_REPRESENTATIVE</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-[11px] font-bold text-slate-600">Status</Label>
+                      <Select
+                        value={reg.status}
+                        onValueChange={(val: LandParcelOwnershipStatus) =>
+                          handleRegistrantChange(idx, 'status', val)
+                        }
+                      >
+                        <SelectTrigger className="w-full bg-white text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="DRAFT">DRAFT</SelectItem>
+                          <SelectItem value="UNDER_VERIFICATION">UNDER_VERIFICATION</SelectItem>
+                          <SelectItem value="PUBLISHED">PUBLISHED</SelectItem>
+                          <SelectItem value="RESERVED">RESERVED</SelectItem>
+                          <SelectItem value="CLOSED">CLOSED</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Form Actions Footer */}
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="w-auto px-5 text-xs font-bold"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-auto px-6 text-xs font-bold"
+            >
+              {isLoading ? 'Creating...' : 'Create Registration'}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
 }
 
 export default AddRegistrationModal

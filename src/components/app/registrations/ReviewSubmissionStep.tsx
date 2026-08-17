@@ -1,45 +1,50 @@
 "use client"
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import type { RegistrationItem } from '@/redux/features/registrations/registration.type'
 
 interface ReviewSubmissionStepProps {
-  registration: any
-  onUpdate: (data: any) => void
-  onCompleteStep: () => void
+  registration: RegistrationItem
+  onNextStep: () => void
 }
 
-const ReviewSubmissionStep = ({ registration, onUpdate, onCompleteStep }: ReviewSubmissionStepProps) => {
-  const [notes, setNotes] = useState(registration?.notes || '')
+const ReviewSubmissionStep: React.FC<ReviewSubmissionStepProps> = ({
+  registration,
+  onNextStep,
+}) => {
+  const isStepCompleted = (registration.step || 1) > 1
 
-  useEffect(() => {
-    setNotes(registration?.notes || '')
-  }, [registration])
-
-  const isStepCompleted = registration?.activeStep > 1
-
-  const handleMarkReviewed = () => {
-    onUpdate({
-      notes,
-      reviewCompleted: true
+  const formatDate = (dateStr?: string | null) => {
+    if (!dateStr) return 'N/A'
+    const parsed = new Date(dateStr)
+    if (isNaN(parsed.getTime())) return 'N/A'
+    return parsed.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     })
-    onCompleteStep()
   }
+
+  const primaryOwner = registration.registrants?.[0]
+  const location = registration.location
 
   return (
     <div className="space-y-5">
       {/* Title block */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-bold text-title">Step 1: Review Submission</h3>
-          <p className="text-xs font-semibold text-subtitle mt-0.5">
-            {isStepCompleted ? 'Completed' : 'In Progress'}
+          <h3 className="text-sm font-bold text-slate-900">Step 1: Review Submission</h3>
+          <p className="text-xs font-semibold text-slate-500 mt-0.5">
+            {isStepCompleted ? 'Completed' : 'Pending Admin Review'}
           </p>
         </div>
 
         <span
           className={cn(
-            "px-2.5 py-0.5 rounded text-[10px] font-bold border whitespace-nowrap uppercase tracking-wider",
+            'px-2.5 py-0.5 rounded text-[10px] font-bold border whitespace-nowrap uppercase tracking-wider',
             isStepCompleted
               ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
               : 'bg-blue-50 text-blue-600 border-blue-100'
@@ -50,48 +55,95 @@ const ReviewSubmissionStep = ({ registration, onUpdate, onCompleteStep }: Review
       </div>
 
       {/* Submission Details Card */}
-      <div className="bg-slate-50/20 border border-slate-100 rounded-xl p-4 space-y-3">
-        <h4 className="text-xs font-bold text-slate-800">Submission Details</h4>
-        
-        <div className="divide-y divide-slate-50 font-medium text-xs">
-          {/* Location row */}
+      <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-4 space-y-3">
+        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+          Registration Overview
+        </h4>
+
+        <div className="divide-y divide-slate-100 font-medium text-xs">
           <div className="flex items-center justify-between py-2">
-            <span className="text-slate-500">Parcel Location</span>
-            <span className="text-slate-800 font-bold">{registration?.city}, {registration?.district}</span>
+            <span className="text-slate-500">Registration Slug</span>
+            <span className="text-slate-800 font-bold font-mono">{registration.slug || `REG-${registration.id}`}</span>
           </div>
 
-          {/* Area row */}
           <div className="flex items-center justify-between py-2">
-            <span className="text-slate-500">Area Declared</span>
-            <span className="text-slate-800 font-bold font-mono">{Number(registration?.area).toLocaleString()} m²</span>
+            <span className="text-slate-500">Status</span>
+            <span className="text-slate-800 font-bold">{registration.status}</span>
           </div>
 
-          {/* Owner row */}
           <div className="flex items-center justify-between py-2">
-            <span className="text-slate-500">Owner</span>
-            <span className="text-slate-800 font-bold">{registration?.ownerName}</span>
+            <span className="text-slate-500">Area (sqm)</span>
+            <span className="text-slate-800 font-bold font-mono">
+              {registration.areaSqm ? `${Number(registration.areaSqm).toLocaleString()} m²` : 'N/A'}
+            </span>
           </div>
+
+          <div className="flex items-center justify-between py-2">
+            <span className="text-slate-500">Submitted At</span>
+            <span className="text-slate-800 font-bold">
+              {formatDate(registration.submittedAt || registration.createdAt)}
+            </span>
+          </div>
+
+          {location && (
+            <div className="py-2 space-y-1">
+              <span className="text-slate-500 block">Location Details</span>
+              <p className="text-slate-800 font-semibold text-xs leading-relaxed">
+                {[location.addressLine1, location.addressLine2, location.city, location.state, location.country]
+                  .filter(Boolean)
+                  .join(', ')}
+              </p>
+              {location.remarks && (
+                <p className="text-slate-500 text-[11px] italic">Remarks: {location.remarks}</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Notes Textarea */}
-      <div className="space-y-1.5">
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Add notes..."
-          rows={4}
-          className="w-full p-3 border border-slate-200 bg-slate-50/20 rounded-lg text-xs md:text-sm text-title placeholder:text-slate-400 focus:border-button-color focus:bg-white focus:outline-none focus:ring-2 focus:ring-button-color/20 transition-all resize-none font-semibold"
-        />
+      {/* Registrants / Owners Section */}
+      <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-4 space-y-3">
+        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+          Registrants ({registration.registrants?.length || 0})
+        </h4>
+
+        {registration.registrants && registration.registrants.length > 0 ? (
+          <div className="space-y-2">
+            {registration.registrants.map((reg, idx) => (
+              <div key={idx} className="p-3 bg-white border border-slate-200/60 rounded-lg text-xs flex items-center justify-between">
+                <div>
+                  <div className="font-bold text-slate-800">{reg.ownerName}</div>
+                  <div className="text-[11px] text-slate-500">{reg.ownerPhone}</div>
+                </div>
+                <div className="text-right">
+                  <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-bold">
+                    {reg.ownershipType || 'PRIMARY'} · {reg.sharePercentage || 0}%
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-slate-400">No registrants associated.</p>
+        )}
       </div>
+
+      {/* Notes (Read-Only HTML / Text) */}
+      {registration.notes && (
+        <div className="space-y-1.5 bg-slate-50/50 border border-slate-100 rounded-xl p-4">
+          <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+            Notes / Description
+          </h4>
+          <div
+            className="text-xs text-slate-700 font-medium leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: registration.notes }}
+          />
+        </div>
+      )}
 
       {/* Action Button */}
       <div className="pt-2">
-        <Button
-          type="button"
-          onClick={handleMarkReviewed}
-          className='w-auto'
-        >
+        <Button type="button" onClick={onNextStep} className="w-auto px-6">
           Mark as Reviewed
         </Button>
       </div>

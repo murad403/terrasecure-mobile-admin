@@ -1,56 +1,54 @@
 "use client"
-import React, { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { step7PublishSchema, type Step7PublishFormValues } from '@/validation/registration.validation'
+import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Check, Globe } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { usePublishRegistrationMutation } from '@/redux/features/registrations/registration.api'
+import { toast } from 'sonner'
+import type { RegistrationItem } from '@/redux/features/registrations/registration.type'
 
 interface PublishParcelStepProps {
-  registration: any
-  onUpdate: (data: any) => void
-  onCompleteStep: () => void
+  registration: RegistrationItem
+  onCloseDrawer: () => void
 }
 
-const PublishParcelStep = ({ registration, onUpdate, onCompleteStep }: PublishParcelStepProps) => {
-  const {
-    handleSubmit,
-    formState: { isSubmitting },
-    reset
-  } = useForm<Step7PublishFormValues>({
-    resolver: zodResolver(step7PublishSchema) as any,
-    defaultValues: {}
-  })
+const PublishParcelStep: React.FC<PublishParcelStepProps> = ({
+  registration,
+  onCloseDrawer,
+}) => {
+  const [publishRegistration, { isLoading }] = usePublishRegistrationMutation()
 
-  useEffect(() => {
-    reset({})
-  }, [registration, reset])
+  const isStepCompleted =
+    registration.status === 'PUBLISHED' ||
+    registration.status === 'CONVERTED' ||
+    (registration.step || 1) >= 7
 
-  const onSubmit = () => {
-    onUpdate({
-      published: true,
-      status: 'Completed'
-    })
-    onCompleteStep()
+  const handlePublish = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      await publishRegistration(registration.id).unwrap()
+      toast.success('Land parcel registration published successfully!')
+      onCloseDrawer()
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Failed to publish land parcel registration.')
+    }
   }
 
-  const isStepCompleted = registration?.status === 'Completed' || registration?.activeStep > 7
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handlePublish} className="space-y-6">
       {/* Header block */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-bold text-title">Step 7: Publish Parcel</h3>
-          <p className="text-xs font-semibold text-subtitle mt-0.5">
-            {isStepCompleted ? 'Completed' : 'Pending'}
+          <h3 className="text-sm font-bold text-slate-900">Step 7: Publish Parcel</h3>
+          <p className="text-xs font-semibold text-slate-500 mt-0.5">
+            {isStepCompleted ? 'Completed' : 'Final Step: Publish parcel to public registry'}
           </p>
         </div>
 
         <span
           className={cn(
-            "px-2.5 py-0.5 rounded text-[10px] font-bold border whitespace-nowrap uppercase tracking-wider",
+            'px-2.5 py-0.5 rounded text-[10px] font-bold border whitespace-nowrap uppercase tracking-wider',
             isStepCompleted
               ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
               : 'bg-amber-50 text-amber-600 border-amber-200'
@@ -65,22 +63,19 @@ const PublishParcelStep = ({ registration, onUpdate, onCompleteStep }: PublishPa
         <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
         <div>
           <span className="text-xs font-extrabold text-emerald-800 block">
-            Registration approved — ready to publish
+            Registration ready to publish
           </span>
-          <span className="text-[10px] font-semibold text-emerald-650 mt-0.5 block">
-            Parcel will be assigned ID CM-3193 upon publication
+          <span className="text-[10px] font-semibold text-emerald-700 mt-0.5 block">
+            Slug: {registration.slug || `REG-${registration.id}`} · Parcel ID: #{registration.parcelId || registration.id}
           </span>
         </div>
       </div>
 
       {/* Submit Button */}
       <div className="pt-2">
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-        >
-          <Globe className="w-4 h-4 shrink-0" />
-          <span>Publish Parcel to Platform</span>
+        <Button type="submit" disabled={isLoading} className="w-auto px-6 font-bold text-xs">
+          <Globe className="w-4 h-4 shrink-0 mr-1.5" />
+          <span>{isLoading ? 'Publishing...' : 'Publish Parcel to Platform'}</span>
         </Button>
       </div>
     </form>

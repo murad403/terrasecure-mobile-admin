@@ -4,10 +4,19 @@ import baseApi from "@/redux/api/api";
 const registrationApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         retrieveRegistrations: builder.query({
-            query: () => ({
-                url: `/land-parcel-registrations`,
-                method: "GET",
-            }),
+            query: (params?: { page?: number; limit?: number; search?: string; status?: string; ownershipType?: string }) => {
+                const queryParams = new URLSearchParams();
+                if (params?.page) queryParams.append("page", params.page.toString());
+                if (params?.limit) queryParams.append("limit", params.limit.toString());
+                if (params?.search) queryParams.append("search", params.search);
+                if (params?.status && params.status !== "All") queryParams.append("status", params.status);
+                if (params?.ownershipType && params.ownershipType !== "All") queryParams.append("ownershipType", params.ownershipType);
+                const queryString = queryParams.toString();
+                return {
+                    url: `/land-parcel-registrations${queryString ? `?${queryString}` : ""}`,
+                    method: "GET",
+                };
+            },
             providesTags: ["Registration"]
         }),
         retrieveRegistrationDetails: builder.query({

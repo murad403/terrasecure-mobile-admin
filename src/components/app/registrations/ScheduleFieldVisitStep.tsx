@@ -1,115 +1,111 @@
 "use client"
-import React, { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { step4VisitSchema, type Step4VisitFormValues } from '@/validation/registration.validation'
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import { useScheduleSiteVisitMutation } from '@/redux/features/registrations/registration.api'
+import { toast } from 'sonner'
+import type { RegistrationItem } from '@/redux/features/registrations/registration.type'
 
 interface ScheduleFieldVisitStepProps {
-    registration: any
-    onUpdate: (data: any) => void
-    onCompleteStep: () => void
+  registration: RegistrationItem
+  onNextStep: () => void
 }
 
-const ScheduleFieldVisitStep = ({ registration, onUpdate, onCompleteStep }: ScheduleFieldVisitStepProps) => {
-    const getInitialDateTime = () => {
-        if (registration?.visitDateTime) return registration.visitDateTime
-        if (registration?.visitDate && registration?.visitTime) {
-            return `${registration.visitDate}T${registration.visitTime}`
-        }
-        return ''
+const ScheduleFieldVisitStep: React.FC<ScheduleFieldVisitStepProps> = ({
+  registration,
+  onNextStep,
+}) => {
+  const [scheduleSiteVisit, { isLoading }] = useScheduleSiteVisitMutation()
+
+  const initialScheduledAt = registration.siteVisit?.scheduledAt
+    ? new Date(registration.siteVisit.scheduledAt).toISOString().slice(0, 16)
+    : ''
+
+  const [scheduledAt, setScheduledAt] = useState<string>(initialScheduledAt)
+  const isStepCompleted = (registration.step || 1) > 4
+
+  const handleSchedule = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!scheduledAt) {
+      toast.error('Please select a date and time.')
+      return
     }
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting },
-        reset
-    } = useForm<Step4VisitFormValues>({
-        resolver: zodResolver(step4VisitSchema) as any,
-        defaultValues: {
-            visitDateTime: getInitialDateTime()
-        }
-    })
-
-    useEffect(() => {
-        reset({
-            visitDateTime: getInitialDateTime()
-        })
-    }, [registration, reset])
-
-    const onSubmit = (data: Step4VisitFormValues) => {
-        const [date, time] = data.visitDateTime.split('T')
-        onUpdate({
-            visitDateTime: data.visitDateTime,
-            visitDate: date || '',
-            visitTime: time || '',
-            visitScheduled: true
-        })
-        onCompleteStep()
+    try {
+      const isoString = new Date(scheduledAt).toISOString()
+      await scheduleSiteVisit({
+        id: registration.id,
+        data: { scheduledAt: isoString },
+      }).unwrap()
+      toast.success('Site visit scheduled successfully!')
+      onNextStep()
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Failed to schedule site visit.')
     }
+  }
 
-    const isStepCompleted = registration?.activeStep > 4
+  return (
+    <form onSubmit={handleSchedule} className="space-y-6">
+      {/* Header block */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-bold text-slate-900">Step 4: Schedule Field Visit</h3>
+          <p className="text-xs font-semibold text-slate-500 mt-0.5">
+            {isStepCompleted ? 'Completed' : 'Schedule on-ground parcel inspection'}
+          </p>
+        </div>
 
-    return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Header block */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h3 className="text-sm font-bold text-title">Step 4: Schedule Field Visit</h3>
-                    <p className="text-xs font-semibold text-subtitle mt-0.5">
-                        {isStepCompleted ? 'Completed' : 'Pending'}
-                    </p>
-                </div>
+        <span
+          className={cn(
+            'px-2.5 py-0.5 rounded text-[10px] font-bold border whitespace-nowrap uppercase tracking-wider',
+            isStepCompleted
+              ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+              : 'bg-amber-50 text-amber-600 border-amber-100'
+          )}
+        >
+          {isStepCompleted ? 'Completed' : 'Pending'}
+        </span>
+      </div>
 
-                <span
-                    className={cn(
-                        "px-2.5 py-0.5 rounded text-[10px] font-bold border whitespace-nowrap uppercase tracking-wider",
-                        isStepCompleted
-                            ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                            : 'bg-amber-50 text-amber-600 border-amber-100'
-                    )}
-                >
-                    {isStepCompleted ? 'Completed' : 'Pending'}
-                </span>
-            </div>
+      {/* Currently scheduled info */}
+      {registration.siteVisit?.scheduledAt && (
+        <div className="p-4 bg-emerald-50/50 border border-emerald-100 rounded-xl space-y-1">
+          <span className="text-xs font-bold text-emerald-800 block">
+            Scheduled Visit: {new Date(registration.siteVisit.scheduledAt).toLocaleString()}
+          </span>
+          {registration.siteVisit.surveyor && (
+            <span className="text-[11px] text-emerald-650 block">
+              Assigned Surveyor: {registration.siteVisit.surveyor.name}
+            </span>
+          )}
+        </div>
+      )}
 
-            {/* Date Time Picker */}
-            <div className="space-y-2">
-                <Label htmlFor="visitDateTime" className="text-xs font-bold text-slate-700">Schedule Date & Time</Label>
-                <Input
-                    id="visitDateTime"
-                    type="datetime-local"
-                    {...register('visitDateTime')}
-                    className="w-full px-3.5 py-2.5 border border-slate-200 bg-white rounded-lg text-xs md:text-sm text-title focus:outline-none focus:border-button-color focus:ring-2 focus:ring-button-color/20 transition-none font-semibold cursor-pointer"
-                />
-                {errors.visitDateTime && (
-                    <p className="text-xs text-destructive font-semibold mt-1">{errors.visitDateTime.message}</p>
-                )}
-            </div>
+      {/* Date Time Picker */}
+      <div className="space-y-2">
+        <Label htmlFor="scheduledAtInput" className="text-xs font-bold text-slate-700">
+          Schedule Date & Time
+        </Label>
+        <Input
+          id="scheduledAtInput"
+          type="datetime-local"
+          value={scheduledAt}
+          onChange={(e) => setScheduledAt(e.target.value)}
+          className="w-full text-xs font-semibold"
+          required
+        />
+      </div>
 
-            {/* Actions */}
-            <div className="flex items-center gap-3 pt-2">
-                <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className='w-auto'
-                >
-                    {isSubmitting ? 'Scheduling...' : 'Schedule Visit'}
-                </Button>
-                <Button
-                    type="button"
-                    className="px-6 py-3.5 w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 border-none text-xs font-bold shadow-sm rounded-lg cursor-pointer"
-                    onClick={() => alert("Notification sent to surveyor!")}
-                >
-                    Notify Surveyor
-                </Button>
-            </div>
-        </form>
-    )
+      {/* Action Buttons */}
+      <div className="flex items-center gap-3 pt-2">
+        <Button type="submit" disabled={isLoading} className="w-auto px-6">
+          {isLoading ? 'Scheduling...' : 'Schedule Visit'}
+        </Button>
+      </div>
+    </form>
+  )
 }
 
 export default ScheduleFieldVisitStep

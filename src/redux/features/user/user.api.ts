@@ -15,5 +15,5 @@ const userApi = baseApi.injectEndpoints({
 
 
 export const {
-    
+    useRetrieveUsersQuery,
 } = userApi;

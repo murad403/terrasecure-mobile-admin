@@ -1,74 +1,53 @@
 "use client"
-import React, { useEffect, useState } from 'react'
-import { File } from 'lucide-react'
+import React from 'react'
+import { FileText, CheckCircle2, XCircle, ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { useVerifyDocumentMutation } from '@/redux/features/registrations/registration.api'
+import { toast } from 'sonner'
+import type { RegistrationItem, LandParcelDocumentStatus } from '@/redux/features/registrations/registration.type'
 
 interface VerifyDocumentsStepProps {
-  registration: any
-  onUpdate: (data: any) => void
-  onCompleteStep: () => void
+  registration: RegistrationItem
+  onNextStep: () => void
 }
 
-type DocStatus = 'Approved' | 'Pending' | 'Rejected'
+const VerifyDocumentsStep: React.FC<VerifyDocumentsStepProps> = ({
+  registration,
+  onNextStep,
+}) => {
+  const [verifyDocument, { isLoading }] = useVerifyDocumentMutation()
+  const isStepCompleted = (registration.step || 1) > 2
 
-interface DocumentItem {
-  key: string
-  name: string
-}
-
-const DOCUMENTS: DocumentItem[] = [
-  { key: 'nationalIdDoc', name: 'National ID Card' },
-  { key: 'proofOwnershipDoc', name: 'Proof of Ownership' },
-  { key: 'surveyCertificateDoc', name: 'Survey Certificate' },
-  { key: 'taxClearanceDoc', name: 'Tax Clearance' }
-]
-
-const VerifyDocumentsStep = ({ registration, onUpdate, onCompleteStep }: VerifyDocumentsStepProps) => {
-  // Local state for documents status
-  const [docStatuses, setDocStatuses] = useState<Record<string, DocStatus>>({
-    nationalIdDoc: registration?.nationalIdDoc || 'Approved',
-    proofOwnershipDoc: registration?.proofOwnershipDoc || 'Pending',
-    surveyCertificateDoc: registration?.surveyCertificateDoc || 'Rejected',
-    taxClearanceDoc: registration?.taxClearanceDoc || 'Approved'
-  })
-
-  useEffect(() => {
-    setDocStatuses({
-      nationalIdDoc: registration?.nationalIdDoc || 'Approved',
-      proofOwnershipDoc: registration?.proofOwnershipDoc || 'Pending',
-      surveyCertificateDoc: registration?.surveyCertificateDoc || 'Rejected',
-      taxClearanceDoc: registration?.taxClearanceDoc || 'Approved'
-    })
-  }, [registration])
-
-  const isStepCompleted = registration?.activeStep > 2
-
-  const updateDocStatus = (key: string, status: DocStatus) => {
-    const updated = { ...docStatuses, [key]: status }
-    setDocStatuses(updated)
-    
-    // Persist to registration parent state
-    onUpdate({
-      [key]: status,
-      // If all documents are approved, we can consider documentsVerified as true
-      documentsVerified: Object.values(updated).every(val => val === 'Approved')
-    })
+  const handleVerify = async (documentId: string, status: LandParcelDocumentStatus) => {
+    try {
+      await verifyDocument({
+        id: registration.id,
+        documentId,
+        data: { status },
+      }).unwrap()
+      toast.success(`Document status updated to ${status}!`)
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Failed to update document status.')
+    }
   }
+
+  const documentsList = registration.documents || []
 
   return (
     <div className="space-y-6">
       {/* Header block */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-bold text-title">Step 2: Verify Documents</h3>
-          <p className="text-xs font-semibold text-subtitle mt-0.5">
-            {isStepCompleted ? 'Completed' : 'In Progress'}
+          <h3 className="text-sm font-bold text-slate-900">Step 2: Verify Documents</h3>
+          <p className="text-xs font-semibold text-slate-500 mt-0.5">
+            {isStepCompleted ? 'Completed' : 'Review & Verify Documents'}
           </p>
         </div>
 
         <span
           className={cn(
-            "px-2.5 py-0.5 rounded text-[10px] font-bold border whitespace-nowrap uppercase tracking-wider",
+            'px-2.5 py-0.5 rounded text-[10px] font-bold border whitespace-nowrap uppercase tracking-wider',
             isStepCompleted
               ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
               : 'bg-blue-50 text-blue-600 border-blue-100'
@@ -78,78 +57,105 @@ const VerifyDocumentsStep = ({ registration, onUpdate, onCompleteStep }: VerifyD
         </span>
       </div>
 
-      {/* Documents Table/List */}
+      {/* Documents List */}
       <div className="border border-slate-100 rounded-xl bg-white overflow-hidden divide-y divide-slate-100">
-        {DOCUMENTS.map((doc) => {
-          const status = docStatuses[doc.key] || 'Pending'
+        {documentsList.length > 0 ? (
+          documentsList.map((doc) => {
+            const status = doc.status || 'PENDING'
+            const mediaUrl = doc.media?.url
+            const originalName = doc.media?.metadata?.originalName || doc.docType || 'Registration Document'
 
-          return (
-            <div key={doc.key} className="flex items-center justify-between p-4 bg-white hover:bg-slate-50/20 transition-all">
-              
-              {/* Document Icon & Title */}
-              <div className="flex items-center gap-3">
-                <File className="w-4 h-4 text-slate-400 shrink-0" />
-                <span className="text-xs font-bold text-slate-700">{doc.name}</span>
-              </div>
+            return (
+              <div key={doc.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white hover:bg-slate-50/20 transition-all gap-4">
+                {/* Info & Media Link */}
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-800">{originalName}</span>
+                      {mediaUrl && (
+                        <a
+                          href={mediaUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 p-0.5"
+                          title="Open Document"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                    </div>
+                    <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
+                      Type: {doc.docType || 'OTHER'} · Access: {doc.accessLevel || 'PUBLIC'}
+                    </span>
+                  </div>
+                </div>
 
-              {/* Status Badge & Actions */}
-              <div className="flex items-center gap-4 select-none shrink-0">
-                {/* Status Badges matching exact image coloring */}
-                <span
-                  className={cn(
-                    "px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap block w-fit",
-                    status === 'Approved' && 'bg-emerald-50 text-emerald-600 border-emerald-100',
-                    status === 'Pending' && 'bg-amber-50 text-amber-600 border-amber-100',
-                    status === 'Rejected' && 'bg-rose-50 text-rose-600 border-rose-100'
-                  )}
-                >
-                  {status}
-                </span>
-
-                {/* Approve/Reject Buttons */}
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => updateDocStatus(doc.key, 'Approved')}
+                {/* Status Badges & Actions */}
+                <div className="flex items-center gap-3 select-none shrink-0 self-end sm:self-center">
+                  <span
                     className={cn(
-                      "px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all cursor-pointer bg-white text-slate-600 border-slate-200 hover:bg-blue-50/40 hover:text-blue-600",
-                      status === 'Approved' && 'border-blue-100 text-blue-600 bg-blue-50/30'
+                      'px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap block w-fit',
+                      status === 'VERIFIED' && 'bg-emerald-50 text-emerald-600 border-emerald-100',
+                      status === 'PENDING' && 'bg-amber-50 text-amber-600 border-amber-100',
+                      status === 'REJECTED' && 'bg-rose-50 text-rose-600 border-rose-100'
                     )}
                   >
-                    Approve
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => updateDocStatus(doc.key, 'Rejected')}
-                    className={cn(
-                      "px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all cursor-pointer bg-white text-slate-600 border-slate-200 hover:bg-rose-50/40 hover:text-rose-600",
-                      status === 'Rejected' && 'border-rose-100 text-rose-600 bg-rose-50/30'
-                    )}
-                  >
-                    Reject
-                  </button>
+                    {status}
+                  </span>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      disabled={isLoading}
+                      onClick={() => handleVerify(doc.id, 'VERIFIED')}
+                      className={cn(
+                        'px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all cursor-pointer flex items-center gap-1',
+                        status === 'VERIFIED'
+                          ? 'border-emerald-200 text-emerald-700 bg-emerald-50'
+                          : 'border-slate-200 text-slate-600 hover:bg-emerald-50/50 hover:text-emerald-600'
+                      )}
+                    >
+                      <CheckCircle2 className="w-3 h-3" />
+                      Approve
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={isLoading}
+                      onClick={() => handleVerify(doc.id, 'REJECTED')}
+                      className={cn(
+                        'px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all cursor-pointer flex items-center gap-1',
+                        status === 'REJECTED'
+                          ? 'border-rose-200 text-rose-700 bg-rose-50'
+                          : 'border-slate-200 text-slate-600 hover:bg-rose-50/50 hover:text-rose-600'
+                      )}
+                    >
+                      <XCircle className="w-3 h-3" />
+                      Reject
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })
+        ) : (
+          <div className="p-6 text-center text-xs text-slate-400 font-semibold">
+            No attached documents found for this registration.
+          </div>
+        )}
       </div>
 
-      {/* Auto complete transition warning or trigger */}
-      {!isStepCompleted && (
-        <div className="pt-2">
-          <button
-            type="button"
-            onClick={onCompleteStep}
-            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm rounded-lg cursor-pointer"
-          >
-            Verify & Approve Documents
-          </button>
-        </div>
-      )}
+      {/* Continue button */}
+      <div className="pt-2">
+        <Button type="button" onClick={onNextStep} className="w-auto px-6">
+          Continue to Next Step
+        </Button>
+      </div>
     </div>
   )
 }
 
 export default VerifyDocumentsStep
-export type { DocStatus }
