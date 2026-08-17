@@ -27,7 +27,7 @@ const registrationApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["Registration"]
         }),
-        verifyRegistrationDocument: builder.mutation({
+        verifyDocument: builder.mutation({
             query: ({id, documentId, data}) => ({
                 url: `/land-parcel-registrations/${id}/documents/${documentId}/verify`,
                 method: "PATCH",
@@ -51,7 +51,7 @@ const registrationApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["Registration"]
         }),
-        updateGisData: builder.mutation({
+        uploadGisData: builder.mutation({
             query: ({id, data}) => ({
                 url: `/land-parcel-registrations/${id}/gis-data`,
                 method: "POST",
@@ -82,10 +82,10 @@ export const {
     useRetrieveRegistrationsQuery,
     useRetrieveRegistrationDetailsQuery,
     useCreateRegistrationMutation,
-    useVerifyRegistrationDocumentMutation,
+    useVerifyDocumentMutation,
     useAssignSurveyorMutation,
     useScheduleSiteVisitMutation,
-    useUpdateGisDataMutation,
+    useUploadGisDataMutation,
     useVerifyGisDataMutation,
     usePublishRegistrationMutation,
 } = registrationApi;
