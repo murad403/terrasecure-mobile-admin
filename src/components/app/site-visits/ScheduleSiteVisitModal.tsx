@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import { X, Calendar, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,7 +13,8 @@ import {
 } from '@/components/ui/select'
 import { LandSiteVisitKind } from '@/enum'
 import { useScheduleSiteVisitMutation } from '@/redux/features/siteVisits/siteVisit.api'
-import { useRetrieveParcelsQuery } from '@/redux/features/parcel/parcel.api'
+import { ParcelPicker, getParcelLabel } from '@/components/tools/ParcelPicker'
+import type { ParcelListItem } from '@/redux/features/parcel/parcel.api'
 import { toast } from 'sonner'
 
 interface ScheduleSiteVisitModalProps {
@@ -29,17 +30,10 @@ const formatToLocalDateTime = (date: Date = new Date()) => {
   return localDate.toISOString().slice(0, 16)
 }
 
-const getParcelLabel = (parcel: any) =>
-  parcel?.slug || parcel?.parcelCode || (parcel?.id ? `Parcel ${parcel.id}` : '')
-
 const ScheduleSiteVisitModal = ({ isOpen, onClose }: ScheduleSiteVisitModalProps) => {
   const [scheduleSiteVisit, { isLoading }] = useScheduleSiteVisitMutation()
-  const { data: parcelsData, isLoading: parcelsLoading } = useRetrieveParcelsQuery(undefined, {
-    skip: !isOpen,
-  })
 
-  const [parcelText, setParcelText] = useState('')
-  const [parcelFocus, setParcelFocus] = useState(false)
+  const [selectedParcels, setSelectedParcels] = useState<ParcelListItem[]>([])
   const [dateTime, setDateTime] = useState('')
   const [kind, setKind] = useState<LandSiteVisitKind>(kindOptions[0])
   const [phone, setPhone] = useState('')
@@ -50,8 +44,7 @@ const ScheduleSiteVisitModal = ({ isOpen, onClose }: ScheduleSiteVisitModalProps
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
-      setParcelText('')
-      setParcelFocus(false)
+      setSelectedParcels([])
       setDateTime('')
       setKind(kindOptions[0])
       setPhone('')
@@ -64,24 +57,13 @@ const ScheduleSiteVisitModal = ({ isOpen, onClose }: ScheduleSiteVisitModalProps
     }
   }, [isOpen])
 
-  const parcels = useMemo(() => {
-    const list = (parcelsData?.data ?? []) as any[]
-    const query = parcelText.trim().toLowerCase()
-    if (!query) return list.slice(0, 50)
-    return list.filter((parcel) =>
-      [parcel?.slug, parcel?.parcelCode, String(parcel?.id ?? '')].some(
-        (value) => value && String(value).toLowerCase().includes(query)
-      )
-    )
-  }, [parcelsData, parcelText])
-
   if (!isOpen) return null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const slug = parcelText.trim()
-    if (!slug) {
-      setError('Parcel slug is required')
+    const parcel = selectedParcels[0]
+    if (!parcel) {
+      setError('Please select a parcel')
       return
     }
     if (!dateTime) {
@@ -96,7 +78,7 @@ const ScheduleSiteVisitModal = ({ isOpen, onClose }: ScheduleSiteVisitModalProps
 
     try {
       await scheduleSiteVisit({
-        parcelSlug: slug,
+        parcelSlug: getParcelLabel(parcel),
         scheduledAt: new Date(dateTime).toISOString(),
         kind,
         phone: phone.trim() || undefined,
@@ -144,59 +126,19 @@ const ScheduleSiteVisitModal = ({ isOpen, onClose }: ScheduleSiteVisitModalProps
             <p className="text-xs text-destructive font-semibold">{error}</p>
           )}
 
-          {/* Parcel Slug with suggestions */}
+          {/* Parcel Picker */}
           <div className="space-y-1.5">
-            <Label htmlFor="parcelSlug" className="text-xs font-bold text-slate-700">
-              Parcel Slug
+            <Label htmlFor="parcelPicker" className="text-xs font-bold text-slate-700">
+              Parcel
             </Label>
-            <div className="relative">
-              <Input
-                id="parcelSlug"
-                placeholder="e.g. CM-2849"
-                value={parcelText}
-                onChange={(e) => {
-                  setParcelText(e.target.value)
-                  setParcelFocus(true)
-                }}
-                onFocus={() => setParcelFocus(true)}
-                onBlur={() => setTimeout(() => setParcelFocus(false), 150)}
-                className="font-semibold text-xs md:text-sm text-title h-11 px-3.5 border-slate-200 rounded-xl focus:border-button-color focus:ring-0 focus:outline-none transition-none"
-              />
-              {parcelFocus && (
-                <div className="absolute z-20 left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-lg max-h-56 overflow-y-auto">
-                  {parcelsLoading ? (
-                    <p className="px-3.5 py-3 text-xs font-semibold text-slate-400 flex items-center gap-2">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      Loading parcels...
-                    </p>
-                  ) : parcels.length > 0 ? (
-                    parcels.map((parcel) => {
-                      const label = getParcelLabel(parcel)
-                      return (
-                        <button
-                          key={parcel?.id ?? label}
-                          type="button"
-                          onMouseDown={(e) => {
-                            e.preventDefault()
-                            setParcelText(label)
-                            setParcelFocus(false)
-                          }}
-                          className="w-full text-left px-3.5 py-2.5 text-xs font-semibold text-slate-700 hover:bg-blue-50/50 transition-colors cursor-pointer"
-                        >
-                          {label}
-                        </button>
-                      )
-                    })
-                  ) : (
-                    <p className="px-3.5 py-3 text-xs font-semibold text-slate-400">
-                      No matching parcels found — type a slug manually.
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
+            <ParcelPicker
+              type="radio"
+              placeholder="Search and select a parcel..."
+              value={selectedParcels}
+              onChange={setSelectedParcels}
+            />
             <p className="text-[10px] text-slate-400 font-medium">
-              Pick an existing parcel or type a slug manually
+              Pick the parcel that needs a site visit
             </p>
           </div>
 
