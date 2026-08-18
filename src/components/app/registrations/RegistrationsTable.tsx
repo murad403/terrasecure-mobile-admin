@@ -33,7 +33,7 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({
   }
 
   // Fetch paginated & filtered registrations directly inside component
-  const { data, isLoading } = useRetrieveRegistrationsQuery({
+  const { data, isLoading, isFetching } = useRetrieveRegistrationsQuery({
     page: currentPage,
     limit: 20,
     search: searchQuery || undefined,
@@ -97,6 +97,19 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({
                 setCurrentPage(1)
               }}
             />
+
+            {/* Clear Filters Button */}
+            {searchQuery || statusFilter !== 'All' || ownershipTypeFilter !== 'All' ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleResetFilters}
+                className="w-fit inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-900 border-slate-200 px-4 py-2.75"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Clear Filters</span>
+              </Button>
+            ) : null}
           </div>
 
           {/* Action Button */}
@@ -253,7 +266,7 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({
                   <td colSpan={7} className="py-16 text-center">
                     <div className="flex flex-col items-center justify-center gap-3">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/images/404-error.svg" alt="No results found" className="w-80"/>
+                      <img src="/images/404-error.svg" alt="No results found" className="w-80" />
                       <p className="text-sm font-semibold text-slate-400 -mt-10 mb-5">
                         No parcel registrations found matching your filters. Try to clear the filters or adjust your search criteria.
                       </p>
@@ -282,6 +295,7 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({
         onPageChange={setCurrentPage}
         totalEntries={totalEntries}
         pageSize={pageSize}
+        isLoading={isFetching || isLoading}
       />
     </div>
   )

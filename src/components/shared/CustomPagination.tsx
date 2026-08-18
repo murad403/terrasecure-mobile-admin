@@ -8,9 +8,10 @@ interface CustomPaginationProps {
   onPageChange: (page: number) => void
   totalEntries: number
   pageSize: number
+  isLoading?: boolean
 }
 
-const CustomPagination = ({ currentPage, totalPages, onPageChange, totalEntries, pageSize }: CustomPaginationProps) => {
+const CustomPagination = ({ currentPage, totalPages, onPageChange, totalEntries, pageSize, isLoading }: CustomPaginationProps) => {
   const startEntry = totalEntries === 0 ? 0 : (currentPage - 1) * pageSize + 1
   const endEntry = Math.min(currentPage * pageSize, totalEntries)
 
@@ -57,6 +58,11 @@ const CustomPagination = ({ currentPage, totalPages, onPageChange, totalEntries,
 
       {/* Pages list buttons */}
       <div className="flex items-center gap-1.5">
+        {isLoading && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src="/images/3-dots-scale.svg" alt="loading..." className="size-7 shrink-0 mr-1" />
+        )}
+
         {/* Previous page */}
         <button
           onClick={() => onPageChange(currentPage - 1)}
