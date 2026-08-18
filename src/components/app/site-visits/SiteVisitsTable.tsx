@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react'
-import { Search, Plus, Eye } from 'lucide-react'
+import { Search, Plus, Eye, Check, X, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'
@@ -8,12 +8,16 @@ import { Button } from '@/components/ui/button'
 import formatDate from '@/utils/formatDate'
 import {
   useRetrieveSiteVisitsQuery,
+  useRetrieveMySiteVisitsQuery,
 } from '@/redux/features/siteVisits/siteVisit.api'
 import { LandSiteVisitKind, LandSiteVisitStatus } from '@/enum'
 
 interface SiteVisitsTableProps {
   onOpenScheduleModal: () => void
   onViewDetails: (id: number) => void
+  onCompleteVisit: (id: number) => void
+  onCancelVisit: (id: number) => void
+  actionBusyId?: number | null
 }
 
 const statusOptions: LandSiteVisitStatus[] = Object.values(LandSiteVisitStatus) as LandSiteVisitStatus[];
@@ -26,22 +30,38 @@ const getVisitStatus = (visit: any): LandSiteVisitStatus => {
   return 'SCHEDULED' as LandSiteVisitStatus
 }
 
-const SiteVisitsTable = ({ onOpenScheduleModal, onViewDetails }: SiteVisitsTableProps) => {
+const SiteVisitsTable = ({
+  onOpenScheduleModal,
+  onViewDetails,
+  onCompleteVisit,
+  onCancelVisit,
+  actionBusyId,
+}: SiteVisitsTableProps) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('All')
   const [kindFilter, setKindFilter] = useState<string>('All')
+  const [myOnly, setMyOnly] = useState(false)
 
-  const { data, isLoading, isFetching } = useRetrieveSiteVisitsQuery({
+  const listArgs = {
     page: currentPage,
     limit: 20,
     search: searchQuery || undefined,
     status: statusFilter !== 'All' ? (statusFilter as LandSiteVisitStatus) : undefined,
     kind: kindFilter !== 'All' ? (kindFilter as LandSiteVisitKind) : undefined,
+  }
+
+  const { data, isLoading, isFetching } = useRetrieveSiteVisitsQuery(listArgs, {
+    skip: myOnly,
+  })
+  const { data: myData, isLoading: myLoading, isFetching: myFetching } = useRetrieveMySiteVisitsQuery(listArgs, {
+    skip: !myOnly,
   })
 
-  const visits = data?.data || []
-  const pagination = data?.pagination
+  const visits = (myOnly ? myData : data)?.data || []
+  const pagination = (myOnly ? myData : data)?.pagination
+  const loading = myOnly ? myLoading : isLoading
+  const fetching = myOnly ? myFetching : isFetching
   const totalEntries = pagination?.total || visits.length
   const totalPages = pagination?.totalPages || 1
   const pageSize = pagination?.limit || 5
@@ -88,6 +108,36 @@ const SiteVisitsTable = ({ onOpenScheduleModal, onViewDetails }: SiteVisitsTable
                 setCurrentPage(1)
               }}
             />
+
+            {/* All / My visits toggle */}
+            <div className="flex items-center rounded-lg border border-slate-200 bg-slate-50/40 p-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setMyOnly(false)
+                  setCurrentPage(1)
+                }}
+                className={cn(
+                  'px-3 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer',
+                  !myOnly ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                )}
+              >
+                All Visits
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMyOnly(true)
+                  setCurrentPage(1)
+                }}
+                className={cn(
+                  'px-3 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer',
+                  myOnly ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                )}
+              >
+                My Visits
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 w-full xl:w-auto shrink-0 justify-end">
@@ -105,6 +155,7 @@ const SiteVisitsTable = ({ onOpenScheduleModal, onViewDetails }: SiteVisitsTable
                 <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">VISIT ID</th>
                 <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">PARCEL / LOCATION</th>
                 <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">SURVEYOR</th>
+                <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">PHONE</th>
                 <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">TYPE</th>
                 <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">SCHEDULED DATE</th>
                 <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">STATUS</th>
@@ -112,9 +163,9 @@ const SiteVisitsTable = ({ onOpenScheduleModal, onViewDetails }: SiteVisitsTable
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {isLoading ? (
+              {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-sm font-semibold text-slate-400">
+                  <td colSpan={8} className="py-12 text-center text-sm font-semibold text-slate-400">
                     Loading site visits...
                   </td>
                 </tr>
@@ -123,7 +174,7 @@ const SiteVisitsTable = ({ onOpenScheduleModal, onViewDetails }: SiteVisitsTable
                   const status = getVisitStatus(item)
 
                   // Prefer a linked parcel; fall back to the registration's pending location; else N/A
-                  const parcelLabel = item.parcel?.slug || item.parcelId
+                  const parcelLabel = item.parcel?.slug || item.parcelSlug || item.parcelId
                   const location = item.parcel?.location || item.registration?.location
                   const locationLabel = location ? `${location.city}, ${location.state}` : null
 
@@ -155,6 +206,10 @@ const SiteVisitsTable = ({ onOpenScheduleModal, onViewDetails }: SiteVisitsTable
                       </td>
 
                       <td className="py-4 px-5 text-sm font-semibold text-slate-700">
+                        {item.phone || <span className="text-slate-400">N/A</span>}
+                      </td>
+
+                      <td className="py-4 px-5 text-sm font-semibold text-slate-700">
                         {item.kind ? item.kind.replaceAll('_', ' ') : 'N/A'}
                       </td>
 
@@ -176,15 +231,41 @@ const SiteVisitsTable = ({ onOpenScheduleModal, onViewDetails }: SiteVisitsTable
                       </td>
 
                       <td className="py-4 px-5 text-center">
-                        <div className="flex items-center justify-center">
-                          <button
-                            type="button"
-                            onClick={() => onViewDetails(item.id)}
-                            className="text-blue-500 hover:text-blue-700 p-1.5 rounded-lg hover:bg-blue-50/50 transition-colors cursor-pointer"
-                            title="View Details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
+                        <div className="flex items-center justify-center gap-1">
+                          {actionBusyId === item.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-button-color" />
+                          ) : (
+                            <>
+                              {status === 'SCHEDULED' && (
+                                <button
+                                  type="button"
+                                  onClick={() => onCompleteVisit(item.id)}
+                                  className="text-emerald-500 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50/50 transition-colors cursor-pointer"
+                                  title="Mark Complete"
+                                >
+                                  <Check className="w-4 h-4" />
+                                </button>
+                              )}
+                              {status === 'SCHEDULED' && (
+                                <button
+                                  type="button"
+                                  onClick={() => onCancelVisit(item.id)}
+                                  className="text-amber-500 hover:text-amber-700 p-1.5 rounded-lg hover:bg-amber-50/50 transition-colors cursor-pointer"
+                                  title="Cancel Visit"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => onViewDetails(item.id)}
+                                className="text-blue-500 hover:text-blue-700 p-1.5 rounded-lg hover:bg-blue-50/50 transition-colors cursor-pointer"
+                                title="View Details"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -192,7 +273,7 @@ const SiteVisitsTable = ({ onOpenScheduleModal, onViewDetails }: SiteVisitsTable
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-sm font-semibold text-slate-400">
+                  <td colSpan={8} className="py-10 text-center text-sm font-semibold text-slate-400">
                     No scheduled site visits found.
                   </td>
                 </tr>
@@ -208,7 +289,7 @@ const SiteVisitsTable = ({ onOpenScheduleModal, onViewDetails }: SiteVisitsTable
         onPageChange={setCurrentPage}
         totalEntries={totalEntries}
         pageSize={pageSize}
-        isLoading={isFetching || isLoading}
+        isLoading={fetching || loading}
       />
     </div>
   )
