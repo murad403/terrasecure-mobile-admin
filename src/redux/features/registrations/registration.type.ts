@@ -1,12 +1,25 @@
-export type LandParcelOwnershipType = "PRIMARY" | "CO_OWNER" | "HEIR" | "LEGAL_REPRESENTATIVE";
+import { UserMinimal } from '@/interfaces/user.interface';
 
-export type LandParcelOwnershipStatus = "DRAFT" | "UNDER_VERIFICATION" | "PUBLISHED" | "RESERVED" | "CLOSED";
+export type LandParcelOwnershipType =
+  'PRIMARY' | 'CO_OWNER' | 'HEIR' | 'LEGAL_REPRESENTATIVE';
 
-export type LandParcelDocumentType = "TITLE_DEED" | "SURVEY_PLAN" | "NATIONAL_ID" | "TAX_RECEIPT" | "COURT_ORDER" | "CONSENT_LETTER" | "SALE_AGREEMENT" | "OTHER";
+export type LandParcelOwnershipStatus =
+  'DRAFT' | 'UNDER_VERIFICATION' | 'PUBLISHED' | 'RESERVED' | 'CLOSED';
 
-export type LandParcelDocumentStatus = "PENDING" | "VERIFIED" | "REJECTED";
+export type LandParcelDocumentType =
+  | 'TITLE_DEED'
+  | 'SURVEY_PLAN'
+  | 'NATIONAL_ID'
+  | 'TAX_RECEIPT'
+  | 'COURT_ORDER'
+  | 'CONSENT_LETTER'
+  | 'SALE_AGREEMENT'
+  | 'OTHER';
 
-export type LandParcelSurveyStatus = "REJECTED" | "DRAFT" | "SYNCED" | "VALIDATING" | "VALIDATED";
+export type LandParcelDocumentStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
+
+export type LandParcelSurveyStatus =
+  'REJECTED' | 'DRAFT' | 'SYNCED' | 'VALIDATING' | 'VALIDATED';
 
 export interface RegistrationLocation {
   id?: string;
@@ -71,12 +84,7 @@ export interface RegistrationDocument {
   media?: RegistrationMedia;
 }
 
-export interface SiteVisitSurveyor {
-  id: number;
-  name: string;
-  phone?: string | null;
-  profilePicture?: string | null;
-}
+export type SiteVisitSurveyor = UserMinimal;
 
 export interface SiteVisit {
   id: number;

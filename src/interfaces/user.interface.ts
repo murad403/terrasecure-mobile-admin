@@ -30,3 +30,8 @@ export type User = {
   roles: string[] | null;
   profilePicture: Media | null;
 };
+
+export type UserMinimal = Pick<
+  User,
+  'id' | 'name' | 'phone' | 'profilePicture'
+>;
