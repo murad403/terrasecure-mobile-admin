@@ -7,6 +7,8 @@ import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'
 import { Button } from '@/components/ui/button'
 import type { RegistrationItem, Pagination } from '@/redux/features/registrations/registration.type'
 import formatDate from '@/utils/formatDate'
+import { LandParcelOwnershipType, LandParcelRegistrationStatus } from '@/enum'
+import SearchInput from '@/components/ui/SearchInput'
 
 interface RegistrationsTableProps {
   registrations: RegistrationItem[]
@@ -39,27 +41,27 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({
   onOpenAddModal,
   onViewDetails,
 }) => {
-  const statusOptions = ['All', 'DRAFT', 'UNDER_VERIFICATION', 'PUBLISHED', 'RESERVED', 'CLOSED']
-  const ownershipTypeOptions = ['All', 'PRIMARY', 'CO_OWNER', 'HEIR', 'LEGAL_REPRESENTATIVE']
+  const statusOptions = Object.values(LandParcelRegistrationStatus) as LandParcelRegistrationStatus[];
+  const ownershipTypeOptions = Object.values(LandParcelOwnershipType) as LandParcelOwnershipType[];
 
   const totalEntries = pagination?.total || registrations.length
   const totalPages = pagination?.totalPages || 1
   const pageSize = pagination?.limit || 20;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden p-6">
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden p-6 min-h-dvh">
       {/* Search & Filters Action Bar */}
       <div className="flex flex-col xl:flex-row items-center justify-between gap-4 mb-6">
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto flex-wrap">
           {/* Search Bar */}
           <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
+            <SearchInput
               type="text"
               placeholder="Search registrations..."
               value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value)
+              onDebounceSearch={(value) => {
+                setSearchQuery(value)
                 setCurrentPage(1)
               }}
               className="w-full pl-9 pr-4 py-2 border border-slate-200 bg-slate-50/40 rounded-lg text-sm text-slate-800 placeholder:text-slate-400 focus:border-button-color focus:bg-white focus:outline-none focus:ring-2 focus:ring-button-color/20 transition-all font-semibold leading-relaxed"
@@ -68,6 +70,7 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({
 
           {/* Status Filter */}
           <CustomFilterDropdown
+            type='checkbox'
             label="All Statuses"
             header="Filter Status"
             options={statusOptions}
@@ -80,6 +83,7 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({
 
           {/* Ownership Type Filter */}
           <CustomFilterDropdown
+            type='checkbox'
             label="All Ownership Types"
             header="Filter Ownership"
             options={ownershipTypeOptions}
@@ -197,13 +201,13 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({
                         className={cn(
                           'px-3 py-1 rounded-full text-xs font-semibold border block w-fit whitespace-nowrap',
                           (reg.status === 'PUBLISHED' || reg.status === 'CONVERTED' || reg.status === 'Completed') &&
-                            'bg-emerald-50 text-emerald-600 border-emerald-200',
+                          'bg-emerald-50 text-emerald-600 border-emerald-200',
                           (reg.status === 'UNDER_VERIFICATION' || reg.status === 'In Progress') &&
-                            'bg-blue-50 text-blue-600 border-blue-200',
+                          'bg-blue-50 text-blue-600 border-blue-200',
                           (reg.status === 'DRAFT' || reg.status === 'Pending') &&
-                            'bg-amber-50 text-amber-600 border-amber-200',
+                          'bg-amber-50 text-amber-600 border-amber-200',
                           (reg.status === 'CLOSED' || reg.status === 'REJECTED' || reg.status === 'Rejected') &&
-                            'bg-rose-50 text-rose-600 border-rose-200'
+                          'bg-rose-50 text-rose-600 border-rose-200'
                         )}
                       >
                         {reg.status}
