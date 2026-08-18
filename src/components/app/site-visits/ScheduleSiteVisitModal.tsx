@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react'
-import { X, Calendar } from 'lucide-react'
+import { X, Calendar, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
@@ -12,42 +12,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { LandSiteVisitKind } from '@/enum'
+import { useScheduleSiteVisitMutation } from '@/redux/features/siteVisits/siteVisit.api'
 
 interface ScheduleSiteVisitModalProps {
   isOpen: boolean
   onClose: () => void
-  onSchedule: (data: {
-    parcelId: string
-    surveyorName: string
-    visitDate: string
-    visitTime: string
-    notes: string
-  }) => void
 }
 
-const ScheduleSiteVisitModal = ({
-  isOpen,
-  onClose,
-  onSchedule
-}: ScheduleSiteVisitModalProps) => {
+const kindOptions: LandSiteVisitKind[] = Object.values(LandSiteVisitKind) as LandSiteVisitKind[]
+
+const ScheduleSiteVisitModal = ({ isOpen, onClose }: ScheduleSiteVisitModalProps) => {
+  const [scheduleSiteVisit, { isLoading }] = useScheduleSiteVisitMutation()
+
   const [parcelId, setParcelId] = useState('')
-  const [surveyorName, setSurveyorName] = useState('Paul Biya Jr - Available')
+  const [surveyorId, setSurveyorId] = useState('')
   const [dateTime, setDateTime] = useState('')
-  const [visitType, setVisitType] = useState('Initial Survey')
+  const [kind, setKind] = useState<LandSiteVisitKind>(kindOptions[0])
   const [notes, setNotes] = useState('')
   const [error, setError] = useState('')
-  const [smsSent, setSmsSent] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
       setParcelId('')
-      setSurveyorName('Paul Biya Jr - Available')
+      setSurveyorId('')
       setDateTime('')
-      setVisitType('Initial Survey')
+      setKind(kindOptions[0])
       setNotes('')
       setError('')
-      setSmsSent(false)
     } else {
       document.body.style.overflow = ''
     }
@@ -58,15 +51,14 @@ const ScheduleSiteVisitModal = ({
 
   if (!isOpen) return null
 
-  const handleSmsToggle = (e: React.MouseEvent) => {
-    e.preventDefault()
-    setSmsSent(!smsSent)
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!parcelId.trim()) {
       setError('Parcel ID is required')
+      return
+    }
+    if (!surveyorId) {
+      setError('Surveyor is required')
       return
     }
     if (!dateTime) {
@@ -75,18 +67,18 @@ const ScheduleSiteVisitModal = ({
     }
     setError('')
 
-    const [datePart, timePart] = dateTime.split('T')
-    
-    // Strip availability status to pass clean surveyor name
-    const cleanSurveyorName = surveyorName.split(' - ')[0]
-
-    onSchedule({
-      parcelId,
-      surveyorName: cleanSurveyorName,
-      visitDate: datePart,
-      visitTime: timePart || '09:00',
-      notes: visitType !== 'Initial Survey' ? `[Type: ${visitType}] ${notes}` : notes
-    })
+    try {
+      await scheduleSiteVisit({
+        parcelId,
+        surveyorId: Number(surveyorId),
+        scheduledAt: new Date(dateTime).toISOString(),
+        kind,
+        notes: notes || undefined,
+      }).unwrap()
+      onClose()
+    } catch (err: any) {
+      setError(err?.data?.message || 'Failed to schedule visit')
+    }
   }
 
   return (
@@ -136,18 +128,17 @@ const ScheduleSiteVisitModal = ({
           </div>
 
           {/* Surveyor Selection */}
+          {/* TODO: replace with a real surveyor-list query once available; using a raw ID input for now */}
           <div className="space-y-1.5">
-            <Label htmlFor="surveyorSelect" className="text-xs font-bold text-slate-700">Assign Surveyor</Label>
-            <Select value={surveyorName} onValueChange={setSurveyorName}>
-              <SelectTrigger id="surveyorSelect" className="w-full">
-                <SelectValue placeholder="Select Surveyor" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Paul Biya Jr - Available">Paul Biya Jr - Available</SelectItem>
-                <SelectItem value="Martin Essono - Available">Martin Essono - Available</SelectItem>
-                <SelectItem value="Cécile Ondoua - Available">Cécile Ondoua - Available</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="surveyorId" className="text-xs font-bold text-slate-700">Assign Surveyor (ID)</Label>
+            <Input
+              id="surveyorId"
+              type="number"
+              placeholder="e.g. 1"
+              value={surveyorId}
+              onChange={(e) => setSurveyorId(e.target.value)}
+              className="font-semibold text-xs md:text-sm text-title h-11 px-3.5 border-slate-200 rounded-xl focus:border-button-color focus:ring-0 focus:outline-none transition-none"
+            />
           </div>
 
           {/* Date & Time Input */}
@@ -165,15 +156,16 @@ const ScheduleSiteVisitModal = ({
           {/* Visit Type */}
           <div className="space-y-1.5">
             <Label htmlFor="visitTypeSelect" className="text-xs font-bold text-slate-700">Visit Type</Label>
-            <Select value={visitType} onValueChange={setVisitType}>
+            <Select value={kind} onValueChange={(val) => setKind(val as LandSiteVisitKind)}>
               <SelectTrigger id="visitTypeSelect" className="w-full">
                 <SelectValue placeholder="Select Visit Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Initial Survey">Initial Survey</SelectItem>
-                <SelectItem value="Boundary Verification">Boundary Verification</SelectItem>
-                <SelectItem value="Dispute Investigation">Dispute Investigation</SelectItem>
-                <SelectItem value="Re-survey">Re-survey</SelectItem>
+                {kindOptions.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option.replaceAll('_', ' ')}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -190,22 +182,6 @@ const ScheduleSiteVisitModal = ({
             />
           </div>
 
-          {/* SMS Notification Toggle Button */}
-          <div>
-            <button
-              onClick={handleSmsToggle}
-              type="button"
-              className={cn(
-                "w-full py-2.5 px-4 font-semibold text-xs text-center rounded-xl cursor-pointer transition-colors border flex items-center justify-center",
-                smsSent
-                  ? "bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100/50"
-                  : "bg-blue-50/50 border-blue-200 text-blue-600 hover:bg-blue-50"
-              )}
-            >
-              {smsSent ? "✓ SMS notification enabled" : "Send SMS notification to surveyor"}
-            </button>
-          </div>
-
           {/* Footer actions */}
           <div className="flex items-center justify-between gap-3 pt-2">
             <Button
@@ -216,11 +192,12 @@ const ScheduleSiteVisitModal = ({
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              className="w-1/2"
-            >
-              <Calendar className="w-4 h-4" />
+            <Button type="submit" className="w-1/2" disabled={isLoading}>
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Calendar className="w-4 h-4" />
+              )}
               Schedule Visit
             </Button>
           </div>
