@@ -1,25 +1,45 @@
-import React, { useState, useEffect, ChangeEvent, InputHTMLAttributes } from 'react';
+import { useState, useEffect, useRef, ChangeEvent, InputHTMLAttributes } from 'react';
 import useDebounce from '@/hooks/useDebounce';
 
-interface SearchInputProps extends InputHTMLAttributes<HTMLInputElement> {
-  onDebounceSearch?: (value: string) => void; 
+export interface SearchInputProps extends InputHTMLAttributes<HTMLInputElement> {
+  onDebounceSearch?: (value: string) => void;
+  debounceDelay?: number;
 }
 
-export default function SearchInput({ onDebounceSearch, ...props }: SearchInputProps) {
-  const [text, setText] = useState<string>('');
+export default function SearchInput({
+  onDebounceSearch,
+  debounceDelay = 500,
+  defaultValue = '',
+  value,
+  onChange,
+  ...props
+}: SearchInputProps) {
+  const [text, setText] = useState<string>(
+    (value ?? defaultValue ?? '') as string
+  );
 
-  const debouncedText = useDebounce<string>(text, 500);
+  const [prevValue, setPrevValue] = useState<string | number | readonly string[] | undefined>(value);
+
+  if (value !== undefined && value !== prevValue) {
+    setPrevValue(value);
+    setText(value as string);
+  }
+
+  const debouncedText = useDebounce<string>(text, debounceDelay);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
-    if (debouncedText) {
-      console.log('API Request sent for:', debouncedText);
-      onDebounceSearch?.(debouncedText);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
     }
+
+    onDebounceSearch?.(debouncedText);
   }, [debouncedText, onDebounceSearch]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
-    props.onChange?.(e); 
+    onChange?.(e);
   };
 
   return (
