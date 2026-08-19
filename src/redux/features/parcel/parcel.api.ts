@@ -1,12 +1,6 @@
 import baseApi from "@/redux/api/api";
 import type { FetchArgs } from '@reduxjs/toolkit/query';
-import {
-    ParcelListItem,
-    RetrieveParcelsArgs,
-    RetrieveParcelsResponse,
-    ParcelDetailsResponse,
-    UpdateParcelPayload,
-} from "./parcel.type";
+import { RetrieveParcelsArgs, RetrieveParcelsResponse, ParcelDetailsResponse, UpdateParcelPayload } from "./parcel.type";
 
 const parcelApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
