@@ -1,22 +1,11 @@
 "use client"
-import React, { useState } from 'react'
+import { useState } from 'react'
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout'
 import UsersTable from './UsersTable'
-import AddUserModal from '@/components/app/users/AddUserModal'
-import EditUserModal from '@/components/app/users/EditUserModal'
-import UserDetailsModal from '@/components/modal/UserDetailsModal'
 import { useRetrieveUsersQuery } from '@/redux/features/user/user.api'
-import type { User } from '@/interfaces/user.interface'
 import { UserRole, UserStatus, Gender } from '@/enum'
 
 const UsersPage = () => {
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
-
-  const [addOpen, setAddOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
-  const [detailsOpen, setDetailsOpen] = useState(false)
-
-  // Filters and Pagination State
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('All')
@@ -36,20 +25,6 @@ const UsersPage = () => {
   const users = userResponse?.data || []
   const pagination = userResponse?.pagination
 
-  const handleViewDetails = (usr: User) => {
-    setSelectedUser(usr)
-    setDetailsOpen(true)
-  }
-
-  const handleOpenEdit = (usr: User) => {
-    setSelectedUser(usr)
-    setEditOpen(true)
-  }
-
-  const handleCloseDetails = () => {
-    setSelectedUser(null)
-    setDetailsOpen(false)
-  }
 
   return (
     <DashboardChildrenLayout
@@ -71,42 +46,7 @@ const UsersPage = () => {
         setStatusFilter={setStatusFilter}
         genderFilter={genderFilter}
         setGenderFilter={setGenderFilter}
-        onOpenAddModal={() => setAddOpen(true)}
-        onViewDetails={handleViewDetails}
-        onOpenEdit={handleOpenEdit}
       />
-
-      {/* Add User Modal */}
-      {addOpen && (
-        <AddUserModal
-          isOpen={addOpen}
-          onClose={() => setAddOpen(false)}
-          onAdd={() => setAddOpen(false)}
-        />
-      )}
-
-      {/* Edit User Modal */}
-      {editOpen && selectedUser && (
-        <EditUserModal
-          isOpen={editOpen}
-          onClose={() => setEditOpen(false)}
-          user={selectedUser as any}
-          onEdit={() => setEditOpen(false)}
-        />
-      )}
-
-      {/* User Details Slide-out Drawer */}
-      {detailsOpen && selectedUser && (
-        <UserDetailsModal
-          isOpen={detailsOpen}
-          onClose={handleCloseDetails}
-          user={selectedUser}
-          onOpenEdit={() => {
-            setDetailsOpen(false)
-            setEditOpen(true)
-          }}
-        />
-      )}
     </DashboardChildrenLayout>
   )
 }

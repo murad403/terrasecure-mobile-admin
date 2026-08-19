@@ -1,6 +1,5 @@
 "use client"
-import React from 'react'
-import { Search, Download, Plus, Eye, Pencil } from 'lucide-react'
+import { Search, Download, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'
@@ -24,10 +23,11 @@ interface UsersTableProps {
   setStatusFilter: (status: string) => void
   genderFilter: string
   setGenderFilter: (gender: string) => void
-  onOpenAddModal: () => void
-  onViewDetails: (user: User) => void
-  onOpenEdit: (user: User) => void
+  onOpenAddModal?: () => void
+  onViewDetails?: (user: User) => void
+  onOpenEdit?: (user: User) => void
 }
+
 
 const statusOptions = ['All', 'ACTIVE', 'INACTIVE', 'LOCKED', 'SUSPENDED', 'DELETED']
 const roleOptions = ['All', 'SUPER_ADMIN', 'ADMIN', 'SUPERVISOR', 'FIELD_AGENT', 'SURVEYOR']
@@ -95,8 +95,6 @@ const UsersTable = ({
   genderFilter,
   setGenderFilter,
   onOpenAddModal,
-  onViewDetails,
-  onOpenEdit,
 }: UsersTableProps) => {
   const totalEntries = pagination?.total || users.length
   const totalPages = pagination?.totalPages || 1
@@ -189,10 +187,13 @@ const UsersTable = ({
               <span>Export</span>
             </button>
 
-            <Button type="button" onClick={onOpenAddModal} className="w-auto">
-              <Plus className="w-4.5 h-4.5" />
-              <span>Add User</span>
-            </Button>
+            {onOpenAddModal && (
+              <Button type="button" onClick={onOpenAddModal} className="w-auto">
+                <Plus className="w-4.5 h-4.5" />
+                <span>Add User</span>
+              </Button>
+            )}
+
           </div>
         </div>
 
@@ -208,7 +209,6 @@ const UsersTable = ({
                 <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">GENDER</th>
                 <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">STATUS</th>
                 <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">CREATED</th>
-                <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase text-center">ACTIONS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -294,28 +294,6 @@ const UsersTable = ({
                       {/* Created date */}
                       <td className="py-4 px-5 text-sm font-semibold text-slate-500">
                         {formatDate(usr?.createdAt)}
-                      </td>
-
-                      {/* Actions Column */}
-                      <td className="py-4 px-5 text-center">
-                        <div className="flex items-center justify-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => onViewDetails(usr)}
-                            className="text-blue-500 hover:text-blue-700 p-1.5 rounded-lg hover:bg-blue-50/50 transition-colors cursor-pointer"
-                            title="View Details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onOpenEdit(usr)}
-                            className="text-emerald-500 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50/50 transition-colors cursor-pointer"
-                            title="Edit Profile"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                        </div>
                       </td>
                     </tr>
                   )
