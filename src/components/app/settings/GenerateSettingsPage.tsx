@@ -171,39 +171,6 @@ const GenerateSettingsPage = () => {
           </Button>
         </form>
       </div>
-
-      {/* Platform Settings Card */}
-      <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm space-y-4">
-        <h3 className="text-xs font-bold text-gray-900 leading-none">Platform Settings</h3>
-
-        <form onSubmit={handlePlatformSave} className="space-y-4 pt-1">
-          {/* Default Language */}
-          <div className="space-y-1.5 max-w-sm">
-            <Label htmlFor="language">Default Language</Label>
-            <Select
-              value={language}
-              onValueChange={setLanguage}
-            >
-              <SelectTrigger id="language" className="w-full">
-                <SelectValue placeholder="Select Language" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="French / English">French / English</SelectItem>
-                <SelectItem value="English">English</SelectItem>
-                <SelectItem value="French">French</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Button
-            type="submit"
-            className="w-auto py-2"
-          >
-            <Save size={13} />
-            Save Settings
-          </Button>
-        </form>
-      </div>
     </div>
   )
 }
