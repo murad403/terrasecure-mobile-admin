@@ -1,13 +1,47 @@
 import baseApi from "@/redux/api/api";
+import type { FetchArgs } from '@reduxjs/toolkit/query';
+import { ApiResponse } from '@/redux/api/api-response.interface';
 
+export interface ParcelListItem {
+  id: number | string;
+  slug?: string | null;
+  parcelCode?: string | null;
+  locationId?: string | null;
+  location?: {
+    city?: string | null;
+    state?: string | null;
+  } | null;
+  areaSqm?: number | null;
+  status?: string | null;
+}
+
+export interface RetrieveParcelsArgs {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+}
 
 const parcelApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        retrieveParcels: builder.query({
-            query: () => ({
-                url: "/land-parcels",
-                method: "GET",
-            }),
+        retrieveParcels: builder.query<ApiResponse<ParcelListItem[]>, RetrieveParcelsArgs>({
+            query: ({ page = 1, limit = 20, search, status }) => {
+                const params: FetchArgs['params'] = { page, limit };
+
+                if (search) {
+                    params.search = search;
+                }
+
+                if (status && status !== 'All') {
+                    params.status = status;
+                }
+
+                return {
+                    url: "/land-parcels",
+                    method: "GET",
+                    params,
+                };
+            },
             providesTags: ["Parcel"]
         }),
         retrieveParcelDetails: builder.query({

@@ -13,6 +13,12 @@ interface ScheduleFieldVisitStepProps {
   onNextStep: () => void
 }
 
+// Converts a Date object to local YYYY-MM-DDTHH:mm format for HTML datetime-local inputs
+const formatToLocalDateTime = (date: Date = new Date()) => {
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+  return localDate.toISOString().slice(0, 16)
+}
+
 const ScheduleFieldVisitStep: React.FC<ScheduleFieldVisitStepProps> = ({
   registration,
   onNextStep,
@@ -20,16 +26,25 @@ const ScheduleFieldVisitStep: React.FC<ScheduleFieldVisitStepProps> = ({
   const [scheduleSiteVisit, { isLoading }] = useScheduleSiteVisitMutation()
 
   const initialScheduledAt = registration.siteVisit?.scheduledAt
-    ? new Date(registration.siteVisit.scheduledAt).toISOString().slice(0, 16)
+    ? formatToLocalDateTime(new Date(registration.siteVisit.scheduledAt))
     : ''
 
   const [scheduledAt, setScheduledAt] = useState<string>(initialScheduledAt)
   const isStepCompleted = (registration.step || 1) > 4
 
+  // Set the current local minute as the absolute minimum selectable date
+  const minDateTime = formatToLocalDateTime()
+
   const handleSchedule = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!scheduledAt) {
       toast.error('Please select a date and time.')
+      return
+    }
+
+    // Client-side validation fallback
+    if (new Date(scheduledAt) < new Date()) {
+      toast.error('Please select a future date and time.')
       return
     }
 
@@ -91,6 +106,7 @@ const ScheduleFieldVisitStep: React.FC<ScheduleFieldVisitStepProps> = ({
         <Input
           id="scheduledAtInput"
           type="datetime-local"
+          min={minDateTime}
           value={scheduledAt}
           onChange={(e) => setScheduledAt(e.target.value)}
           className="w-full text-xs font-semibold"
