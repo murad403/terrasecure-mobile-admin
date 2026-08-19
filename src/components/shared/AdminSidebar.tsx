@@ -5,6 +5,7 @@ import { LayoutDashboard, Map, ClipboardList, Users, MessageSquare, Shield, MapP
 import { cn } from '@/lib/utils'
 import logo from "@/assets/logo/logo.png"
 import Image from 'next/image'
+import { useRetrieveProfileQuery } from '@/redux/features/profile/profile.api'
 
 
 interface AdminSidebarProps {
@@ -21,6 +22,18 @@ const AdminSidebar = ({
     setMobileOpen
 }: AdminSidebarProps) => {
     const pathname = usePathname()
+    const { data: profileResponse } = useRetrieveProfileQuery()
+    const user = profileResponse?.data
+
+    const initials = user?.name
+        ? user.name
+            .split(' ')
+            .filter(Boolean)
+            .map((n) => n[0])
+            .join('')
+            .substring(0, 2)
+            .toUpperCase()
+        : 'AD'
 
     const sections = [
         {
@@ -167,15 +180,43 @@ const AdminSidebar = ({
 
             {/* Bottom Profile Section */}
             <div className="p-3 border-t border-slate-800 bg-[#0b0f19] flex flex-col items-center">
-                {!collapsed && (
-                    <div className="flex items-center gap-3 w-full px-2 py-1.5 mb-2.5">
+                {collapsed ? (
+                    <div className="mb-2.5 flex items-center justify-center">
+                        {user?.profilePicture?.url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={user.profilePicture.url}
+                                alt={user.name || 'User Avatar'}
+                                className="w-8 h-8 rounded-full object-cover shrink-0 border border-slate-700 shadow-sm"
+                            />
+                        ) : (
+                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-button-color text-white font-extrabold text-xs shrink-0 select-none border border-slate-700 shadow-sm uppercase">
+                                {initials}
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="flex items-center gap-3 w-full px-2 py-1.5 mb-2.5 overflow-hidden">
                         {/* Avatar */}
-                        <div className="flex items-center justify-center w-9 h-9 rounded-full bg-button-color text-white font-bold text-xs shrink-0 select-none border border-slate-700 shadow-sm">
-                            JA
-                        </div>
+                        {user?.profilePicture?.url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={user.profilePicture.url}
+                                alt={user.name || 'User Avatar'}
+                                className="w-9 h-9 rounded-full object-cover shrink-0 border border-slate-700 shadow-sm"
+                            />
+                        ) : (
+                            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-button-color text-white font-extrabold text-xs shrink-0 select-none border border-slate-700 shadow-sm uppercase">
+                                {initials}
+                            </div>
+                        )}
                         <div className="flex flex-col min-w-0 leading-tight">
-                            <span className="font-semibold text-white text-xs truncate">Jean Alima</span>
-                            <span className="text-[10px] text-subtitle truncate mt-0.5">Super Admin</span>
+                            <span className="font-semibold text-white text-xs truncate">
+                                {user?.name || 'Admin User'}
+                            </span>
+                            <span className="text-[10px] text-subtitle truncate mt-0.5">
+                                {user?.roles?.join(', ') || 'ADMIN'}
+                            </span>
                         </div>
                     </div>
                 )}
