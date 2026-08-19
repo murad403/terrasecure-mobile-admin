@@ -1,13 +1,9 @@
 "use client"
-import React, { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { parcelSchema, type ParcelFormValues } from '@/validation/parcel.validation'
-import { X } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { X, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Parcel } from '@/components/app/parcels/ParcelsPage'
 import {
   Select,
   SelectContent,
@@ -15,53 +11,46 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useUpdateParcelMutation } from '@/redux/features/parcel/parcel.api'
+import { toast } from 'sonner'
+import type { ParcelListItem, LandParcelStatus } from '@/redux/features/parcel/parcel.type'
 
 interface EditParcelModalProps {
   isOpen: boolean
   onClose: () => void
-  parcel: Parcel
-  onUpdate: (data: Partial<Parcel> & { location?: string }) => void
+  parcelItem: ParcelListItem
 }
 
-const EditParcelModal = ({ isOpen, onClose, parcel, onUpdate }: EditParcelModalProps) => {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors, isSubmitting },
-    reset
-  } = useForm<ParcelFormValues>({
-    resolver: zodResolver(parcelSchema) as any,
-    defaultValues: {
-      name: parcel.name,
-      location: `${parcel.city} / ${parcel.district}`,
-      area: parcel.area,
-      description: parcel.description || '',
-      latitude: parcel.latitude,
-      longitude: parcel.longitude,
-      status: parcel.status,
-      ownerName: parcel.ownerName
-    }
-  })
+const statusOptions: { label: string; value: LandParcelStatus }[] = [
+  { label: 'DRAFT', value: 'DRAFT' },
+  { label: 'VERIFICATION', value: 'VERIFICATION' },
+  { label: 'VALIDATED', value: 'VALIDATED' },
+  { label: 'PUBLISHED', value: 'PUBLISHED' },
+  { label: 'RESERVED', value: 'RESERVED' },
+  { label: 'SOLD', value: 'SOLD' },
+  { label: 'DISPUTED', value: 'DISPUTED' },
+  { label: 'BLOCKED', value: 'BLOCKED' },
+]
 
-  const statusValue = watch('status')
+const EditParcelModal = ({ isOpen, onClose, parcelItem }: EditParcelModalProps) => {
+  const [updateParcel, { isLoading }] = useUpdateParcelMutation()
 
-  // Sync form data when selected parcel changes
+  const cleanNotes = (parcelItem.notes || '').replace(/<[^>]*>/g, '')
+
+  const [areaSqm, setAreaSqm] = useState<string | number>(parcelItem.areaSqm ?? '')
+  const [pricePerSqm, setPricePerSqm] = useState<string | number>(parcelItem.pricePerSqm ?? '')
+  const [status, setStatus] = useState<LandParcelStatus>((parcelItem.status as LandParcelStatus) || 'PUBLISHED')
+  const [notes, setNotes] = useState<string>(cleanNotes)
+
   useEffect(() => {
-    reset({
-      name: parcel.name,
-      location: `${parcel.city} / ${parcel.district}`,
-      area: parcel.area,
-      description: parcel.description || '',
-      latitude: parcel.latitude,
-      longitude: parcel.longitude,
-      status: parcel.status,
-      ownerName: parcel.ownerName
-    })
-  }, [parcel, reset])
+    if (parcelItem) {
+      setAreaSqm(parcelItem.areaSqm ?? '')
+      setPricePerSqm(parcelItem.pricePerSqm ?? '')
+      setStatus((parcelItem.status as LandParcelStatus) || 'PUBLISHED')
+      setNotes((parcelItem.notes || '').replace(/<[^>]*>/g, ''))
+    }
+  }, [parcelItem])
 
-  // Lock scroll
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -75,183 +64,150 @@ const EditParcelModal = ({ isOpen, onClose, parcel, onUpdate }: EditParcelModalP
 
   if (!isOpen) return null
 
-  const onSubmit = (data: ParcelFormValues) => {
-    onUpdate({
-      name: data.name,
-      location: data.location,
-      area: data.area,
-      description: data.description,
-      latitude: data.latitude,
-      longitude: data.longitude,
-      status: data.status,
-      ownerName: data.ownerName
-    })
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      const payload = {
+        areaSqm: areaSqm !== '' ? Number(areaSqm) : undefined,
+        pricePerSqm: pricePerSqm !== '' ? Number(pricePerSqm) : undefined,
+        status: status,
+        notes: notes ? `<p>${notes}</p>` : undefined,
+      }
+
+      await updateParcel({ id: parcelItem.id, data: payload }).unwrap()
+      toast.success('Land parcel updated successfully!')
+      onClose()
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Failed to update parcel.')
+    }
   }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-[1px] p-4 overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4 overflow-y-auto animate-in fade-in duration-200"
       onClick={onClose}
     >
       {/* Modal Dialog Card */}
       <div
-        className="bg-white rounded-2xl border border-slate-100 w-full max-w-lg shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
+        className="bg-white rounded-2xl border border-slate-200 w-full max-w-lg shadow-2xl flex flex-col overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-          <h2 className="text-base font-bold text-title">Edit Parcel — {parcel.id}</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
+          <div>
+            <h2 className="text-base font-extrabold text-slate-900">
+              Edit Parcel — {parcelItem.slug || parcelItem.parcelCode || `PCL-${parcelItem.id}`}
+            </h2>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              Update area size, price per sqm, land status, and notes
+            </p>
+          </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors"
+            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col overflow-hidden">
+        <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
           <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
-            {/* Grid fields */}
-            <div className="grid grid-cols-2 gap-4">
-
-              {/* Parcel Name */}
-              <div className="col-span-2 space-y-1.5">
-                <Label htmlFor="name">Parcel Name</Label>
-                <Input
-                  id="name"
-                  placeholder="e.g. Bastos Estate Plot A"
-                  {...register('name')}
-                />
-                {errors.name && (
-                  <p className="text-xs text-destructive font-medium mt-1">{errors.name.message}</p>
-                )}
-              </div>
-
-              {/* Location */}
-              <div className="col-span-2 space-y-1.5">
-                <Label htmlFor="location">Location / Zone</Label>
-                <Input
-                  id="location"
-                  placeholder="e.g. Bastos, Yaoundé"
-                  {...register('location')}
-                />
-                {errors.location && (
-                  <p className="text-xs text-destructive font-medium mt-1">{errors.location.message}</p>
-                )}
-              </div>
-
-              {/* Area */}
+            {/* Area Sqm & Price Per Sqm */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="area">Total Area (sqm)</Label>
+                <Label htmlFor="areaSqm" className="text-xs font-bold text-slate-700">
+                  Area (sqm)
+                </Label>
                 <Input
-                  id="area"
+                  id="areaSqm"
                   type="number"
-                  placeholder="e.g. 1200"
-                  {...register('area')}
+                  step="0.01"
+                  placeholder="e.g. 1250.75"
+                  value={areaSqm}
+                  onChange={(e) => setAreaSqm(e.target.value)}
+                  className="w-full text-xs font-semibold"
                 />
-                {errors.area && (
-                  <p className="text-xs text-destructive font-medium mt-1">{errors.area.message}</p>
-                )}
               </div>
 
-              {/* Status */}
               <div className="space-y-1.5">
-                <Label htmlFor="status">Land Status</Label>
-                <Select
-                  value={statusValue}
-                  onValueChange={(val) => setValue('status', val as any, { shouldValidate: true, shouldDirty: true })}
-                >
-                  <SelectTrigger id="status" className="w-full">
-                    <SelectValue placeholder="Select Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Approved">Approved</SelectItem>
-                    <SelectItem value="Pending">Pending</SelectItem>
-                    <SelectItem value="Disputed">Disputed</SelectItem>
-                    <SelectItem value="Reserved">Reserved</SelectItem>
-                    <SelectItem value="Validated">Validated</SelectItem>
-                    <SelectItem value="Blocked">Blocked</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.status && (
-                  <p className="text-xs text-destructive font-medium mt-1">{errors.status.message}</p>
-                )}
-              </div>
-
-              {/* Latitude */}
-              <div className="space-y-1.5">
-                <Label htmlFor="latitude">Latitude</Label>
+                <Label htmlFor="pricePerSqm" className="text-xs font-bold text-slate-700">
+                  Price per sqm
+                </Label>
                 <Input
-                  id="latitude"
+                  id="pricePerSqm"
                   type="number"
-                  step="any"
-                  placeholder="e.g. 3.8964"
-                  {...register('latitude')}
-                />
-                {errors.latitude && (
-                  <p className="text-xs text-destructive font-medium mt-1">{errors.latitude.message}</p>
-                )}
-              </div>
-
-              {/* Longitude */}
-              <div className="space-y-1.5">
-                <Label htmlFor="longitude">Longitude</Label>
-                <Input
-                  id="longitude"
-                  type="number"
-                  step="any"
-                  placeholder="e.g. 11.5126"
-                  {...register('longitude')}
-                />
-                {errors.longitude && (
-                  <p className="text-xs text-destructive font-medium mt-1">{errors.longitude.message}</p>
-                )}
-              </div>
-
-              {/* Primary Owner Name */}
-              <div className="col-span-2 space-y-1.5">
-                <Label htmlFor="ownerName">Primary Owner Name</Label>
-                <Input
-                  id="ownerName"
-                  placeholder="e.g. Jean Alima"
-                  {...register('ownerName')}
-                />
-                {errors.ownerName && (
-                  <p className="text-xs text-destructive font-medium mt-1">{errors.ownerName.message}</p>
-                )}
-              </div>
-
-              {/* Description */}
-              <div className="col-span-2 space-y-1.5">
-                <Label htmlFor="description">Land Description</Label>
-                <textarea
-                  id="description"
-                  rows={3}
-                  placeholder="Describe the boundaries, landmarks or usage..."
-                  {...register('description')}
-                  className="w-full p-3 border border-slate-200 bg-slate-50/40 rounded-lg text-xs md:text-sm text-title placeholder:text-slate-400 focus:border-button-color focus:bg-white focus:outline-none transition-all resize-none font-medium"
+                  step="0.01"
+                  placeholder="e.g. 150000"
+                  value={pricePerSqm}
+                  onChange={(e) => setPricePerSqm(e.target.value)}
+                  className="w-full text-xs font-semibold"
                 />
               </div>
+            </div>
 
+            {/* Status Dropdown */}
+            <div className="space-y-1.5">
+              <Label htmlFor="status" className="text-xs font-bold text-slate-700">
+                Land Status
+              </Label>
+              <Select
+                value={status}
+                onValueChange={(val: LandParcelStatus) => setStatus(val)}
+              >
+                <SelectTrigger id="status" className="w-full bg-white text-xs font-semibold">
+                  <SelectValue placeholder="Select Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {statusOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value} className="text-xs font-semibold">
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Notes Textarea */}
+            <div className="space-y-1.5">
+              <Label htmlFor="notes" className="text-xs font-bold text-slate-700">
+                Notes
+              </Label>
+              <textarea
+                id="notes"
+                rows={4}
+                placeholder="Describe land details, notes or soil quality..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="w-full p-3 border border-slate-200 bg-white rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:border-button-color focus:outline-none focus:ring-2 focus:ring-button-color/20 font-semibold resize-none"
+              />
             </div>
           </div>
 
           {/* Action Footer */}
-          <div className="px-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between py-4 gap-4">
-            <button
+          <div className="px-6 bg-white border-t border-slate-100 flex items-center justify-end py-4 gap-3">
+            <Button
               type="button"
+              variant="outline"
               onClick={onClose}
-              className="px-4 w-1/2 py-3 border border-slate-400 text-xs font-semibold text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+              className="w-auto px-5 text-xs font-bold"
             >
               Cancel
-            </button>
+            </Button>
             <Button
               type="submit"
-              disabled={isSubmitting}
-              className='w-1/2'
+              disabled={isLoading}
+              className="w-auto px-6 text-xs font-bold"
             >
-              {isSubmitting ? 'Updating...' : 'Update Parcel'}
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Updating...</span>
+                </div>
+              ) : (
+                'Update Parcel'
+              )}
             </Button>
           </div>
         </form>

@@ -1,22 +1,30 @@
 "use client"
 import React, { useEffect } from 'react'
-import { X, MapPin } from 'lucide-react'
-import ParcelDetailsTabs from '../app/parcels/ParcelDetailsTabs'
-import { Parcel } from '@/components/app/parcels/ParcelsPage'
+import { X, MapPin, Loader2, Pencil, ShieldX, Trash2, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useRetrieveParcelDetailsQuery } from '@/redux/features/parcel/parcel.api'
+import formatDate from '@/utils/formatDate'
 
 interface ParcelDetailsModalProps {
   isOpen: boolean
   onClose: () => void
-  parcel: Parcel
-  onAddOwner: () => void
-  onUpdateStatus: (newStatus: string, reason: string) => void
+  parcelId: number | null
   onEdit: () => void
   onBlock: () => void
   onDelete: () => void
 }
 
-const ParcelDetailsModal = ({ isOpen, onClose, parcel, onAddOwner, onUpdateStatus, onEdit, onBlock, onDelete }: ParcelDetailsModalProps) => {
+const ParcelDetailsModal: React.FC<ParcelDetailsModalProps> = ({
+  isOpen,
+  onClose,
+  parcelId,
+  onEdit,
+  onBlock,
+  onDelete,
+}) => {
+  const { data: detailsData, isLoading } = useRetrieveParcelDetailsQuery(parcelId!, {
+    skip: !parcelId || !isOpen,
+  })
 
   useEffect(() => {
     if (isOpen) {
@@ -31,154 +39,284 @@ const ParcelDetailsModal = ({ isOpen, onClose, parcel, onAddOwner, onUpdateStatu
 
   if (!isOpen) return null
 
+  const parcel = detailsData?.data
+
+  const cleanNotes = parcel?.notes ? parcel.notes.replace(/<[^>]*>/g, '') : ''
+
   return (
     <div
-      className="fixed inset-0 z-50 flex justify-end bg-slate-900/30 backdrop-blur-[1px] animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex justify-end bg-slate-950/60 backdrop-blur-[2px] animate-in fade-in duration-200"
       onClick={onClose}
     >
       {/* Sliding Sheet Panel */}
       <div
-        className="w-full max-w-md md:max-w-lg bg-white h-screen flex flex-col shadow-2xl animate-in slide-in-from-right duration-300"
+        className="w-full max-w-md md:max-w-lg bg-white h-screen flex flex-col shadow-2xl animate-in slide-in-from-right duration-300 text-slate-800"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header (Top section) */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0 bg-white">
           <div className="flex flex-col leading-snug">
-            <h2 className="text-lg font-bold text-slate-800">
-              Parcel {parcel.id}
+            <h2 className="text-base font-extrabold text-slate-900">
+              {isLoading ? 'Loading Parcel...' : parcel?.slug || parcel?.parcelCode || `Parcel #${parcelId}`}
             </h2>
             <span className="text-xs font-semibold text-slate-400 mt-0.5">
-              {parcel.city}, {parcel.district}
+              {parcel?.location?.city
+                ? `${parcel.location.city}${parcel.location.state ? `, ${parcel.location.state}` : ''}`
+                : 'Land Parcel Details'}
             </span>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-50 transition-colors"
+            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Topographic Map visual area */}
-        <div className="relative h-48 bg-[#D1FAE5]/60 border-b border-emerald-50 shrink-0 flex items-center justify-center overflow-hidden">
-          {/* Topographic contours */}
-          <svg className="absolute inset-0 w-full h-full text-emerald-800/10 stroke-current stroke-1" fill="none">
-            <path d="M-50,20 C30,40 60,-30 110,30 C150,80 200,30 250,70 T450,20 T650,50" />
-            <path d="M-50,45 C30,65 60,-5 110,55 C150,105 200,55 250,95 T450,45 T650,75" />
-            <path d="M-50,70 C30,90 60,20 110,80 C150,130 200,80 250,120 T450,70 T650,100" />
-            <path d="M-50,95 C30,115 60,45 110,105 C150,155 200,105 250,145 T450,95 T650,125" />
-            {/* Abstract highway road paths */}
-            <path d="M80,-20 L80,240" stroke="#94A3B8" strokeWidth="3" />
-            <path d="M-20,130 H500" stroke="#94A3B8" strokeWidth="3" />
-          </svg>
+        {/* Content Body */}
+        {isLoading ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 gap-3 text-slate-400">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <span className="text-xs font-bold">Fetching parcel details...</span>
+          </div>
+        ) : parcel ? (
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {/* Topographic Visual Map Header */}
+            <div className="relative h-40 bg-emerald-50/70 rounded-xl border border-emerald-100 p-4 flex flex-col justify-between overflow-hidden">
+              <div className="flex items-center justify-between z-10">
+                <span
+                  className={cn(
+                    'px-2.5 py-0.5 rounded text-[11px] font-extrabold border shadow-sm',
+                    parcel.status === 'PUBLISHED' && 'bg-emerald-50 text-emerald-600 border-emerald-200',
+                    parcel.status === 'UNDER_VERIFICATION' && 'bg-blue-50 text-blue-600 border-blue-200',
+                    parcel.status === 'DRAFT' && 'bg-slate-50 text-slate-600 border-slate-200',
+                    parcel.status === 'RESERVED' && 'bg-amber-50 text-amber-600 border-amber-200',
+                    parcel.status === 'CLOSED' && 'bg-rose-50 text-rose-600 border-rose-200',
+                    parcel.status === 'BLOCKED' && 'bg-red-50 text-red-600 border-red-200'
+                  )}
+                >
+                  {parcel.status}
+                </span>
 
-          {/* Dotted parcel area highlighting boundary */}
-          <div className="absolute w-28 h-20 border-2 border-dashed border-blue-500 bg-blue-500/10 rounded-md flex items-center justify-center animate-pulse">
-            {/* Map Pin icon */}
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white shadow-md">
-              <MapPin className="w-4.5 h-4.5" />
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-600 text-white border border-emerald-700 shadow-sm">
+                  Reliability: {parcel.reliabilityScore ?? 0}%
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 z-10">
+                <MapPin className="w-4 h-4 text-rose-600 shrink-0" />
+                <span className="text-xs font-extrabold text-slate-800 truncate">
+                  {parcel.location?.addressLine1 || parcel.location?.city || 'Location Pin'}
+                  {parcel.location?.country ? `, ${parcel.location.country}` : ''}
+                </span>
+              </div>
             </div>
+
+            {/* Information Grid */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                Parcel Overview
+              </h3>
+
+              <div className="grid grid-cols-2 gap-3 text-xs bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+                <div>
+                  <span className="text-slate-400 font-semibold block text-[11px]">Parcel Code</span>
+                  <span className="font-extrabold text-slate-800">{parcel.parcelCode || 'N/A'}</span>
+                </div>
+
+                <div>
+                  <span className="text-slate-400 font-semibold block text-[11px]">Slug</span>
+                  <span className="font-extrabold text-slate-800">{parcel.slug || 'N/A'}</span>
+                </div>
+
+                <div>
+                  <span className="text-slate-400 font-semibold block text-[11px]">Area Size</span>
+                  <span className="font-extrabold text-slate-800">{parcel.areaSqm ? `${parcel.areaSqm.toLocaleString()} m²` : 'N/A'}</span>
+                </div>
+
+                <div>
+                  <span className="text-slate-400 font-semibold block text-[11px]">Price per sqm</span>
+                  <span className="font-extrabold text-slate-800">
+                    {parcel.pricePerSqm ? `${parcel.pricePerSqm.toLocaleString()} XAF` : 'Not set'}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-slate-400 font-semibold block text-[11px]">Created Date</span>
+                  <span className="font-extrabold text-slate-800">{formatDate(parcel.createdAt)}</span>
+                </div>
+
+                <div>
+                  <span className="text-slate-400 font-semibold block text-[11px]">Last Updated</span>
+                  <span className="font-extrabold text-slate-800">{formatDate(parcel.updatedAt)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Location Details */}
+            {parcel.location && (
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Location Details
+                </h3>
+                <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 space-y-2 text-xs">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <span className="text-slate-400 font-semibold block text-[11px]">Address Line 1</span>
+                      <span className="font-extrabold text-slate-800">{parcel.location.addressLine1 || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-semibold block text-[11px]">Address Line 2</span>
+                      <span className="font-extrabold text-slate-800">{parcel.location.addressLine2 || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-semibold block text-[11px]">City / State</span>
+                      <span className="font-extrabold text-slate-800">
+                        {parcel.location.city ? `${parcel.location.city}, ${parcel.location.state || ''}` : 'N/A'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-semibold block text-[11px]">Country / Zip</span>
+                      <span className="font-extrabold text-slate-800">
+                        {parcel.location.country ? `${parcel.location.country} (${parcel.location.zipCode || ''})` : 'N/A'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-semibold block text-[11px]">Coordinates</span>
+                      <span className="font-extrabold text-slate-800 font-mono text-[11px]">
+                        {parcel.location.latitude ?? 'N/A'}, {parcel.location.longitude ?? 'N/A'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-semibold block text-[11px]">Remarks</span>
+                      <span className="font-extrabold text-slate-800">{parcel.location.remarks || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Owners List */}
+            {parcel.owners && parcel.owners.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Parcel Owners ({parcel.owners.length})
+                </h3>
+                <div className="space-y-2">
+                  {parcel.owners.map((owner, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between text-xs"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold shrink-0">
+                          <User className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="font-extrabold text-slate-800 block">
+                            {owner.ownerName || 'Unknown Owner'}
+                          </span>
+                          <span className="text-[11px] text-slate-400 font-medium">
+                            {owner.ownerPhone || 'No phone'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-[10px] font-extrabold block w-fit ml-auto">
+                          {owner.ownershipType || 'PRIMARY'} ({owner.sharePercentage || '0'}%)
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-semibold">
+                          Status: {owner.status || 'PUBLISHED'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Registration Workflow Linked Info */}
+            {parcel.registration && (
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Linked Registration Record
+                </h3>
+                <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-100 text-xs grid grid-cols-2 gap-2">
+                  <div>
+                    <span className="text-slate-400 font-semibold block text-[11px]">Registration Slug</span>
+                    <span className="font-extrabold text-slate-800">{parcel.registration.slug}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block text-[11px]">Workflow Step</span>
+                    <span className="font-extrabold text-slate-800">Step {parcel.registration.step}/7</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block text-[11px]">Submission Date</span>
+                    <span className="font-extrabold text-slate-800">{formatDate(parcel.registration.submittedAt)}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block text-[11px]">Registration Status</span>
+                    <span className="font-extrabold text-slate-800">{parcel.registration.status}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Notes */}
+            {cleanNotes && (
+              <div className="space-y-2">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Notes
+                </h3>
+                <p className="text-xs font-semibold text-slate-700 bg-slate-50/60 p-3 rounded-xl border border-slate-100 leading-relaxed">
+                  {cleanNotes}
+                </p>
+              </div>
+            )}
           </div>
-
-          {/* Red Highway Shield Badge */}
-          <div className="absolute top-[65%] left-[20%] bg-rose-500 text-white text-[8px] font-bold px-1 rounded shadow-sm border border-rose-600 tracking-wider">
-            N15
+        ) : (
+          <div className="flex-1 flex items-center justify-center p-6 text-xs text-slate-400 font-semibold">
+            No parcel details found.
           </div>
+        )}
 
-          {/* Top-Right overlays: Status & Reliability Pills */}
-          <div className="absolute top-3 right-3 flex items-center gap-1.5">
-            <span
-              className={cn(
-                "px-2.5 py-0.5 rounded text-[10px] font-bold border shrink-0 shadow-sm",
-                parcel.status === 'Published' && 'bg-emerald-50 text-emerald-600 border-emerald-100',
-                parcel.status === 'Validated' && 'bg-teal-50 text-teal-600 border-teal-100',
-                parcel.status === 'Pending' && 'bg-yellow-50 text-yellow-600 border-yellow-100',
-                parcel.status === 'Reserved' && 'bg-amber-50 text-amber-600 border-amber-100',
-                parcel.status === 'Disputed' && 'bg-rose-50 text-rose-600 border-rose-100',
-                parcel.status === 'Under Verification' && 'bg-blue-50 text-blue-600 border-blue-100',
-                parcel.status === 'Sold' && 'bg-purple-50 text-purple-600 border-purple-100',
-                parcel.status === 'Draft' && 'bg-slate-50 text-slate-500 border-slate-200',
-                parcel.status === 'Blocked' && 'bg-red-50 text-red-600 border-red-100'
-              )}
-            >
-              {parcel.status}
-            </span>
-
-            <span
-              className={cn(
-                "px-2 py-0.5 rounded-full text-[10px] font-bold text-white border shrink-0 shadow-sm",
-                parcel.reliability === 'Very High' && 'bg-[#047857] border-[#047857]',
-                parcel.reliability === 'High' && 'bg-emerald-500 border-emerald-500',
-                parcel.reliability === 'Medium' && 'bg-amber-500 border-amber-500',
-                parcel.reliability === 'Low' && 'bg-red-500 border-red-500'
-              )}
-            >
-              {parcel.reliability}
-            </span>
-          </div>
-
-          {/* Bottom-Left overlay: Yaoundé, Bastos */}
-          <div className="absolute bottom-2 left-3 bg-white px-2.5 py-0.5 rounded-md shadow-sm border border-slate-100 flex items-center gap-1">
-            <MapPin className="w-3.5 h-3.5 text-rose-500" />
-            <span className="text-[10px] font-bold text-slate-700">
-              {parcel.city}, {parcel.district}
-            </span>
-          </div>
-        </div>
-
-        {/* Scrollable details tabs content */}
-        <div className="flex-1 overflow-hidden flex flex-col bg-white">
-          <ParcelDetailsTabs
-            selectedParcel={parcel}
-            onAddOwner={onAddOwner}
-            onUpdateStatus={onUpdateStatus}
-          />
-        </div>
-
-        {/* Sticky Action Footer (Bottom row) */}
-        <div className="px-5 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between gap-2.5 shrink-0">
-          {/* Edit */}
+        {/* Footer Actions with Edit, Block, Delete */}
+        <div className="px-6 py-4 border-t border-slate-100 bg-white flex items-center justify-between gap-2.5 shrink-0">
           <button
+            type="button"
             onClick={() => {
               onClose()
               onEdit()
             }}
-            className="flex-1 py-2.5 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-lg hover:bg-emerald-100/60 transition-colors shadow-sm cursor-pointer text-center"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-lg hover:bg-emerald-100/60 transition-colors cursor-pointer"
           >
-            Edit
+            <Pencil className="w-3.5 h-3.5" />
+            <span>Edit</span>
           </button>
 
-          {/* Block */}
           <button
+            type="button"
             onClick={() => {
               onClose()
               onBlock()
             }}
-            className="flex-1 py-2.5 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 hover:bg-amber-100/60 transition-colors shadow-sm cursor-pointer text-center"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-extrabold text-amber-700 bg-amber-50 border border-amber-100 hover:bg-amber-100/60 rounded-lg transition-colors cursor-pointer"
           >
-            Block
+            <ShieldX className="w-3.5 h-3.5" />
+            <span>Block</span>
           </button>
 
-          {/* Publish */}
           <button
-            onClick={() => {
-              onUpdateStatus('Published', 'Published from sticky footer actions panel')
-              alert(`Parcel ${parcel.id} status updated to Published!`)
-            }}
-            className="flex-1 py-2.5 text-xs font-bold text-white bg-button-color rounded-lg hover:bg-button-color/90 transition-colors shadow-sm cursor-pointer text-center"
-          >
-            Publish
-          </button>
-
-          {/* Delete */}
-          <button
+            type="button"
             onClick={() => {
               onClose()
               onDelete()
             }}
-            className="flex-1 py-2.5 text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 hover:bg-rose-100/60 transition-colors shadow-sm cursor-pointer text-center"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-extrabold text-rose-600 bg-rose-50 border border-rose-100 hover:bg-rose-100/60 rounded-lg transition-colors cursor-pointer"
           >
-            Delete
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Delete</span>
           </button>
         </div>
       </div>

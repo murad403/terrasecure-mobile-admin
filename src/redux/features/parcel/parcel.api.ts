@@ -1,30 +1,16 @@
 import baseApi from "@/redux/api/api";
 import type { FetchArgs } from '@reduxjs/toolkit/query';
-import { ApiResponse } from '@/redux/api/api-response.interface';
-
-export interface ParcelListItem {
-  id: number | string;
-  slug?: string | null;
-  parcelCode?: string | null;
-  locationId?: string | null;
-  location?: {
-    city?: string | null;
-    state?: string | null;
-  } | null;
-  areaSqm?: number | null;
-  status?: string | null;
-}
-
-export interface RetrieveParcelsArgs {
-  page?: number;
-  limit?: number;
-  search?: string;
-  status?: string;
-}
+import {
+    ParcelListItem,
+    RetrieveParcelsArgs,
+    RetrieveParcelsResponse,
+    ParcelDetailsResponse,
+    UpdateParcelPayload,
+} from "./parcel.type";
 
 const parcelApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        retrieveParcels: builder.query<ApiResponse<ParcelListItem[]>, RetrieveParcelsArgs>({
+        retrieveParcels: builder.query<RetrieveParcelsResponse, RetrieveParcelsArgs>({
             query: ({ page = 1, limit = 20, search, status }) => {
                 const params: FetchArgs['params'] = { page, limit };
 
@@ -44,7 +30,7 @@ const parcelApi = baseApi.injectEndpoints({
             },
             providesTags: ["Parcel"]
         }),
-        retrieveParcelDetails: builder.query({
+        retrieveParcelDetails: builder.query<ParcelDetailsResponse, number | string>({
             query: (id) => ({
                 url: `/land-parcels/${id}`,
                 method: "GET",
@@ -59,7 +45,7 @@ const parcelApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["Parcel"]
         }),
-        updateParcel: builder.mutation({
+        updateParcel: builder.mutation<ParcelDetailsResponse, { id: number | string; data: UpdateParcelPayload }>({
             query: ({ id, data }) => ({
                 url: `/land-parcels/${id}`,
                 method: "PATCH",
@@ -76,7 +62,6 @@ const parcelApi = baseApi.injectEndpoints({
         }),
     })
 });
-
 
 export const {
     useRetrieveParcelsQuery,

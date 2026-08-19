@@ -9,7 +9,7 @@ import SearchInput from '@/components/ui/SearchInput'
 import formatDate from '@/utils/formatDate'
 import { LandParcelOwnershipType, LandParcelRegistrationStatus } from '@/enum'
 import { useRetrieveRegistrationsQuery } from '@/redux/features/registrations/registration.api'
-import { UserPicker } from '@/components/tools/UserPicker'
+
 
 interface RegistrationsTableProps {
   onOpenAddModal: () => void
@@ -73,7 +73,6 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({
               />
             </div>
 
-            <UserPicker onChange={(x) => console.log(x)} />
               
             {/* Status Filter */}
             <CustomFilterDropdown
