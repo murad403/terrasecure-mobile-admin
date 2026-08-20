@@ -1,9 +1,8 @@
 import { MapPin } from 'lucide-react';
 import useDebounce from '@/hooks/useDebounce';
-import {
-  useRetrieveParcelsQuery,
-  type ParcelListItem,
-} from '@/redux/features/parcel/parcel.api';
+import { useRetrieveParcelsQuery } from '@/redux/features/parcel/parcel.api';
+import type { ParcelListItem } from '@/redux/features/parcel/parcel.type';
+
 import React, { useState, useRef, useEffect } from 'react';
 
 interface ParcelPickerProps {

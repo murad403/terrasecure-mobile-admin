@@ -1,94 +1,79 @@
 "use client"
-import React, { useState, useEffect, useRef } from 'react'
-import { X, MapPin, Upload, ChevronDown, Check } from 'lucide-react'
-import { type InvestigationRecord } from './InvestigationsPage'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import React, { useEffect } from 'react'
+import { X, MapPin, Loader2, Building2, User, FileText, CheckCircle2, ShieldAlert } from 'lucide-react'
+import formatDate from '@/utils/formatDate'
+import { useRetrieveLandInvestigationDetailsQuery } from '@/redux/features/investigations/investigations.api'
+import { LandInvestigationKind } from '@/enum'
+import type { LandInvestigationItem } from '@/redux/features/investigations/investigations.type'
 
 interface InvestigationDetailsModalProps {
   isOpen: boolean
   onClose: () => void
-  investigation: InvestigationRecord
-  onReassign: (newInspector: string) => void
-  onUploadFindings: (notes: string, fileName?: string) => void
-  onCloseCase: () => void
+  investigationId: number | string | null
 }
 
-const getInitials = (name: string) => {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .substring(0, 2)
-    .toUpperCase()
-}
+const KIND_LABELS: Record<string, string> = Object.keys(LandInvestigationKind).reduce(
+  (acc, key) => {
+    acc[key] = key.replace(/_/g, ' ')
+    return acc
+  },
+  {} as Record<string, string>
+)
+
 
 const InvestigationDetailsModal = ({
   isOpen,
   onClose,
-  investigation,
-  onReassign,
-  onUploadFindings,
-  onCloseCase
+  investigationId,
 }: InvestigationDetailsModalProps) => {
-  const [notes, setNotes] = useState(investigation.notes || '')
-  const [uploadedFile, setUploadedFile] = useState<string | null>(
-    investigation.uploadedFiles.length > 0 ? investigation.uploadedFiles[0] : null
-  )
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { data: detailsRes, isLoading: loadingDetails } =
+    useRetrieveLandInvestigationDetailsQuery(investigationId!, {
+      skip: !isOpen || !investigationId,
+    })
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setUploadedFile(file.name)
-    }
-  }
-
-  const triggerFileInput = () => {
-    fileInputRef.current?.click()
-  }
+  const investigation: LandInvestigationItem | undefined = detailsRes?.data
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
-      setNotes(investigation.notes || '')
-      setUploadedFile(investigation.uploadedFiles.length > 0 ? investigation.uploadedFiles[0] : null)
     } else {
       document.body.style.overflow = ''
     }
     return () => {
       document.body.style.overflow = ''
     }
-  }, [isOpen, investigation])
+  }, [isOpen])
 
   if (!isOpen) return null
 
-  const initials = getInitials(investigation.assigneeName)
-
-  const handleUploadClick = () => {
-    onUploadFindings(notes, uploadedFile || 'findings_report_inv_case.pdf')
-    alert('Investigation findings notes and files uploaded successfully! Step 3 is now complete.')
-  }
-
   return (
-    <div className="fixed inset-0 z-40 flex justify-end">
+    <div className="fixed inset-0 z-50 flex justify-end">
       {/* Backdrop overlay */}
       <div
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-[1px] transition-opacity duration-300 animate-in fade-in"
+        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
         onClick={onClose}
       />
 
       {/* Slide-out Drawer Panel */}
-      <div className="relative w-full sm:w-112.5 md:w-120 h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-350 ease-out border-l border-slate-100 z-50">
-        
+      <div className="relative w-full sm:w-120 md:w-130 h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300 ease-out border-l border-slate-100 z-50">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
           <div className="space-y-0.5 select-none">
-            <h2 className="text-sm font-extrabold text-slate-900 leading-tight">
-              {investigation.id}
-            </h2>
-            <p className="text-[10px] font-semibold text-slate-400 leading-relaxed max-w-[320px] truncate" title={investigation.title}>
-              {investigation.title}
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-extrabold text-slate-900 leading-tight">
+                Case Details
+              </h2>
+              {investigation?.slug && (
+                <span className="text-[11px] font-mono font-bold text-red-600 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded">
+                  {investigation.slug}
+                </span>
+              )}
+            </div>
+            <p
+              className="text-[10px] font-semibold text-slate-400 leading-relaxed max-w-[320px] truncate"
+              title={investigation?.title || ''}
+            >
+              {investigation?.title || 'Land Dispute Investigation'}
             </p>
           </div>
           <button
@@ -100,164 +85,162 @@ const InvestigationDetailsModal = ({
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 select-none text-xs">
-          
-          {/* Related Parcel Box */}
-          <div className="space-y-2">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">
-              Related Parcel
-            </span>
-            <div className="bg-white border border-slate-100 rounded-xl p-4 flex items-center justify-between">
-              <span className="text-sm font-bold text-blue-600 hover:underline cursor-pointer">
-                {investigation.parcelId}
+        {loadingDetails || !investigation ? (
+          <div className="flex-1 flex items-center justify-center p-8 text-slate-500 font-semibold text-xs">
+            <Loader2 className="w-5 h-5 animate-spin text-button-color mr-2" />
+            <span>Loading case details...</span>
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto p-6 space-y-5 select-none text-xs">
+            {/* Kind & Priority Badges */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-slate-900 text-white uppercase tracking-wider">
+                {KIND_LABELS[investigation.kind] || investigation.kind}
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-rose-50 text-rose-600 border border-rose-100 uppercase tracking-wider select-none">
-                Disputed
+              {investigation.priorityLevel && (
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-600 border border-rose-200 uppercase tracking-wider">
+                  {investigation.priorityLevel} Priority
+                </span>
+              )}
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider">
+                {investigation.status}
               </span>
             </div>
-          </div>
 
-          {/* Assigned Investigator Box */}
-          <div className="space-y-2">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">
-              Assigned Investigator
-            </span>
-            <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-4 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100 text-blue-700 font-extrabold text-sm shrink-0 shadow-sm uppercase tracking-wide">
-                  {initials}
+            {/* Requester Info Box */}
+            <div className="space-y-2">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">
+                Requester Info
+              </span>
+              <div className="flex items-center gap-3 bg-slate-50/70 border border-slate-100 rounded-xl p-4">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100 text-button-color font-extrabold text-xs shrink-0 overflow-hidden border border-white shadow-xs">
+                  {investigation.requester?.profilePicture?.url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={investigation.requester.profilePicture.url}
+                      alt={investigation.requester.name || 'User'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    investigation.requester?.name?.substring(0, 2).toUpperCase() || 'US'
+                  )}
                 </div>
                 <div className="space-y-0.5">
-                  <h3 className="text-sm font-bold text-slate-900">{investigation.assigneeName}</h3>
-                  <span className="text-[10px] font-semibold text-slate-400 block leading-tight">
-                    {investigation.assigneeRole}
+                  <h3 className="text-sm font-bold text-slate-900">
+                    {investigation.requester?.name || 'System Admin'}
+                  </h3>
+                  <span className="text-[10px] font-semibold text-slate-400 block">
+                    Created {formatDate(investigation.createdAt)}
                   </span>
                 </div>
               </div>
+            </div>
 
-              {/* Reassign dropdown selector */}
-              <div className="relative shrink-0">
-                <select
-                  value={investigation.assigneeName}
-                  onChange={(e) => onReassign(e.target.value)}
-                  className="appearance-none pl-3 pr-8 py-2 border border-slate-200 bg-white hover:bg-slate-50 rounded-lg text-xs font-bold text-slate-700 focus:outline-none transition-none cursor-pointer"
-                >
-                  <option value="Inspector Alain Dimi">Inspector Alain Dimi</option>
-                  <option value="Inspector Marie Bello">Inspector Marie Bello</option>
-                  <option value="Inspector Paul Njoya">Inspector Paul Njoya</option>
-                  <option value="Inspector Cécile Eba">Inspector Cécile Eba</option>
-                </select>
-                <ChevronDown className="absolute right-2 top-2.5 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+            {/* Requester Location Box if Present */}
+            {investigation.requesterLocation && (
+              <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 space-y-1.5">
+                <div className="flex items-center gap-2 text-emerald-700 font-bold">
+                  <MapPin className="w-4 h-4 shrink-0" />
+                  <span>Requester Location</span>
+                </div>
+                <div className="text-slate-700 text-xs font-semibold pl-6 space-y-0.5">
+                  <div>
+                    {investigation.requesterLocation.addressLine1}
+                    {investigation.requesterLocation.addressLine2 &&
+                      `, ${investigation.requesterLocation.addressLine2}`}
+                  </div>
+                  <div>
+                    {investigation.requesterLocation.city},{' '}
+                    {investigation.requesterLocation.state},{' '}
+                    {investigation.requesterLocation.country}{' '}
+                    {investigation.requesterLocation.zipCode}
+                  </div>
+                  {investigation.requesterLocation.latitude && (
+                    <div className="font-mono text-[11px] text-slate-500 pt-1">
+                      GPS: {investigation.requesterLocation.latitude}°N,{' '}
+                      {investigation.requesterLocation.longitude}°E
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Related Disputed Parcel */}
+            {investigation.parcel && (
+              <div className="space-y-2">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">
+                  Related Land Parcel
+                </span>
+                <div className="bg-white border border-slate-100 rounded-xl p-4 flex items-center justify-between shadow-xs">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-blue-600" />
+                    <span className="text-xs font-bold text-blue-600">
+                      {investigation.parcel.parcelCode || investigation.parcel.slug}
+                    </span>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-rose-50 text-rose-600 border border-rose-100 uppercase tracking-wider">
+                    Disputed Parcel
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Case Description */}
+            <div className="space-y-2">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">
+                Investigation Description
+              </span>
+              <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-4 text-slate-700 font-semibold leading-relaxed">
+                {investigation.description ? (
+                  <div
+                    dangerouslySetInnerHTML={{ __html: investigation.description }}
+                    className="prose prose-slate max-w-none text-xs"
+                  />
+                ) : (
+                  'No description attached for this investigation.'
+                )}
               </div>
             </div>
-          </div>
 
-          {/* Investigation Timeline */}
-          <div className="space-y-3">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">
-              Investigation Timeline
-            </span>
-            <div className="relative pl-6 space-y-4 pt-1 select-none">
-              
-              {/* Vertical timeline line */}
-              <div className="absolute left-2.5 top-2.5 bottom-2.5 w-0.5 bg-slate-100" />
-
-              {/* Steps mappings */}
-              {investigation.timeline.map((step) => {
-                const isStepCompleted = step.isCompleted
-                
-                return (
-                  <div key={step.stepNumber} className="relative flex items-start gap-4 text-xs">
-                    
-                    {/* Circle indicators */}
-                    <div className="absolute -left-6 mt-0.5 shrink-0">
-                      {isStepCompleted ? (
-                        <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-white border border-blue-600 shadow-sm">
-                          <Check className="w-3.5 h-3.5 stroke-[3px]" />
+            {/* Attached Evidence Media */}
+            {investigation.evidences && investigation.evidences.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">
+                  Attached Evidences ({investigation.evidences.length})
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  {investigation.evidences.map((ev) => (
+                    <a
+                      key={ev.id}
+                      href={ev.media.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group border border-slate-200 rounded-xl overflow-hidden bg-slate-50 hover:border-button-color transition-all block"
+                    >
+                      {ev.media.type === 'IMAGE' || ev.media.mimeType?.startsWith('image/') ? (
+                        <div className="h-28 w-full overflow-hidden bg-slate-100">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={ev.media.url}
+                            alt="Evidence"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
                         </div>
                       ) : (
-                        <div className="w-5 h-5 rounded-full border-2 border-slate-200 bg-white text-slate-400 flex items-center justify-center text-[10px] font-bold">
-                          {step.stepNumber}
+                        <div className="p-4 flex items-center gap-2">
+                          <FileText className="w-5 h-5 text-button-color" />
+                          <span className="text-xs font-bold text-slate-700 truncate">
+                            Evidence File
+                          </span>
                         </div>
                       )}
-                    </div>
-
-                    <div className="space-y-0.5">
-                      <h4 className={cn(
-                        "text-xs font-bold",
-                        isStepCompleted ? "text-slate-800" : "text-slate-400"
-                      )}>
-                        {step.title}
-                      </h4>
-                      <p className="text-[10px] font-semibold text-slate-400 leading-relaxed">
-                        {step.subtext}
-                      </p>
-                    </div>
-                  </div>
-                )
-              })}
-
-            </div>
-          </div>
-
-          {/* Upload Findings */}
-          {investigation.status !== 'Closed' && (
-            <div className="space-y-3 border-t border-slate-100 pt-5">
-              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">
-                Upload Findings
-              </span>
-              
-              {/* Dashed upload input */}
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <div 
-                onClick={triggerFileInput}
-                className="border-2 border-dashed border-slate-200 rounded-xl p-5 flex flex-col items-center justify-center gap-1.5 hover:bg-slate-50 cursor-pointer transition-colors text-center select-none"
-              >
-                <Upload className="w-5 h-5 text-slate-400 shrink-0" />
-                <span className="text-[11px] font-bold text-slate-500 block">
-                  {uploadedFile ? `Attached: ${uploadedFile}` : 'Drop files here or click to upload'}
-                </span>
+                    </a>
+                  ))}
+                </div>
               </div>
-
-              {/* Textarea notes */}
-              <textarea
-                placeholder="Investigation notes..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full border border-slate-200 bg-white rounded-xl p-4 text-xs md:text-sm text-title placeholder:text-slate-400 focus:outline-none focus:border-button-color focus:ring-2 focus:ring-button-color/20 transition-all font-semibold min-h-22.5 leading-relaxed resize-none block"
-              />
-
-              {/* Action upload button */}
-              <Button
-                type="button"
-                onClick={handleUploadClick}
-                className='w-auto'
-              >
-                Upload Findings
-              </Button>
-            </div>
-          )}
-
-        </div>
-
-        {/* Footer actions: Close Investigation */}
-        {investigation.status !== 'Closed' && (
-          <div className="border-t border-slate-100 p-4 bg-slate-50/50 flex items-center justify-stretch shrink-0 select-none">
-            <Button
-              type="button"
-              onClick={onCloseCase}
-              className='bg-red-700 hover:bg-red-800/90'
-            >
-              Close Investigation
-            </Button>
+            )}
           </div>
         )}
-
       </div>
     </div>
   )
