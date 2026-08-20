@@ -1,10 +1,25 @@
 "use client"
-import React, { useEffect } from 'react'
-import { X, MapPin, Loader2, Building2, User, FileText, CheckCircle2, ShieldAlert } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import {
+  X,
+  MapPin,
+  Loader2,
+  Building2,
+  User,
+  FileText,
+  CheckCircle2,
+  Check,
+  ChevronRight,
+} from 'lucide-react'
 import formatDate from '@/utils/formatDate'
 import { useRetrieveLandInvestigationDetailsQuery } from '@/redux/features/investigations/investigations.api'
-import { LandInvestigationKind } from '@/enum'
 import type { LandInvestigationItem } from '@/redux/features/investigations/investigations.type'
+import { LandInvestigationKind } from '@/enum'
+
+import AssignInvestigatorStep from './steps/AssignInvestigatorStep'
+import AttachEvidenceStep from './steps/AttachEvidenceStep'
+import SubmitFindingsStep from './steps/SubmitFindingsStep'
+import FinalizeDecisionStep from './steps/FinalizeDecisionStep'
 
 interface InvestigationDetailsModalProps {
   isOpen: boolean
@@ -20,18 +35,21 @@ const KIND_LABELS: Record<string, string> = Object.keys(LandInvestigationKind).r
   {} as Record<string, string>
 )
 
-
-const InvestigationDetailsModal = ({
+export const InvestigationDetailsModal = ({
   isOpen,
   onClose,
   investigationId,
 }: InvestigationDetailsModalProps) => {
-  const { data: detailsRes, isLoading: loadingDetails } =
-    useRetrieveLandInvestigationDetailsQuery(investigationId!, {
-      skip: !isOpen || !investigationId,
-    })
+  const {
+    data: detailsRes,
+    isLoading: loadingDetails,
+    refetch,
+  } = useRetrieveLandInvestigationDetailsQuery(investigationId!, {
+    skip: !isOpen || !investigationId,
+  })
 
   const investigation: LandInvestigationItem | undefined = detailsRes?.data
+  const [activeStepTab, setActiveStepTab] = useState<number>(2)
 
   useEffect(() => {
     if (isOpen) {
@@ -44,7 +62,37 @@ const InvestigationDetailsModal = ({
     }
   }, [isOpen])
 
+  // Automatically determine active step
+  useEffect(() => {
+    if (investigation) {
+      if (investigation.status === 'CLOSED' || investigation.resolvedAt) {
+        setActiveStepTab(5)
+      } else if (investigation.findings) {
+        setActiveStepTab(5)
+      } else if (investigation.evidences && investigation.evidences.length > 0) {
+        setActiveStepTab(4)
+      } else if (investigation.investigatorId || investigation.investigator) {
+        setActiveStepTab(3)
+      } else {
+        setActiveStepTab(2)
+      }
+    }
+  }, [investigation])
+
   if (!isOpen) return null
+
+  const isStep2Completed = Boolean(investigation?.investigatorId || investigation?.investigator)
+  const isStep3Completed = Boolean(investigation?.evidences && investigation.evidences.length > 0)
+  const isStep4Completed = Boolean(investigation?.findings)
+  const isStep5Completed = Boolean(investigation?.status === 'CLOSED' || investigation?.resolvedAt)
+
+  const stepsList = [
+    { number: 1, title: 'Case Created', isCompleted: true },
+    { number: 2, title: 'Assign Investigator', isCompleted: isStep2Completed },
+    { number: 3, title: 'Attach Evidence', isCompleted: isStep3Completed },
+    { number: 4, title: 'Submit Findings', isCompleted: isStep4Completed },
+    { number: 5, title: 'Final Decision', isCompleted: isStep5Completed },
+  ]
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -55,7 +103,7 @@ const InvestigationDetailsModal = ({
       />
 
       {/* Slide-out Drawer Panel */}
-      <div className="relative w-full sm:w-120 md:w-130 h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300 ease-out border-l border-slate-100 z-50">
+      <div className="relative w-full sm:w-125 md:w-140 h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300 ease-out border-l border-slate-100 z-50">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
           <div className="space-y-0.5 select-none">
@@ -70,7 +118,7 @@ const InvestigationDetailsModal = ({
               )}
             </div>
             <p
-              className="text-[10px] font-semibold text-slate-400 leading-relaxed max-w-[320px] truncate"
+              className="text-[10px] font-semibold text-slate-400 leading-relaxed max-w-85 truncate"
               title={investigation?.title || ''}
             >
               {investigation?.title || 'Land Dispute Investigation'}
@@ -91,8 +139,8 @@ const InvestigationDetailsModal = ({
             <span>Loading case details...</span>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-6 space-y-5 select-none text-xs">
-            {/* Kind & Priority Badges */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 select-none text-xs">
+            {/* Kind, Priority & Status Badges */}
             <div className="flex items-center gap-2 flex-wrap">
               <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-slate-900 text-white uppercase tracking-wider">
                 {KIND_LABELS[investigation.kind] || investigation.kind}
@@ -215,10 +263,10 @@ const InvestigationDetailsModal = ({
                       href={ev.media.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group border border-slate-200 rounded-xl overflow-hidden bg-slate-50 hover:border-button-color transition-all block"
+                      className="group border border-slate-200 rounded-xl overflow-hidden bg-slate-50 hover:border-button-color transition-all block p-2"
                     >
                       {ev.media.type === 'IMAGE' || ev.media.mimeType?.startsWith('image/') ? (
-                        <div className="h-28 w-full overflow-hidden bg-slate-100">
+                        <div className="h-28 w-full overflow-hidden bg-slate-100 rounded-lg mb-1">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={ev.media.url}
@@ -227,11 +275,16 @@ const InvestigationDetailsModal = ({
                           />
                         </div>
                       ) : (
-                        <div className="p-4 flex items-center gap-2">
+                        <div className="p-3 flex items-center gap-2">
                           <FileText className="w-5 h-5 text-button-color" />
                           <span className="text-xs font-bold text-slate-700 truncate">
                             Evidence File
                           </span>
+                        </div>
+                      )}
+                      {ev.description && (
+                        <div className="text-[10px] text-slate-500 font-medium truncate pt-1">
+                          {ev.description}
                         </div>
                       )}
                     </a>
@@ -239,6 +292,131 @@ const InvestigationDetailsModal = ({
                 </div>
               </div>
             )}
+
+            {/* Investigation Findings if Submitted */}
+            {investigation.findings && (
+              <div className="space-y-2 border-t border-slate-100 pt-4">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">
+                  Submitted Findings Report
+                </span>
+                <div className="bg-blue-50/40 border border-blue-100 rounded-xl p-4 text-slate-800 font-semibold leading-relaxed">
+                  <div
+                    dangerouslySetInnerHTML={{ __html: investigation.findings }}
+                    className="prose prose-blue max-w-none text-xs"
+                  />
+                  {investigation.resolutionNotes && (
+                    <div className="mt-3 pt-3 border-t border-blue-100 text-[11px] text-slate-600">
+                      <span className="font-bold text-slate-900 block mb-0.5">
+                        Resolution Notes:
+                      </span>
+                      <div
+                        dangerouslySetInnerHTML={{ __html: investigation.resolutionNotes }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Workflow Step Indicator Tabs */}
+            <div className="space-y-3 border-t border-slate-100 pt-4">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">
+                Investigation Workflow Steps
+              </span>
+
+              <div className="grid grid-cols-5 gap-1 bg-slate-100 p-1 rounded-xl">
+                {stepsList.map((step) => {
+                  const isActive = activeStepTab === step.number
+                  return (
+                    <button
+                      key={step.number}
+                      type="button"
+                      onClick={() => setActiveStepTab(step.number)}
+                      className={`flex flex-col items-center justify-center p-2 rounded-lg transition-all cursor-pointer text-center ${
+                        isActive
+                          ? 'bg-white text-slate-900 shadow-xs font-bold'
+                          : 'text-slate-500 hover:text-slate-800 font-medium'
+                      }`}
+                    >
+                      <div
+                        className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mb-1 ${
+                          step.isCompleted
+                            ? 'bg-emerald-500 text-white'
+                            : isActive
+                            ? 'bg-button-color text-white'
+                            : 'bg-slate-200 text-slate-600'
+                        }`}
+                      >
+                        {step.isCompleted ? <Check size={11} strokeWidth={3} /> : step.number}
+                      </div>
+                      <span className="text-[9px] truncate max-w-full">{step.title}</span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Step Component View */}
+              <div className="pt-2">
+                {(() => {
+                  const currentId = investigation?.id ?? investigationId!
+                  return (
+                    <>
+                      {activeStepTab === 1 && (
+                        <div className="bg-emerald-50/60 border border-emerald-100 rounded-xl p-4 text-xs font-semibold text-emerald-800 flex items-center gap-2">
+                          <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                          <span>Case created successfully on {formatDate(investigation.createdAt)}.</span>
+                        </div>
+                      )}
+
+                      {activeStepTab === 2 && (
+                        <AssignInvestigatorStep
+                          investigationId={currentId}
+                          currentInvestigator={investigation.investigator}
+                          onSuccess={() => {
+                            refetch()
+                            setActiveStepTab(3)
+                          }}
+                        />
+                      )}
+
+
+                      {activeStepTab === 3 && (
+                        <AttachEvidenceStep
+                          investigationId={currentId}
+                          onSuccess={() => {
+                            refetch()
+                            setActiveStepTab(4)
+                          }}
+                        />
+                      )}
+
+                      {activeStepTab === 4 && (
+                        <SubmitFindingsStep
+                          investigationId={currentId}
+                          initialFindings={investigation.findings || ''}
+                          initialResolutionNotes={investigation.resolutionNotes || ''}
+                          onSuccess={() => {
+                            refetch()
+                            setActiveStepTab(5)
+                          }}
+                        />
+                      )}
+
+                      {activeStepTab === 5 && (
+                        <FinalizeDecisionStep
+                          investigationId={currentId}
+                          initialResolutionNotes={investigation.resolutionNotes || ''}
+                          onSuccess={() => {
+                            refetch()
+                          }}
+                        />
+                      )}
+                    </>
+                  )
+                })()}
+
+              </div>
+            </div>
           </div>
         )}
       </div>

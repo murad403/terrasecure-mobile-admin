@@ -486,3 +486,16 @@ export const LandInvestigationDecision = {
 } as const;
 
 export type LandInvestigationDecision = keyof typeof LandInvestigationDecision;
+
+
+
+export const LandParcelInvestigationStep = {
+  Created: 1,
+  AssignedInvestigation: 2,
+  AttachEvidence: 3,
+  SubmitFindings: 4,
+  MakeFinalDecision: 5,
+} as const satisfies Record<string, number>;
+
+
+export type LandParcelInvestigationStep = keyof typeof LandParcelInvestigationStep;

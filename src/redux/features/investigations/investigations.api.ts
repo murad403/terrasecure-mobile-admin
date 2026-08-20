@@ -5,6 +5,10 @@ import type {
   LandInvestigationItem,
   RetrieveLandInvestigationsArgs,
   CreateLandInvestigationInput,
+  AssignInvestigatorInput,
+  AttachEvidenceInput,
+  SubmitFindingsInput,
+  FinalizeLandInvestigationInput,
   LandInvestigationsResponseData,
 } from './investigations.type';
 
@@ -67,6 +71,54 @@ const investigationsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Investigations'],
     }),
+
+    assignInvestigator: builder.mutation<
+      ApiResponse<LandInvestigationItem>,
+      { investigationId: number | string; data: AssignInvestigatorInput }
+    >({
+      query: ({ investigationId, data }) => ({
+        url: `/land-investigations/${investigationId}/investigator`,
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: ['Investigations'],
+    }),
+
+    attachEvidence: builder.mutation<
+      ApiResponse<any>,
+      { investigationId: number | string; data: AttachEvidenceInput }
+    >({
+      query: ({ investigationId, data }) => ({
+        url: `/land-investigations/${investigationId}/evidences`,
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Investigations'],
+    }),
+
+    submitFindings: builder.mutation<
+      ApiResponse<LandInvestigationItem>,
+      { investigationId: number | string; data: SubmitFindingsInput }
+    >({
+      query: ({ investigationId, data }) => ({
+        url: `/land-investigations/${investigationId}/findings`,
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Investigations'],
+    }),
+
+    submitFinalDecision: builder.mutation<
+      ApiResponse<LandInvestigationItem>,
+      { investigationId: number | string; data: FinalizeLandInvestigationInput }
+    >({
+      query: ({ investigationId, data }) => ({
+        url: `/land-investigations/${investigationId}/final-decision`,
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Investigations'],
+    }),
   }),
 });
 
@@ -74,4 +126,8 @@ export const {
   useRetrieveLandInvestigationsQuery,
   useRetrieveLandInvestigationDetailsQuery,
   useCreateLandInvestigationMutation,
+  useAssignInvestigatorMutation,
+  useAttachEvidenceMutation,
+  useSubmitFindingsMutation,
+  useSubmitFinalDecisionMutation,
 } = investigationsApi;

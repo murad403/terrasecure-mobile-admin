@@ -10,6 +10,20 @@ export type LandInvestigationKind =
 
 export type LandInvestigationPriorityLevel = 'HIGH' | 'MEDIUM' | 'LOW';
 
+export type LandInvestigationDecision =
+  | 'CLOSE'
+  | 'SET_PARCEL_DISPUTED'
+  | 'SET_PARCEL_BLOCKED'
+  | 'CREATE_CONFLICT'
+  | 'FORCE_NEW_SURVEY'
+  | 'LEGAL_PROCESS';
+
+export type LandParcelConflictKind =
+  | 'OVERLAP'
+  | 'DUPLICATE'
+  | 'BOUNDARY_DISPUTE'
+  | 'INVALID_GEOMETRY';
+
 export interface LandInvestigationMedia {
   id: string;
   url: string;
@@ -65,6 +79,7 @@ export interface LandInvestigationItem {
   kind: LandInvestigationKind | string;
   priorityLevel?: LandInvestigationPriorityLevel | string;
   status: string;
+  step?: number;
   parcelId?: number;
   requesterId?: number;
   investigatorId?: number | null;
@@ -99,6 +114,29 @@ export interface CreateLandInvestigationInput {
   priorityLevel?: LandInvestigationPriorityLevel | string;
   parcelSlug: string;
   evidenceMediaIds?: string[];
+}
+
+export interface AssignInvestigatorInput {
+  investigatorId: number;
+}
+
+export interface AttachEvidenceInput {
+  mediaId: string;
+  description?: string;
+}
+
+export interface SubmitFindingsInput {
+  findings: string;
+  status?: string;
+  resolutionNotes?: string;
+}
+
+export interface FinalizeLandInvestigationInput {
+  decision: LandInvestigationDecision | string;
+  resolutionNotes: string;
+  conflictKind?: LandParcelConflictKind | string;
+  conflictingParcelSlug?: string;
+  legalCaseReference?: string;
 }
 
 export interface LandInvestigationsPagination {
