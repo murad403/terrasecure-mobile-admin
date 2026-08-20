@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { useScheduleSiteVisitMutation } from '@/redux/features/registrations/registration.api'
+import { useScheduleRegistrationSiteVisitMutation } from '@/redux/features/registrations/registration.api'
 import { toast } from 'sonner'
 import type { RegistrationItem } from '@/redux/features/registrations/registration.type'
 
@@ -23,7 +23,7 @@ const ScheduleFieldVisitStep: React.FC<ScheduleFieldVisitStepProps> = ({
   registration,
   onNextStep,
 }) => {
-  const [scheduleSiteVisit, { isLoading }] = useScheduleSiteVisitMutation()
+  const [scheduleSiteVisit, { isLoading }] = useScheduleRegistrationSiteVisitMutation()
 
   const initialScheduledAt = registration.siteVisit?.scheduledAt
     ? formatToLocalDateTime(new Date(registration.siteVisit.scheduledAt))

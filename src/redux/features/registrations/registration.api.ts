@@ -2,6 +2,7 @@ import baseApi from "@/redux/api/api";
 
 
 const registrationApi = baseApi.injectEndpoints({
+    overrideExisting: true,
     endpoints: (builder) => ({
         retrieveRegistrations: builder.query({
             query: (params?: { page?: number; limit?: number; search?: string; status?: string; ownershipType?: string }) => {
@@ -52,7 +53,7 @@ const registrationApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["Registration"]
         }),
-        scheduleSiteVisit: builder.mutation({
+        scheduleRegistrationSiteVisit: builder.mutation({
             query: ({id, data}) => ({
                 url: `/land-parcel-registrations/${id}/site-visit/schedule`,
                 method: "PATCH",
@@ -93,7 +94,7 @@ export const {
     useCreateRegistrationMutation,
     useVerifyDocumentMutation,
     useAssignSurveyorMutation,
-    useScheduleSiteVisitMutation,
+    useScheduleRegistrationSiteVisitMutation,
     useUploadGisDataMutation,
     useVerifyGisDataMutation,
     usePublishRegistrationMutation,

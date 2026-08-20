@@ -63,6 +63,7 @@ const siteVisitListTags = (result?: ApiResponse<SiteVisit[]>) =>
     : [{ type: 'SiteVisits' as const, id: 'LIST' }];
 
 const siteVisitApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     retrieveSiteVisits: builder.query<
       ApiResponse<SiteVisit[]>,
