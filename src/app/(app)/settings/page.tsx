@@ -1,6 +1,6 @@
 
 import GenerateSettingsPage from '@/components/app/settings/GenerateSettingsPage'
-import React from 'react'
+
 
 const page = () => {
   return (

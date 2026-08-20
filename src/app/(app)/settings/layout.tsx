@@ -3,16 +3,7 @@ import React from 'react'
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {
-  Settings,
-  ShieldCheck,
-  FileText,
-  Clipboard,
-  Info,
-  Bell,
-  Shield,
-  Database,
-} from 'lucide-react'
+import { Settings, ShieldCheck, FileText, Clipboard, Info, Bell, Shield, Database } from 'lucide-react'
 
 const settingsMenu = [
   {
@@ -41,20 +32,10 @@ const settingsMenu = [
     icon: <Info size={14} />,
   },
   {
-    name: 'Notifications',
-    path: '/settings/notifications',
-    icon: <Bell size={14} />,
-  },
-  {
     name: 'Security',
     path: '/settings/security',
     icon: <Shield size={14} />,
-  },
-  {
-    name: 'Backup & Restore',
-    path: '/settings/backup-restore',
-    icon: <Database size={14} />,
-  },
+  }
 ]
 
 const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
@@ -74,11 +55,10 @@ const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
               <Link
                 key={item.path}
                 href={item.path}
-                className={`flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer border-l-2 ${
-                  isActive
+                className={`flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer border-l-2 ${isActive
                     ? 'bg-[#f0fdf4] text-[#1b4332] border-[#1b4332]'
                     : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 border-transparent'
-                }`}
+                  }`}
               >
                 <span className={isActive ? 'text-[#1b4332]' : 'text-gray-400'}>
                   {item.icon}
