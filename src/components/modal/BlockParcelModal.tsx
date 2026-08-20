@@ -6,7 +6,7 @@ import { blockSchema, type BlockFormValues } from '@/validation/parcel.validatio
 import { X, ShieldAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Parcel } from '@/components/app/parcels/ParcelsPage'
+import { Parcel } from '../app/reliability-score/ReliabilityScorePage'
 
 interface BlockParcelModalProps {
   isOpen: boolean

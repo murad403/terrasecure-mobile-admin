@@ -9,6 +9,12 @@ interface GISViewMapModalProps {
   onClose: () => void
   registration?: RegistrationItem
   survey?: RegistrationSurvey
+  latitude?: number
+  longitude?: number
+  parcelName?: string
+  area?: number
+  registrationId?: string | number
+  onConfirm?: () => void
 }
 
 const GISViewMapModal: React.FC<GISViewMapModalProps> = ({
@@ -16,6 +22,12 @@ const GISViewMapModal: React.FC<GISViewMapModalProps> = ({
   onClose,
   registration,
   survey,
+  latitude,
+  longitude,
+  parcelName,
+  area,
+  registrationId,
+  onConfirm,
 }) => {
   useEffect(() => {
     if (isOpen) {
@@ -31,12 +43,12 @@ const GISViewMapModal: React.FC<GISViewMapModalProps> = ({
   if (!isOpen) return null
 
   const points = survey?.points || []
-  const pointsCount = points.length
-  const computedArea = survey?.computedAreaSqm || registration?.areaSqm || 0
-  const registrationIdStr = registration?.slug || `REG-${registration?.id || ''}`
+  const pointsCount = points.length || (latitude && longitude ? 1 : 0)
+  const computedArea = survey?.computedAreaSqm || registration?.areaSqm || area || 0
+  const registrationIdStr = registrationId || registration?.slug || (registration?.id ? `REG-${registration.id}` : '') || parcelName || 'GIS Submission'
   const firstPoint = points[0] || {
-    lat: registration?.location?.latitude || 40.7128,
-    lng: registration?.location?.longitude || -74.006,
+    lat: latitude || registration?.location?.latitude || 40.7128,
+    lng: longitude || registration?.location?.longitude || -74.006,
   }
 
   return (
@@ -99,7 +111,7 @@ const GISViewMapModal: React.FC<GISViewMapModalProps> = ({
             <div className="flex items-center gap-1.5 text-[10.5px] font-extrabold text-slate-800">
               <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
               <span>
-                {registration?.location?.city || registration?.location?.addressLine1 || 'Parcel Location'}
+                {registration?.location?.city || registration?.location?.addressLine1 || parcelName || 'Parcel Location'}
               </span>
             </div>
             <span className="text-[9px] font-bold text-slate-500 font-mono block mt-0.5 ml-5">
@@ -137,9 +149,16 @@ const GISViewMapModal: React.FC<GISViewMapModalProps> = ({
           <div className="text-[10px] text-slate-500">
             Source: {survey?.source || 'MOBILE_GPS'} · Status: {survey?.status || 'VALIDATED'}
           </div>
-          <Button type="button" onClick={onClose} className="w-auto px-6">
-            Close GIS Map
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="outline" onClick={onClose} className="w-auto px-4">
+              Close
+            </Button>
+            {onConfirm && (
+              <Button type="button" onClick={onConfirm} className="w-auto px-5 bg-emerald-600 hover:bg-emerald-700 text-white">
+                Confirm & Import GIS Data
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

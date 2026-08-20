@@ -54,12 +54,12 @@ const buildListParams = (args: RetrieveSiteVisitsArgs = {}): FetchArgs['params']
 const siteVisitListTags = (result?: ApiResponse<SiteVisit[]>) =>
   result?.data
     ? [
-        ...result.data.map(({ id }) => ({
-          type: 'SiteVisits' as const,
-          id,
-        })),
-        { type: 'SiteVisits' as const, id: 'LIST' },
-      ]
+      ...result.data.map(({ id }) => ({
+        type: 'SiteVisits' as const,
+        id,
+      })),
+      { type: 'SiteVisits' as const, id: 'LIST' },
+    ]
     : [{ type: 'SiteVisits' as const, id: 'LIST' }];
 
 const siteVisitApi = baseApi.injectEndpoints({

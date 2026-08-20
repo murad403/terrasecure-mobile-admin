@@ -2,13 +2,14 @@
 import React, { useState } from 'react'
 import SiteVisitsTable from './SiteVisitsTable'
 import ScheduleSiteVisitModal from './ScheduleSiteVisitModal'
+import EditSiteVisitModal from './EditSiteVisitModal'
+import DeleteSiteVisitModal from './DeleteSiteVisitModal'
+import SiteVisitDetails from './SiteVisitDetails'
 import {
   useRetrieveSiteVisitDetailsQuery,
   useCompleteSiteVisitMutation,
   useCancelSiteVisitMutation,
-  useDeleteSiteVisitMutation,
 } from '@/redux/features/siteVisits/siteVisit.api'
-import SiteVisitDetails from './SiteVisitDetails'
 import { toast } from 'sonner'
 
 const SiteVisitsPage = () => {
@@ -17,6 +18,14 @@ const SiteVisitsPage = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [busyVisitId, setBusyVisitId] = useState<number | null>(null)
 
+  // Edit Modal State
+  const [editOpen, setEditOpen] = useState(false)
+  const [selectedEditVisit, setSelectedEditVisit] = useState<any | null>(null)
+
+  // Delete Modal State
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [selectedDeleteVisit, setSelectedDeleteVisit] = useState<{ id: number; slug?: string } | null>(null)
+
   const { data: detailsData, isLoading: detailsLoading } = useRetrieveSiteVisitDetailsQuery(
     selectedVisitId as number,
     { skip: !selectedVisitId || !drawerOpen }
@@ -24,9 +33,8 @@ const SiteVisitsPage = () => {
 
   const [completeSiteVisit, { isLoading: isCompleting }] = useCompleteSiteVisitMutation()
   const [cancelSiteVisit, { isLoading: isCancelling }] = useCancelSiteVisitMutation()
-  const [deleteSiteVisit, { isLoading: isDeleting }] = useDeleteSiteVisitMutation()
 
-  const actionLoading = isCompleting || isCancelling || isDeleting
+  const actionLoading = isCompleting || isCancelling
 
   const handleViewDetails = (id: number) => {
     setSelectedVisitId(id)
@@ -36,6 +44,16 @@ const SiteVisitsPage = () => {
   const handleCloseDrawer = () => {
     setDrawerOpen(false)
     setSelectedVisitId(null)
+  }
+
+  const handleEditVisit = (visit: any) => {
+    setSelectedEditVisit(visit)
+    setEditOpen(true)
+  }
+
+  const handleDeleteVisitTrigger = (id: number, slug?: string) => {
+    setSelectedDeleteVisit({ id, slug })
+    setDeleteOpen(true)
   }
 
   const handleCompleteVisit = async (id: number) => {
@@ -51,27 +69,12 @@ const SiteVisitsPage = () => {
   }
 
   const handleCancelVisit = async (id: number) => {
-    if (!confirm('Are you sure you want to cancel this site visit?')) return
     setBusyVisitId(id)
     try {
       await cancelSiteVisit(id).unwrap()
       toast.success('Site visit cancelled')
     } catch (err: any) {
       toast.error(err?.data?.message || 'Failed to cancel site visit')
-    } finally {
-      setBusyVisitId(null)
-    }
-  }
-
-  const handleDeleteVisit = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this site visit? This cannot be undone.')) return
-    setBusyVisitId(id)
-    try {
-      await deleteSiteVisit(id).unwrap()
-      toast.success('Site visit deleted')
-      handleCloseDrawer()
-    } catch (err: any) {
-      toast.error(err?.data?.message || 'Failed to delete site visit')
     } finally {
       setBusyVisitId(null)
     }
@@ -84,11 +87,14 @@ const SiteVisitsPage = () => {
       <SiteVisitsTable
         onOpenScheduleModal={() => setScheduleOpen(true)}
         onViewDetails={handleViewDetails}
+        onEditVisit={handleEditVisit}
+        onDeleteVisit={(id) => handleDeleteVisitTrigger(id)}
         onCompleteVisit={handleCompleteVisit}
         onCancelVisit={handleCancelVisit}
         actionBusyId={busyVisitId}
       />
 
+      {/* Details Drawer */}
       {drawerOpen && selectedVisitId && (
         <SiteVisitDetails
           isOpen={drawerOpen}
@@ -97,15 +103,44 @@ const SiteVisitsPage = () => {
           isLoading={detailsLoading}
           onComplete={handleCompleteVisit}
           onCancel={handleCancelVisit}
-          onDelete={handleDeleteVisit}
+          onDelete={(id) => {
+            handleDeleteVisitTrigger(id, activeVisit?.slug)
+            handleCloseDrawer()
+          }}
           actionLoading={actionLoading || busyVisitId !== null}
         />
       )}
 
+      {/* Schedule Modal */}
       {scheduleOpen && (
         <ScheduleSiteVisitModal
           isOpen={scheduleOpen}
           onClose={() => setScheduleOpen(false)}
+        />
+      )}
+
+      {/* Edit Site Visit Modal */}
+      {editOpen && selectedEditVisit && (
+        <EditSiteVisitModal
+          isOpen={editOpen}
+          onClose={() => {
+            setEditOpen(false)
+            setSelectedEditVisit(null)
+          }}
+          visit={selectedEditVisit}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteOpen && selectedDeleteVisit && (
+        <DeleteSiteVisitModal
+          isOpen={deleteOpen}
+          onClose={() => {
+            setDeleteOpen(false)
+            setSelectedDeleteVisit(null)
+          }}
+          visitId={selectedDeleteVisit.id}
+          visitSlug={selectedDeleteVisit.slug}
         />
       )}
     </div>

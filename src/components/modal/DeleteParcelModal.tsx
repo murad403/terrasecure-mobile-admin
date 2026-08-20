@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react'
 import { X, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Parcel } from '@/components/app/parcels/ParcelsPage'
+import { Parcel } from '../app/reliability-score/ReliabilityScorePage'
 
 interface DeleteParcelModalProps {
   isOpen: boolean

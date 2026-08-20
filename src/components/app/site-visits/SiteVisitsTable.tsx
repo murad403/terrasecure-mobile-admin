@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react'
-import { Search, Plus, Eye, Check, X, Loader2 } from 'lucide-react'
+import { Search, Plus, Eye, Check, X, Loader2, Pencil, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'
@@ -15,6 +15,8 @@ import { LandSiteVisitKind, LandSiteVisitStatus } from '@/enum'
 interface SiteVisitsTableProps {
   onOpenScheduleModal: () => void
   onViewDetails: (id: number) => void
+  onEditVisit: (visit: any) => void
+  onDeleteVisit: (id: number) => void
   onCompleteVisit: (id: number) => void
   onCancelVisit: (id: number) => void
   actionBusyId?: number | null
@@ -33,6 +35,8 @@ const getVisitStatus = (visit: any): LandSiteVisitStatus => {
 const SiteVisitsTable = ({
   onOpenScheduleModal,
   onViewDetails,
+  onEditVisit,
+  onDeleteVisit,
   onCompleteVisit,
   onCancelVisit,
   actionBusyId,
@@ -67,7 +71,7 @@ const SiteVisitsTable = ({
   const pageSize = pagination?.limit || 5
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden p-6 min-h-[calc(100vh-12rem)] flex flex-col justify-between">
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden p-6 min-h-[calc(100vh-12rem)] flex flex-col justify-between select-none">
       <div>
         <div className="flex flex-col xl:flex-row items-center justify-between gap-4 mb-6">
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto flex-wrap">
@@ -263,6 +267,22 @@ const SiteVisitsTable = ({
                                 title="View Details"
                               >
                                 <Eye className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onEditVisit(item)}
+                                className="text-slate-500 hover:text-slate-800 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                                title="Edit Site Visit"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onDeleteVisit(item.id)}
+                                className="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50/50 transition-colors cursor-pointer"
+                                title="Delete Site Visit"
+                              >
+                                <Trash2 className="w-4 h-4" />
                               </button>
                             </>
                           )}
