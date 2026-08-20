@@ -31,10 +31,10 @@ export const CreateTransferModal = ({
   initialParcelSlug = '',
   purchaseInterestId,
   defaultOfferAmount,
-  sellerName = 'John Smith',
-  sellerPhone = '+1234567890',
-  buyerName = 'Alice Johnson',
-  buyerPhone = '+1987654321',
+  sellerName = '',
+  sellerPhone = '',
+  buyerName = '',
+  buyerPhone = '',
 }: CreateTransferModalProps) => {
   const [createTransfer, { isLoading }] = useLandParcelTransfersMutation()
 
@@ -177,7 +177,8 @@ export const CreateTransferModal = ({
               id="transferParcelSlug"
               placeholder="e.g. NEW-DR5REG-0001M"
               {...register('parcelSlug')}
-              className="font-semibold text-xs text-slate-900"
+              disabled
+              className="font-semibold text-xs text-slate-700 bg-slate-100/80 border-slate-200 cursor-not-allowed select-none"
             />
             {errors.parcelSlug && (
               <p className="text-[11px] text-rose-500 font-semibold">{errors.parcelSlug.message}</p>
@@ -214,7 +215,7 @@ export const CreateTransferModal = ({
               </Label>
               <Input
                 id="considerationAmount"
-                type="number"
+                type="text"
                 placeholder="e.g. 300000"
                 {...register('considerationAmount', { valueAsNumber: true })}
                 className="font-semibold text-xs text-slate-900"

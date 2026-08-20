@@ -2,7 +2,8 @@ export type PurchaseInterestStatus =
   | 'PENDING'
   | 'ACKNOWLEDGED'
   | 'DECLINED'
-  | 'MORE_INFO_REQUESTED';
+  | 'MORE_INFO_REQUESTED'
+  | 'CONVERTED_TO_TRANSFER';
 
 export type LandParcelTransferType =
   | 'SALE'
@@ -14,6 +15,7 @@ export type LandParcelTransferType =
   | 'FORECLOSURE';
 
 export type LandParcelTransferPartyRole = 'FROM' | 'TO';
+export type LandParcelTransferStatus = 'PENDING' | 'VERIFIED' | 'COMPLETED' | 'CANCELLED' | 'REJECTED';
 
 export interface PurchaseInterestMedia {
   id: string;
@@ -98,6 +100,24 @@ export interface PurchaseInterestParcel {
   registration?: PurchaseInterestParcelRegistration | null;
 }
 
+export interface LandParcelTransferItem {
+  id: number;
+  slug?: string;
+  parcelId?: number;
+  transferType?: LandParcelTransferType | string;
+  status: LandParcelTransferStatus | string;
+  considerationAmount?: string | number;
+  currency?: string;
+  verifiedById?: number | null;
+  effectiveDate?: string;
+  notes?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  parcel?: PurchaseInterestParcel;
+  parties?: any[];
+  verifiedBy?: PurchaseInterestUser | null;
+}
+
 export interface PurchaseInterestItem {
   id: number;
   slug: string;
@@ -110,6 +130,7 @@ export interface PurchaseInterestItem {
   status: PurchaseInterestStatus | string;
   respondedById?: number | null;
   resultingTransferId?: number | null;
+  resultingTransfer?: LandParcelTransferItem | null;
   createdAt: string;
   respondedAt?: string | null;
   updatedAt: string;

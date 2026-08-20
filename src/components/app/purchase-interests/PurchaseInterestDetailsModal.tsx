@@ -1,13 +1,27 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import { X, Building2, User, DollarSign, MessageSquare, ArrowRightLeft, Calendar, MapPin, Loader2 } from 'lucide-react'
+import {
+  X,
+  Building2,
+  User,
+  DollarSign,
+  MessageSquare,
+  ArrowRightLeft,
+  ShieldCheck,
+  CheckCheck,
+  Calendar,
+  MapPin,
+  Loader2,
+} from 'lucide-react'
 import formatDate from '@/utils/formatDate'
 import type { PurchaseInterestItem } from '@/redux/features/purchase-interests/purchase-interests.type'
 import { Button } from '@/components/ui/button'
 import { useGetPurchaseInterestDetailsQuery } from '@/redux/features/purchase-interests/purchase-interests.api'
+import { getTransferActionState } from './PurchaseInterestsTable'
 
 import ReplyInterestModal from './ReplyInterestModal'
 import CreateTransferModal from './CreateTransferModal'
+import TransferActionModal from './TransferActionModal'
 
 interface PurchaseInterestDetailsModalProps {
   isOpen: boolean
@@ -21,6 +35,7 @@ const STATUS_BADGES: Record<string, { label: string; className: string }> = {
   ACKNOWLEDGED: { label: 'Acknowledged', className: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   DECLINED: { label: 'Declined', className: 'bg-rose-50 text-rose-700 border-rose-200' },
   MORE_INFO_REQUESTED: { label: 'More Info Requested', className: 'bg-blue-50 text-blue-700 border-blue-200' },
+  CONVERTED_TO_TRANSFER: { label: 'Converted To Transfer', className: 'bg-purple-50 text-purple-700 border-purple-200' },
 }
 
 export const PurchaseInterestDetailsModal = ({
@@ -31,6 +46,15 @@ export const PurchaseInterestDetailsModal = ({
 }: PurchaseInterestDetailsModalProps) => {
   const [replyModalOpen, setReplyModalOpen] = useState(false)
   const [transferModalOpen, setTransferModalOpen] = useState(false)
+  const [actionModalState, setActionModalState] = useState<{
+    isOpen: boolean
+    actionType: 'VERIFY' | 'COMPLETE'
+    transferId: number | string | null
+  }>({
+    isOpen: false,
+    actionType: 'VERIFY',
+    transferId: null,
+  })
 
   // API Call to fetch details from /land-purchase-interests/:id
   const { data: detailsRes, isLoading, isFetching } = useGetPurchaseInterestDetailsQuery(
@@ -55,17 +79,19 @@ export const PurchaseInterestDetailsModal = ({
 
   const statusConfig = interest?.status
     ? STATUS_BADGES[interest.status] || {
-        label: interest.status,
-        className: 'bg-slate-50 text-slate-700 border-slate-200',
-      }
+      label: interest.status,
+      className: 'bg-slate-50 text-slate-700 border-slate-200',
+    }
     : { label: 'Pending', className: 'bg-amber-50 text-amber-700 border-amber-200' }
 
   const formattedOffer = interest?.offerAmount
     ? `${Number(interest.offerAmount).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })} ${interest.currency || 'USD'}`
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })} ${interest.currency || 'USD'}`
     : 'N/A'
+
+  const transferState = interest ? getTransferActionState(interest) : null
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -126,7 +152,7 @@ export const PurchaseInterestDetailsModal = ({
                   {statusConfig.label}
                 </span>
               </div>
-              <div className="text-2xl font-black tracking-tight text-black  flex items-center gap-1">
+              <div className="text-2xl font-black tracking-tight text-black flex items-center gap-1">
                 <DollarSign className="w-6 h-6 text-emerald-400 shrink-0" />
                 <span>{formattedOffer}</span>
               </div>
@@ -244,14 +270,59 @@ export const PurchaseInterestDetailsModal = ({
                 <span>Reply to Purchase Interest</span>
               </Button>
 
-              <Button
-                onClick={() => setTransferModalOpen(true)}
-                variant="outline"
-                className="w-full flex items-center justify-center gap-2 cursor-pointer font-bold border-button-color text-button-color hover:bg-blue-50"
-              >
-                <ArrowRightLeft size={15} />
-                <span>Initiate Land Transfer</span>
-              </Button>
+              {/* Initiate Transfer */}
+              {transferState?.canInitiate && (
+                <Button
+                  onClick={() => setTransferModalOpen(true)}
+                  variant="outline"
+                  className="w-full flex items-center justify-center gap-2 cursor-pointer font-bold border-button-color text-button-color hover:bg-blue-50"
+                >
+                  <ArrowRightLeft size={15} />
+                  <span>Initiate Land Transfer</span>
+                </Button>
+              )}
+
+              {/* Verify Transfer */}
+              {transferState?.canVerify && transferState.transferId && (
+                <Button
+                  onClick={() =>
+                    setActionModalState({
+                      isOpen: true,
+                      actionType: 'VERIFY',
+                      transferId: transferState.transferId!,
+                    })
+                  }
+                  className="w-full flex items-center justify-center gap-2 cursor-pointer font-bold bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <ShieldCheck size={16} />
+                  <span>Verify Land Transfer</span>
+                </Button>
+              )}
+
+              {/* Complete Transfer */}
+              {transferState?.canComplete && transferState.transferId && (
+                <Button
+                  onClick={() =>
+                    setActionModalState({
+                      isOpen: true,
+                      actionType: 'COMPLETE',
+                      transferId: transferState.transferId!,
+                    })
+                  }
+                  className="w-full flex items-center justify-center gap-2 cursor-pointer font-bold bg-emerald-600 hover:bg-emerald-700 text-white"
+                >
+                  <CheckCheck size={16} />
+                  <span>Complete Land Transfer</span>
+                </Button>
+              )}
+
+              {/* Fully Completed Transfer Banner */}
+              {transferState?.isDone && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 text-center text-emerald-800 font-extrabold text-xs flex items-center justify-center gap-2">
+                  <CheckCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Land Ownership Transferred & Completed</span>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -276,8 +347,22 @@ export const PurchaseInterestDetailsModal = ({
           initialParcelSlug={interest.parcel?.slug || ''}
           purchaseInterestId={interest.id}
           defaultOfferAmount={interest.offerAmount}
-          buyerName={interest.user?.name}
+          sellerName={interest.parcel?.owners?.[0]?.ownerName || ''}
+          sellerPhone={interest.parcel?.owners?.[0]?.ownerPhone || ''}
+          buyerName={interest.user?.name || ''}
           buyerPhone={interest.user?.phone || ''}
+        />
+      )}
+
+      {/* Transfer Action Modal (Verify / Complete) */}
+      {actionModalState.isOpen && actionModalState.transferId && (
+        <TransferActionModal
+          isOpen={actionModalState.isOpen}
+          onClose={() =>
+            setActionModalState((prev) => ({ ...prev, isOpen: false, transferId: null }))
+          }
+          transferId={actionModalState.transferId}
+          actionType={actionModalState.actionType}
         />
       )}
     </div>

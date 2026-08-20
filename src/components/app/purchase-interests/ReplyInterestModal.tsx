@@ -146,7 +146,7 @@ export const ReplyInterestModal = ({
               id="replyMsg"
               placeholder="e.g. Thank you for your interest. We have received your inquiry and will review it shortly."
               {...register('message')}
-              className="w-full border border-slate-200 bg-white rounded-xl p-3 text-xs md:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-button-color font-semibold min-h-[100px] leading-relaxed resize-none"
+              className="w-full border border-slate-200 bg-white rounded-xl p-3 text-xs md:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-button-color font-semibold min-h-25 leading-relaxed resize-none"
             />
             {errors.message && (
               <p className="text-[11px] text-rose-500 font-semibold">{errors.message.message}</p>

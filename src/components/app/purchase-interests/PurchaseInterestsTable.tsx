@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import { Search, Eye, MessageSquare, ArrowRightLeft, Loader2, DollarSign } from 'lucide-react'
+import { Search, Eye, MessageSquare, ArrowRightLeft, ShieldCheck, CheckCheck, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'
@@ -27,6 +27,8 @@ interface PurchaseInterestsTableProps {
   onViewDetails: (item: PurchaseInterestItem) => void
   onReply: (item: PurchaseInterestItem) => void
   onTransfer: (item: PurchaseInterestItem) => void
+  onVerifyTransfer: (item: PurchaseInterestItem) => void
+  onCompleteTransfer: (item: PurchaseInterestItem) => void
 }
 
 const STATUS_CONFIG: Record<string, { label: string; badgeClass: string }> = {
@@ -34,6 +36,27 @@ const STATUS_CONFIG: Record<string, { label: string; badgeClass: string }> = {
   ACKNOWLEDGED: { label: 'Acknowledged', badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   DECLINED: { label: 'Declined', badgeClass: 'bg-rose-50 text-rose-700 border-rose-200' },
   MORE_INFO_REQUESTED: { label: 'More Info Requested', badgeClass: 'bg-blue-50 text-blue-700 border-blue-200' },
+  CONVERTED_TO_TRANSFER: { label: 'Converted To Transfer', badgeClass: 'bg-purple-50 text-purple-700 border-purple-200' },
+}
+
+export const getTransferActionState = (item: PurchaseInterestItem) => {
+  const transfer = item.resultingTransfer
+  const transferId = item.resultingTransferId || transfer?.id || null
+  const transferStatus = transfer?.status
+
+  if (transferStatus === 'COMPLETED' || item.parcel?.status === 'SOLD') {
+    return { canInitiate: false, canVerify: false, canComplete: false, isDone: true, transferId }
+  }
+
+  if (transferStatus === 'VERIFIED') {
+    return { canInitiate: false, canVerify: false, canComplete: true, isDone: false, transferId }
+  }
+
+  if (transferStatus === 'PENDING' || transferId || item.status === 'CONVERTED_TO_TRANSFER') {
+    return { canInitiate: false, canVerify: true, canComplete: false, isDone: false, transferId }
+  }
+
+  return { canInitiate: true, canVerify: false, canComplete: false, isDone: false, transferId: null }
 }
 
 const PurchaseInterestsTable = ({
@@ -50,6 +73,8 @@ const PurchaseInterestsTable = ({
   onViewDetails,
   onReply,
   onTransfer,
+  onVerifyTransfer,
+  onCompleteTransfer,
 }: PurchaseInterestsTableProps) => {
   const totalEntries = pagination?.total || interests.length
   const totalPages = pagination?.totalPages || 1
@@ -126,6 +151,8 @@ const PurchaseInterestsTable = ({
                       maximumFractionDigits: 2,
                     })} ${item.currency || 'USD'}`
                   : 'N/A'
+
+                const transferState = getTransferActionState(item)
 
                 return (
                   <tr
@@ -229,15 +256,54 @@ const PurchaseInterestsTable = ({
                           <MessageSquare className="w-4 h-4" />
                         </Button>
 
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => onTransfer(item)}
-                          className="h-8 w-8 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg cursor-pointer"
-                          title="Initiate Transfer"
-                        >
-                          <ArrowRightLeft className="w-4 h-4" />
-                        </Button>
+                        {/* Initiate Transfer */}
+                        {transferState.canInitiate && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => onTransfer(item)}
+                            className="h-8 w-8 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg cursor-pointer"
+                            title="Initiate Land Transfer"
+                          >
+                            <ArrowRightLeft className="w-4 h-4" />
+                          </Button>
+                        )}
+
+                        {/* Verify Transfer */}
+                        {transferState.canVerify && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => onVerifyTransfer(item)}
+                            className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer"
+                            title="Verify Land Transfer"
+                          >
+                            <ShieldCheck className="w-4 h-4 text-blue-600" />
+                          </Button>
+                        )}
+
+                        {/* Complete Transfer */}
+                        {transferState.canComplete && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => onCompleteTransfer(item)}
+                            className="h-8 w-8 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg cursor-pointer"
+                            title="Complete Land Transfer"
+                          >
+                            <CheckCheck className="w-4 h-4 text-emerald-600" />
+                          </Button>
+                        )}
+
+                        {/* Complete Done Badge */}
+                        {transferState.isDone && (
+                          <span
+                            className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full select-none"
+                            title="Transfer Completed"
+                          >
+                            Transferred
+                          </span>
+                        )}
                       </div>
                     </td>
                   </tr>

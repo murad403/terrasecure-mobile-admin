@@ -1,10 +1,11 @@
 "use client"
 import React, { useState } from 'react'
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout'
-import PurchaseInterestsTable from './PurchaseInterestsTable'
+import PurchaseInterestsTable, { getTransferActionState } from './PurchaseInterestsTable'
 import PurchaseInterestDetailsModal from './PurchaseInterestDetailsModal'
 import ReplyInterestModal from './ReplyInterestModal'
 import CreateTransferModal from './CreateTransferModal'
+import TransferActionModal from './TransferActionModal'
 import { useGetPurchaseInterestsQuery } from '@/redux/features/purchase-interests/purchase-interests.api'
 import type { PurchaseInterestItem } from '@/redux/features/purchase-interests/purchase-interests.type'
 
@@ -19,6 +20,17 @@ const PurchaseInterestsPage = () => {
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [replyOpen, setReplyOpen] = useState(false)
   const [transferOpen, setTransferOpen] = useState(false)
+
+  // Transfer Action Modal State (Verify / Complete)
+  const [actionModalState, setActionModalState] = useState<{
+    isOpen: boolean
+    actionType: 'VERIFY' | 'COMPLETE'
+    transferId: number | string | null
+  }>({
+    isOpen: false,
+    actionType: 'VERIFY',
+    transferId: null,
+  })
 
   // API Call
   const { data: interestsRes, isLoading, isFetching } = useGetPurchaseInterestsQuery({
@@ -46,6 +58,28 @@ const PurchaseInterestsPage = () => {
     setTransferOpen(true)
   }
 
+  const handleVerifyTransfer = (item: PurchaseInterestItem) => {
+    const state = getTransferActionState(item)
+    if (state.transferId) {
+      setActionModalState({
+        isOpen: true,
+        actionType: 'VERIFY',
+        transferId: state.transferId,
+      })
+    }
+  }
+
+  const handleCompleteTransfer = (item: PurchaseInterestItem) => {
+    const state = getTransferActionState(item)
+    if (state.transferId) {
+      setActionModalState({
+        isOpen: true,
+        actionType: 'COMPLETE',
+        transferId: state.transferId,
+      })
+    }
+  }
+
   return (
     <DashboardChildrenLayout
       title="Purchase Interests"
@@ -66,6 +100,8 @@ const PurchaseInterestsPage = () => {
           onViewDetails={handleViewDetails}
           onReply={handleReply}
           onTransfer={handleTransfer}
+          onVerifyTransfer={handleVerifyTransfer}
+          onCompleteTransfer={handleCompleteTransfer}
         />
 
         {/* Details Drawer Modal */}
@@ -106,8 +142,22 @@ const PurchaseInterestsPage = () => {
             initialParcelSlug={selectedInterest.parcel?.slug || ''}
             purchaseInterestId={selectedInterest.id}
             defaultOfferAmount={selectedInterest.offerAmount}
-            buyerName={selectedInterest.user?.name}
+            sellerName={selectedInterest.parcel?.owners?.[0]?.ownerName || ''}
+            sellerPhone={selectedInterest.parcel?.owners?.[0]?.ownerPhone || ''}
+            buyerName={selectedInterest.user?.name || ''}
             buyerPhone={selectedInterest.user?.phone || ''}
+          />
+        )}
+
+        {/* Transfer Action Modal (Verify / Complete) */}
+        {actionModalState.isOpen && actionModalState.transferId && (
+          <TransferActionModal
+            isOpen={actionModalState.isOpen}
+            onClose={() =>
+              setActionModalState((prev) => ({ ...prev, isOpen: false, transferId: null }))
+            }
+            transferId={actionModalState.transferId}
+            actionType={actionModalState.actionType}
           />
         )}
       </div>
