@@ -45,7 +45,7 @@ const ConsultationsTable = ({
   const pageSize = pagination?.limit || 20
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden p-6">
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden p-6 min-h-[calc(100vh-12rem)]">
       {/* Search & Filters Action Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full flex-wrap">
