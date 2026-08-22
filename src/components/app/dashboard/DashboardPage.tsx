@@ -1,10 +1,8 @@
 "use client"
-import React from 'react'
 import DashboardStats from '@/components/app/dashboard/DashboardStats'
 import GISCoverage from '@/components/app/dashboard/GISCoverage'
 import GISCoverageMap from '@/components/app/dashboard/GISCoverageMap'
 import ParcelsByStatusChart from '@/components/app/dashboard/ParcelsByStatusChart'
-import QuickActions from '@/components/app/dashboard/QuickActions'
 import RecentActivity from '@/components/app/dashboard/RecentActivity'
 import RegistrationsOverTimeChart from '@/components/app/dashboard/RegistrationsOverTimeChart'
 import RevenueOverviewChart from '@/components/app/dashboard/RevenueOverviewChart'
@@ -46,7 +44,6 @@ const DashboardPage = () => {
                         <RecentActivity />
                     </div>
                     <div className="lg:col-span-4 flex flex-col gap-4 md:gap-6">
-                        <QuickActions />
                         <GISCoverageMap />
                     </div>
                 </div>
