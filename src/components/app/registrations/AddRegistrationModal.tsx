@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useCreateRegistrationMutation } from '@/redux/features/registrations/registration.api'
+import { useUploadFileMutation } from '@/redux/features/profile/profile.api'
 import { toast } from 'sonner'
 import formatFileSize from '@/utils/formatFileSize'
 import LocationPicker, { type LocationValue } from '@/components/shared/LocationPicker'
@@ -49,6 +50,7 @@ const documentTypeOptions: { label: string; value: LandParcelDocumentType }[] = 
 
 const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onClose }) => {
   const [createRegistration, { isLoading }] = useCreateRegistrationMutation()
+  const [uploadFile, { isLoading: isUploading }] = useUploadFileMutation()
 
   const [location, setLocation] = useState<LocationValue>({})
 
@@ -122,20 +124,41 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
     0
   )
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
 
-    const newDocs: UploadedDocument[] = Array.from(files).map((file) => ({
-      mediaId: 'edfaf66e-fe87-40ab-a02c-0d2f84cec8c2',
-      name: file.name,
-      size: file.size,
-      docType: 'OTHER',
-      file,
-    }))
+    const fileList = Array.from(files)
+    const toastId = toast.loading(`Uploading ${fileList.length} file(s)...`)
 
-    setUploadedDocs((prev) => [...prev, ...newDocs])
-    toast.success(`${newDocs.length} file(s) attached.`)
+    try {
+      const uploaded: UploadedDocument[] = []
+      for (const file of fileList) {
+        const formData = new FormData()
+        formData.append('file', file)
+        const res = await uploadFile(formData).unwrap()
+        if (res.data?.id) {
+          uploaded.push({
+            mediaId: res.data.id,
+            name: file.name,
+            size: file.size,
+            docType: 'OTHER',
+            file,
+          })
+        }
+      }
+
+      if (uploaded.length > 0) {
+        setUploadedDocs((prev) => [...prev, ...uploaded])
+        toast.success(`${uploaded.length} file(s) uploaded successfully.`, { id: toastId })
+      } else {
+        toast.error('Failed to upload file(s).', { id: toastId })
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Failed to upload file(s).', { id: toastId })
+    } finally {
+      e.target.value = ''
+    }
   }
 
   const handleDocTypeChange = (index: number, docType: LandParcelDocumentType) => {
@@ -314,17 +337,18 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
                 multiple
                 accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
                 onChange={handleFileUpload}
+                disabled={isUploading}
                 className="hidden"
               />
               <label
                 htmlFor="registration-file-upload"
-                className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 hover:border-button-color rounded-xl bg-slate-50/50 hover:bg-slate-50 transition-all cursor-pointer text-center group"
+                className={`flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 hover:border-button-color rounded-xl bg-slate-50/50 hover:bg-slate-50 transition-all text-center group ${isUploading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
                   <Upload className="w-5 h-5" />
                 </div>
                 <span className="text-xs font-extrabold text-slate-800">
-                  Click to upload documents
+                  {isUploading ? 'Uploading files...' : 'Click to upload documents'}
                 </span>
                 <span className="text-[10px] text-slate-400 font-semibold mt-1">
                   Supports PDF, PNG, JPG, DOC (Max 10MB each)
@@ -548,10 +572,10 @@ const AddRegistrationModal: React.FC<AddRegistrationModalProps> = ({ isOpen, onC
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || isUploading}
               className="w-auto px-6 text-xs font-bold"
             >
-              {isLoading ? 'Creating...' : 'Create Registration'}
+              {isLoading ? 'Creating...' : isUploading ? 'Uploading...' : 'Create Registration'}
             </Button>
           </div>
         </form>
