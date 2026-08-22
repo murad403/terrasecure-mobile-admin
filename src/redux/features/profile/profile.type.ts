@@ -38,6 +38,54 @@ export interface UpdateProfileInput {
   profilePictureId?: string;
 }
 
+export interface IUserActivityUser {
+  id: number;
+  name: string;
+  phone?: string | null;
+  profilePicture?: MediaItem | null;
+}
+
+export interface IUserActivityItem {
+  id: string;
+  userId: number;
+  kind: string;
+  action: string;
+  timestamp: string;
+  snapshot?: Record<string, any> | null;
+  user?: IUserActivityUser | null;
+  landConsultationId?: number | null;
+  landInvestigationId?: number | null;
+  landParcelTransferId?: number | null;
+  landParcelId?: number | null;
+  landParcelRegistrationId?: number | null;
+  landSiteVisitId?: number | null;
+  landParcelOwnershipId?: number | null;
+  landParcelDocumentId?: number | null;
+  landParcelConflictId?: number | null;
+  landParcelSurveyId?: number | null;
+  landPurchaseInterestId?: number | null;
+  landConsultation?: any;
+  landInvestigation?: any;
+  landParcelTransfer?: any;
+  landParcel?: any;
+  landParcelRegistration?: any;
+  landSiteVisit?: any;
+  landParcelOwnership?: any;
+  landParcelDocument?: any;
+}
+
+export interface IUserActivitiesResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: IUserActivityItem[];
+  pagination?: {
+    limit: number;
+    page: number;
+    total: number;
+    totalPages: number;
+  };
+}
 
 export type ProfileResponse = ApiResponse<ProfileData>;
 export type UpdateProfileResponse = ApiResponse<null>;

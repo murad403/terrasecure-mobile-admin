@@ -4,6 +4,7 @@ import {
   ProfileData,
   UpdateProfileInput,
   MediaItem,
+  IUserActivitiesResponse,
 } from './profile.type';
 
 const profileApi = baseApi.injectEndpoints({
@@ -40,6 +41,16 @@ const profileApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+
+
+    // dashboard***************************
+    recentActivities: builder.query<IUserActivitiesResponse, { page?: number; limit?: number } | void>({
+      query: (params) => ({
+        url: `/user-activities`,
+        method: 'GET',
+        params: params || undefined,
+      }),
+    }),
   }),
 });
 
@@ -48,4 +59,5 @@ export const {
   useUpdateProfileMutation,
   useUploadImageMutation,
   useUploadFileMutation,
+  useRecentActivitiesQuery,
 } = profileApi;
