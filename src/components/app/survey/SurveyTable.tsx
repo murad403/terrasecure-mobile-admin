@@ -10,6 +10,8 @@ import formatDate from '@/utils/formatDate'
 import { LandParcelSurveySource, LandParcelSurveyStatus } from '@/enum'
 import { useRetrieveSurveyQuery } from '@/redux/features/survey/survey.api'
 import { ISurveyItem } from '@/redux/features/survey/survey.type'
+import { UserPicker } from '@/components/tools/UserPicker'
+import type { User } from '@/interfaces/user.interface'
 
 interface SurveyTableProps {
   onViewDetails: (id: number) => void
@@ -62,11 +64,13 @@ const SurveyTable: React.FC<SurveyTableProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [statusFilter, setStatusFilter] = useState<string>('All')
   const [sourceFilter, setSourceFilter] = useState<string>('All')
+  const [selectedSurveyor, setSelectedSurveyor] = useState<User[]>([])
 
   const handleResetFilters = () => {
     setSearchQuery('')
     setStatusFilter('All')
     setSourceFilter('All')
+    setSelectedSurveyor([])
     setCurrentPage(1)
   }
 
@@ -76,6 +80,7 @@ const SurveyTable: React.FC<SurveyTableProps> = ({
     search: searchQuery || undefined,
     status: statusFilter !== 'All' ? statusFilter : undefined,
     source: sourceFilter !== 'All' ? sourceFilter : undefined,
+    surveyorId: selectedSurveyor.length > 0 ? selectedSurveyor[0].id : undefined,
   })
 
   const surveyList: ISurveyItem[] = data?.data || []
@@ -134,8 +139,21 @@ const SurveyTable: React.FC<SurveyTableProps> = ({
               }}
             />
 
+            {/* Surveyor Filter */}
+            <div className="w-full sm:w-60">
+              <UserPicker
+                value={selectedSurveyor}
+                onChange={(users) => {
+                  setSelectedSurveyor(users)
+                  setCurrentPage(1)
+                }}
+                type="radio"
+                placeholder="Filter by surveyor..."
+              />
+            </div>
+
             {/* Clear Filters Button */}
-            {(searchQuery || statusFilter !== 'All' || sourceFilter !== 'All') && (
+            {(searchQuery || statusFilter !== 'All' || sourceFilter !== 'All' || selectedSurveyor.length > 0) && (
               <Button
                 type="button"
                 variant="outline"

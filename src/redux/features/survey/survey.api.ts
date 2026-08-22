@@ -18,14 +18,14 @@ const surveyApi = baseApi.injectEndpoints({
                 method: 'GET',
                 params: params || undefined,
             }),
-            providesTags: ['Survey', 'Servey'],
+            providesTags: ['Survey'],
         }),
         retrieveSurveyDetails: builder.query<ISurveyDetailsResponse, number | string>({
             query: (id) => ({
                 url: `/land-parcel-surveys/${id}`,
                 method: 'GET',
             }),
-            providesTags: ['Survey', 'Servey'],
+            providesTags: ['Survey'],
         }),
         createSurvey: builder.mutation<ISurveyMutationResponse, ICreateSurveyPayload>({
             query: (data) => ({
@@ -33,7 +33,7 @@ const surveyApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body: data,
             }),
-            invalidatesTags: ['Survey', 'Servey'],
+            invalidatesTags: ['Survey'],
         }),
         surveyUploadFile: builder.mutation<ISurveyMutationResponse, { surveyId: number | string; data: FormData }>({
             query: ({ surveyId, data }) => ({
@@ -41,15 +41,15 @@ const surveyApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body: data,
             }),
-            invalidatesTags: ['Survey', 'Servey'],
+            invalidatesTags: ['Survey'],
         }),
         updateSurveySurveyor: builder.mutation<ISurveyMutationResponse, { id: number | string; data: IUpdateSurveySurveyorPayload }>({
             query: ({ id, data }) => ({
                 url: `/land-parcel-surveys/${id}/surveyor`,
-                method: 'POST',
+                method: 'PATCH',
                 body: data,
             }),
-            invalidatesTags: ['Survey', 'Servey'],
+            invalidatesTags: ['Survey'],
         }),
         verifyGisDataForsurvery: builder.mutation<ISurveyMutationResponse, { id: number | string; data: IVerifyGisDataPayload }>({
             query: ({ id, data }) => ({
@@ -57,7 +57,7 @@ const surveyApi = baseApi.injectEndpoints({
                 method: 'PATCH',
                 body: data,
             }),
-            invalidatesTags: ['Survey', 'Servey'],
+            invalidatesTags: ['Survey'],
         }),
         updateSurvey: builder.mutation<ISurveyMutationResponse, { id: number | string; data: IUpdateSurveyPayload }>({
             query: ({ id, data }) => ({
@@ -65,14 +65,14 @@ const surveyApi = baseApi.injectEndpoints({
                 method: 'PATCH',
                 body: data,
             }),
-            invalidatesTags: ['Survey', 'Servey'],
+            invalidatesTags: ['Survey'],
         }),
         deleteSurvey: builder.mutation<ISurveyMutationResponse, number | string>({
             query: (id) => ({
                 url: `/land-parcel-surveys/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['Survey', 'Servey'],
+            invalidatesTags: ['Survey'],
         }),
     }),
 });

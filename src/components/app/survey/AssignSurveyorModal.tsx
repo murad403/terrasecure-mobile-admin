@@ -104,10 +104,10 @@ const AssignSurveyorModal: React.FC<AssignSurveyorModalProps> = ({
 
           {/* Buttons */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+            <Button type="button" variant="outline" className="w-auto" onClick={onClose} disabled={isLoading}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="gap-2">
+            <Button type="submit" disabled={isLoading} className="gap-2 w-auto">
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />

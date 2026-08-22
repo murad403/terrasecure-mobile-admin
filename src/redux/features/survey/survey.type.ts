@@ -80,6 +80,7 @@ export interface ISurveyQueryParams {
   search?: string;
   status?: string;
   source?: string;
+  surveyorId?: number | string;
 }
 
 export interface ICreateSurveyPayload {
