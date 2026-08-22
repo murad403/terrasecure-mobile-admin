@@ -9,7 +9,7 @@ import { useCreateRegistrationMutation } from '@/redux/features/registrations/re
 import { useUploadFileMutation } from '@/redux/features/profile/profile.api'
 import { toast } from 'sonner'
 import formatFileSize from '@/utils/formatFileSize'
-import LocationPicker, { type LocationValue } from '@/components/shared/LocationPicker'
+import LocationPicker, { type LocationValue } from '@/components/tools/LocationPicker'
 import type {
   LandParcelOwnershipType,
   LandParcelOwnershipStatus,

@@ -349,7 +349,7 @@ export const SiteVisitDetails = ({
                 variant="outline"
                 onClick={() => onDelete(visit.id)}
                 disabled={actionLoading}
-                className="py-3 px-3 text-xs text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 cursor-pointer font-bold shrink-0"
+                className="py-3 px-3 text-xs  text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 cursor-pointer font-bold w-auto"
                 title="Delete Visit"
               >
                 {actionLoading ? (
