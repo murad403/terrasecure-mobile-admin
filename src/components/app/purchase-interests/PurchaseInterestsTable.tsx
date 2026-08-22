@@ -323,6 +323,7 @@ const PurchaseInterestsTable = ({
         onPageChange={(page) => setCurrentPage(page)}
         totalEntries={totalEntries}
         pageSize={pageSize}
+        isLoading={isFetching || isLoading}
       />
     </div>
   )

@@ -46,7 +46,6 @@ const AdminSidebar = ({
             title: 'LAND',
             items: [
                 { name: 'Registrations', href: '/registrations', icon: ClipboardList },
-                { name: 'Servey', href: '/servey', icon: DatabaseSearch },
                 { name: 'Parcels', href: '/parcels', icon: Map }
             ]
         },
@@ -62,6 +61,7 @@ const AdminSidebar = ({
             items: [
                 { name: 'Investigations', href: '/investigations', icon: Shield },
                 { name: 'Site Visits', href: '/site-visits', icon: MapPin },
+                { name: 'Servey', href: '/servey', icon: DatabaseSearch },
                 { name: 'Purchase Interests', href: '/purchase-interests', icon: ShoppingCart },
                 { name: 'Payments', href: '/payments', icon: CreditCard },
                 // { name: 'Documents', href: '/documents', icon: FileText },
