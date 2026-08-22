@@ -1,7 +1,7 @@
 "use client"
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Map, ClipboardList, Users, MessageSquare, Shield, MapPin, CreditCard, FileText, UserCheck, Globe, AlertTriangle, Radio, FileBarChart, History, Layers, Bell, Settings, ChevronLeft, ChevronRight, X, ShoppingCart } from 'lucide-react'
+import { LayoutDashboard, Map, ClipboardList, Users, MessageSquare, Shield, MapPin, CreditCard, FileText, UserCheck, Globe, AlertTriangle, Radio, FileBarChart, History, Layers, Bell, Settings, ChevronLeft, ChevronRight, X, ShoppingCart, DatabaseSearch } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import logo from "@/assets/logo/logo.png"
 import Image from 'next/image'
@@ -45,8 +45,9 @@ const AdminSidebar = ({
         {
             title: 'LAND',
             items: [
-                { name: 'Parcels', href: '/parcels', icon: Map },
-                { name: 'Registrations', href: '/registrations', icon: ClipboardList }
+                { name: 'Registrations', href: '/registrations', icon: ClipboardList },
+                { name: 'Servey', href: '/servey', icon: DatabaseSearch },
+                { name: 'Parcels', href: '/parcels', icon: Map }
             ]
         },
         {
@@ -64,7 +65,7 @@ const AdminSidebar = ({
                 { name: 'Purchase Interests', href: '/purchase-interests', icon: ShoppingCart },
                 { name: 'Payments', href: '/payments', icon: CreditCard },
                 // { name: 'Documents', href: '/documents', icon: FileText },
-                { name: 'Surveyor Assignment', href: '/surveyor-assignment', icon: UserCheck }
+                // { name: 'Surveyor Assignment', href: '/surveyor-assignment', icon: UserCheck }
             ]
         },
         {
