@@ -1,8 +1,9 @@
 "use client"
-import React, { useEffect } from 'react'
-import { X, MapPin } from 'lucide-react'
+import React, { useEffect, useRef } from 'react'
+import { X, MapPin, Layers } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { RegistrationItem, RegistrationSurvey } from '@/redux/features/registrations/registration.type'
+import 'leaflet/dist/leaflet.css'
 
 interface GISViewMapModalProps {
   isOpen: boolean
@@ -29,6 +30,9 @@ const GISViewMapModal: React.FC<GISViewMapModalProps> = ({
   registrationId,
   onConfirm,
 }) => {
+  const mapContainerRef = useRef<HTMLDivElement>(null)
+  const leafletMapRef = useRef<any>(null)
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -40,15 +44,109 @@ const GISViewMapModal: React.FC<GISViewMapModalProps> = ({
     }
   }, [isOpen])
 
-  if (!isOpen) return null
-
+  // Extract points
   const points = survey?.points || []
   const pointsCount = points.length || (latitude && longitude ? 1 : 0)
   const computedArea = survey?.computedAreaSqm || registration?.areaSqm || area || 0
-  const registrationIdStr = registrationId || registration?.slug || (registration?.id ? `REG-${registration.id}` : '') || parcelName || 'GIS Submission'
+  const registrationIdStr =
+    registrationId || registration?.slug || (registration?.id ? `REG-${registration.id}` : '') || parcelName || 'GIS Submission'
+
+  const defaultCenter: [number, number] = [
+    latitude || registration?.location?.latitude || 48.01027,
+    longitude || registration?.location?.longitude || -89.5994,
+  ]
+
+  // Initialize interactive Leaflet map
+  useEffect(() => {
+    if (!isOpen || !mapContainerRef.current) return
+
+    let isMounted = true
+
+    const initMap = async () => {
+      const L = await import('leaflet')
+      if (!isMounted || !mapContainerRef.current) return
+
+      if (leafletMapRef.current) {
+        leafletMapRef.current.remove()
+        leafletMapRef.current = null
+      }
+      if ((mapContainerRef.current as any)._leaflet_id) {
+        delete (mapContainerRef.current as any)._leaflet_id
+      }
+
+      delete (L.Icon.Default.prototype as any)._getIconUrl
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      })
+
+      const latLngs: [number, number][] = points
+        .filter((p) => p.lat != null && p.lng != null)
+        .map((p) => [p.lat, p.lng])
+
+      const initialCenter: [number, number] = latLngs.length > 0 ? latLngs[0] : defaultCenter
+
+      const map = L.map(mapContainerRef.current, {
+        zoomControl: true,
+        scrollWheelZoom: true,
+      }).setView(initialCenter, 14)
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap',
+      }).addTo(map)
+
+      if (latLngs.length > 1) {
+        const polygon = L.polygon(latLngs, {
+          color: '#2563eb',
+          fillColor: '#3b82f6',
+          fillOpacity: 0.3,
+          weight: 3,
+        }).addTo(map)
+
+        // Add markers for each vertex
+        latLngs.forEach((pt, idx) => {
+          L.circleMarker(pt, {
+            radius: 5,
+            color: '#1d4ed8',
+            fillColor: '#ffffff',
+            fillOpacity: 1,
+            weight: 2,
+          })
+            .bindTooltip(`Pt #${idx + 1}`)
+            .addTo(map)
+        })
+
+        map.fitBounds(polygon.getBounds(), { padding: [30, 30] })
+      } else if (latLngs.length === 1) {
+        L.marker(latLngs[0]).bindTooltip('Survey Point').addTo(map)
+      } else if (latitude && longitude) {
+        L.marker([latitude, longitude]).bindTooltip(parcelName || 'Parcel Location').addTo(map)
+      }
+
+      leafletMapRef.current = map
+    }
+
+    const timer = setTimeout(() => {
+      initMap()
+    }, 100)
+
+    return () => {
+      isMounted = false
+      clearTimeout(timer)
+      if (leafletMapRef.current) {
+        leafletMapRef.current.remove()
+        leafletMapRef.current = null
+      }
+    }
+  }, [isOpen, survey?.points, latitude, longitude])
+
+  if (!isOpen) return null
+
   const firstPoint = points[0] || {
-    lat: latitude || registration?.location?.latitude || 40.7128,
-    lng: longitude || registration?.location?.longitude || -74.006,
+    lat: defaultCenter[0],
+    lng: defaultCenter[1],
   }
 
   return (
@@ -57,7 +155,7 @@ const GISViewMapModal: React.FC<GISViewMapModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-white border border-slate-200 rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200 max-h-[90vh]"
+        className="bg-white border border-slate-200 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200 max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -66,8 +164,11 @@ const GISViewMapModal: React.FC<GISViewMapModalProps> = ({
             <h2 className="text-sm font-extrabold text-slate-900">
               GIS View – {registrationIdStr}
             </h2>
-            <p className="text-[10px] font-bold text-slate-400 mt-0.5 font-sans">
-              QField Data · {pointsCount} GPS points collected
+            <p className="text-[10px] font-bold text-slate-400 mt-0.5 font-sans flex items-center gap-1.5">
+              <Layers className="w-3 h-3 text-button-color" />
+              <span>
+                Source: {survey?.source || 'QFIELD'} · {pointsCount} GPS points collected
+              </span>
             </p>
           </div>
           <button
@@ -78,65 +179,42 @@ const GISViewMapModal: React.FC<GISViewMapModalProps> = ({
           </button>
         </div>
 
-        {/* Map Visualization Area */}
-        <div className="relative flex-1 bg-[#eaf4ec] min-h-80 flex items-center justify-center overflow-hidden select-none p-4">
-          <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            {/* Topographic background contour lines */}
-            <path d="M -50,50 C 100,20 200,80 300,10 C 400,-60 500,40 650,20" fill="none" stroke="#d5e8dc" strokeWidth="1.5" />
-            <path d="M -50,110 C 110,80 210,140 310,70 C 410,0 510,100 650,80" fill="none" stroke="#d5e8dc" strokeWidth="1.5" />
-            <path d="M -50,170 C 120,140 220,200 320,130 C 420,60 520,160 650,140" fill="none" stroke="#d5e8dc" strokeWidth="1.5" />
-            <path d="M -50,230 C 130,200 230,260 330,190 C 430,120 530,220 650,200" fill="none" stroke="#d5e8dc" strokeWidth="1.5" />
+        {/* Real Leaflet Map Container */}
+        <div className="relative flex-1 bg-slate-100 min-h-96 w-full overflow-hidden select-none">
+          <div ref={mapContainerRef} className="w-full h-96 z-0" />
 
-            {/* Polygon Boundary */}
-            <polygon
-              points="200,120 380,150 400,280 330,340 210,320 180,210"
-              fill="#2e7d32"
-              fillOpacity="0.18"
-              stroke="#2e7d32"
-              strokeWidth="2.5"
-              strokeDasharray="4 2"
-            />
-
-            {/* Vertices */}
-            <circle cx="200" cy="120" r="5" fill="#1b5e20" stroke="white" strokeWidth="1.5" />
-            <circle cx="380" cy="150" r="5" fill="#1b5e20" stroke="white" strokeWidth="1.5" />
-            <circle cx="400" cy="280" r="5" fill="#1b5e20" stroke="white" strokeWidth="1.5" />
-            <circle cx="330" cy="340" r="5" fill="#1b5e20" stroke="white" strokeWidth="1.5" />
-            <circle cx="210" cy="320" r="5" fill="#1b5e20" stroke="white" strokeWidth="1.5" />
-            <circle cx="180" cy="210" r="5" fill="#1b5e20" stroke="white" strokeWidth="1.5" />
-          </svg>
-
-          {/* Floating Info Overlay */}
-          <div className="absolute top-4 left-4 z-10 bg-white/95 backdrop-blur-[2.5px] border border-slate-200 px-3.5 py-2.5 rounded-xl shadow-md text-slate-800 pointer-events-none select-none">
-            <div className="flex items-center gap-1.5 text-[10.5px] font-extrabold text-slate-800">
-              <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
+          {/* Floating Location Overlay */}
+          <div className="absolute top-3 left-3 z-10 bg-white/95 backdrop-blur-[2.5px] border border-slate-200 px-3.5 py-2 rounded-xl shadow-md text-slate-800 pointer-events-none select-none">
+            <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-slate-800">
+              <MapPin className="w-3.5 h-3.5 text-button-color shrink-0" />
               <span>
                 {registration?.location?.city || registration?.location?.addressLine1 || parcelName || 'Parcel Location'}
               </span>
             </div>
-            <span className="text-[9px] font-bold text-slate-500 font-mono block mt-0.5 ml-5">
+            <span className="text-[10px] font-bold text-slate-500 font-mono block mt-0.5 ml-5">
               Lat: {firstPoint.lat}°, Lng: {firstPoint.lng}°
             </span>
           </div>
 
-          <div className="absolute bottom-4 right-4 z-10 bg-white/95 backdrop-blur-[2.5px] border border-slate-200 px-3.5 py-2.5 rounded-xl shadow-md text-right text-slate-800 pointer-events-none select-none">
-            <div className="text-[10.5px] font-extrabold text-slate-800">
+          {/* Floating Area & Points Badge */}
+          <div className="absolute bottom-3 right-3 z-10 bg-white/95 backdrop-blur-[2.5px] border border-slate-200 px-3.5 py-2 rounded-xl shadow-md text-right text-slate-800 pointer-events-none select-none">
+            <div className="text-[11px] font-extrabold text-slate-800">
               Area: {Number(computedArea).toLocaleString()} m²
             </div>
-            <div className="text-[9px] font-bold text-slate-500 mt-0.5">
-              {pointsCount} GPS points collected
+            <div className="text-[10px] font-bold text-slate-500 mt-0.5">
+              {pointsCount} GPS points mapped
             </div>
           </div>
         </div>
 
-        {/* GPS Points Table Details */}
+        {/* GPS Points Log Table */}
         {points.length > 0 && (
           <div className="p-4 bg-slate-50 border-t border-slate-100 max-h-36 overflow-y-auto">
-            <h4 className="text-[11px] font-bold text-slate-700 mb-2">Captured GPS Points</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <h4 className="text-[11px] font-bold text-slate-700 mb-2">Captured GPS Points ({points.length})</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
               {points.map((pt, idx) => (
-                <div key={idx} className="p-1.5 bg-white rounded border border-slate-200 text-[10px] font-mono">
-                  <span className="font-bold text-slate-800">Pt #{idx + 1}:</span> {pt.lat.toFixed(4)}, {pt.lng.toFixed(4)}
+                <div key={idx} className="p-1.5 bg-white rounded-lg border border-slate-200 text-[10px] font-mono shadow-2xs">
+                  <span className="font-bold text-button-color">Pt #{idx + 1}:</span> {pt.lat.toFixed(5)}, {pt.lng.toFixed(5)}
                   {pt.accuracy && <span className="text-slate-400 block text-[9px]">±{pt.accuracy}m</span>}
                 </div>
               ))}
@@ -146,8 +224,8 @@ const GISViewMapModal: React.FC<GISViewMapModalProps> = ({
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-slate-100 bg-white flex items-center justify-between font-semibold">
-          <div className="text-[10px] text-slate-500">
-            Source: {survey?.source || 'MOBILE_GPS'} · Status: {survey?.status || 'VALIDATED'}
+          <div className="text-[11px] text-slate-500 font-mono">
+            Status: <strong className="text-slate-800">{survey?.status || 'VALIDATED'}</strong>
           </div>
           <div className="flex items-center gap-2">
             <Button type="button" variant="outline" onClick={onClose} className="w-auto px-4">
