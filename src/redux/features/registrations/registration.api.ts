@@ -38,7 +38,7 @@ const registrationApi = baseApi.injectEndpoints({
             invalidatesTags: ["Registration"]
         }),
         verifyDocument: builder.mutation({
-            query: ({id, documentId, data}) => ({
+            query: ({ id, documentId, data }) => ({
                 url: `/land-parcel-registrations/${id}/documents/${documentId}/verify`,
                 method: "PATCH",
                 body: data,
@@ -46,7 +46,7 @@ const registrationApi = baseApi.injectEndpoints({
             invalidatesTags: ["Registration"]
         }),
         assignSurveyor: builder.mutation({
-            query: ({id, data}) => ({
+            query: ({ id, data }) => ({
                 url: `/land-parcel-registrations/${id}/site-visit/surveyor`,
                 method: "POST",
                 body: data,
@@ -54,7 +54,7 @@ const registrationApi = baseApi.injectEndpoints({
             invalidatesTags: ["Registration"]
         }),
         scheduleRegistrationSiteVisit: builder.mutation({
-            query: ({id, data}) => ({
+            query: ({ id, data }) => ({
                 url: `/land-parcel-registrations/${id}/site-visit/schedule`,
                 method: "PATCH",
                 body: data,
@@ -62,7 +62,7 @@ const registrationApi = baseApi.injectEndpoints({
             invalidatesTags: ["Registration"]
         }),
         uploadGisData: builder.mutation({
-            query: ({id, data}) => ({
+            query: ({ id, data }) => ({
                 url: `/land-parcel-registrations/${id}/gis-data`,
                 method: "POST",
                 body: data,
@@ -70,7 +70,7 @@ const registrationApi = baseApi.injectEndpoints({
             invalidatesTags: ["Registration"]
         }),
         verifyGisData: builder.mutation({
-            query: ({id, surveyId, data}) => ({
+            query: ({ id, surveyId, data }) => ({
                 url: `/land-parcel-registrations/${id}/gis-data/${surveyId}/verify`,
                 method: "PATCH",
                 body: data,

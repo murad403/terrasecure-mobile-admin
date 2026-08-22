@@ -82,5 +82,28 @@ export interface ISurveyQueryParams {
   source?: string;
 }
 
+export interface ICreateSurveyPayload {
+  parcelId?: number | string;
+  registrationId?: number | string;
+}
+
+export interface IUpdateSurveySurveyorPayload {
+  surveyorId: number | string;
+}
+
+export interface IVerifyGisDataPayload {
+  reliabilityScore: number;
+  status?: LandParcelSurveyStatus | string;
+  validationNotes?: string;
+}
+
+export interface IUpdateSurveyPayload {
+  source?: LandParcelSurveySource | string;
+  computedAreaSqm?: number;
+  reliabilityScore?: number;
+  status?: LandParcelSurveyStatus | string;
+}
+
 export type ISurveyListResponse = ApiResponse<ISurveyItem[]>;
 export type ISurveyDetailsResponse = ApiResponse<ISurveyItem>;
+export type ISurveyMutationResponse = ApiResponse<ISurveyItem>;

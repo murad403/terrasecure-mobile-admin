@@ -81,7 +81,7 @@ export const UserPicker: React.FC<UserPickerProps> = ({
     userResponse?.data?.filter((user) => !value.some((v) => v.id === user.id)) ?? [];
 
   return (
-    <div ref={containerRef} className="relative w-72">
+    <div ref={containerRef} className="relative w-full">
       {/* Selector Display Field */}
       <div
         onClick={() => setIsOpen((prev) => !prev)}
@@ -126,7 +126,7 @@ export const UserPicker: React.FC<UserPickerProps> = ({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-hidden flex flex-col">
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-hidden flex flex-col">
           {/* Search Input inside Dropdown */}
           <div className="p-2 border-b bg-gray-50">
             <input

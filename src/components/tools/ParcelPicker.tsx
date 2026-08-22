@@ -135,7 +135,7 @@ export const ParcelPicker: React.FC<ParcelPickerProps> = ({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-hidden flex flex-col">
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-hidden flex flex-col">
           {/* Search Input inside Dropdown */}
           <div className="p-2 border-b bg-gray-50">
             <input

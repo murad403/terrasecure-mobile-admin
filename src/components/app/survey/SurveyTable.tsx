@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react'
-import { Search, Eye, Loader2, RotateCcw, Compass, MapPin } from 'lucide-react'
+import { Search, Eye, Loader2, RotateCcw, Compass, UploadCloud, UserCheck, ShieldCheck, Edit3, Trash2, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'
@@ -8,11 +8,17 @@ import { Button } from '@/components/ui/button'
 import SearchInput from '@/components/ui/SearchInput'
 import formatDate from '@/utils/formatDate'
 import { LandParcelSurveySource, LandParcelSurveyStatus } from '@/enum'
-import { useRetrieveServeyQuery } from '@/redux/features/servey/servey.api'
-import { ISurveyItem } from '@/redux/features/servey/servey.type'
+import { useRetrieveSurveyQuery } from '@/redux/features/survey/survey.api'
+import { ISurveyItem } from '@/redux/features/survey/survey.type'
 
-interface ServeyTableProps {
+interface SurveyTableProps {
   onViewDetails: (id: number) => void
+  onOpenCreateModal?: () => void
+  onUploadFile?: (id: number) => void
+  onAssignSurveyor?: (item: ISurveyItem) => void
+  onVerifyGis?: (item: ISurveyItem) => void
+  onEditSurvey?: (item: ISurveyItem) => void
+  onDeleteSurvey?: (id: number) => void
 }
 
 const getInitials = (name?: string) => {
@@ -43,7 +49,15 @@ const getStatusBadge = (status?: string) => {
   }
 }
 
-const ServeyTable: React.FC<ServeyTableProps> = ({ onViewDetails }) => {
+const SurveyTable: React.FC<SurveyTableProps> = ({
+  onViewDetails,
+  onOpenCreateModal,
+  onUploadFile,
+  onAssignSurveyor,
+  onVerifyGis,
+  onEditSurvey,
+  onDeleteSurvey,
+}) => {
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [statusFilter, setStatusFilter] = useState<string>('All')
@@ -56,7 +70,7 @@ const ServeyTable: React.FC<ServeyTableProps> = ({ onViewDetails }) => {
     setCurrentPage(1)
   }
 
-  const { data, isLoading, isFetching } = useRetrieveServeyQuery({
+  const { data, isLoading, isFetching } = useRetrieveSurveyQuery({
     page: currentPage,
     limit: 20,
     search: searchQuery || undefined,
@@ -133,6 +147,16 @@ const ServeyTable: React.FC<ServeyTableProps> = ({ onViewDetails }) => {
               </Button>
             )}
           </div>
+
+          {/* Action Button */}
+          {onOpenCreateModal && (
+            <div className="flex items-center gap-3 w-full xl:w-auto shrink-0 justify-end">
+              <Button className="w-auto gap-2" type="button" onClick={onOpenCreateModal}>
+                <Plus className="w-4.5 h-4.5" />
+                <span>New Survey</span>
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Table Container */}
@@ -324,16 +348,89 @@ const ServeyTable: React.FC<ServeyTableProps> = ({ onViewDetails }) => {
 
                       {/* Actions */}
                       <td className="py-4 px-5 text-center">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => onViewDetails(item.id)}
-                          className="h-8 w-8 text-slate-500 hover:text-button-color hover:bg-button-color/10 rounded-lg transition-colors cursor-pointer"
-                          title="View Details"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center justify-center gap-1">
+                          {/* View Details */}
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => onViewDetails(item.id)}
+                            className="h-8 w-8 text-slate-500 hover:text-button-color hover:bg-button-color/10 rounded-lg transition-colors cursor-pointer"
+                            title="View Details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+
+                          {/* Upload File */}
+                          {onUploadFile && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => onUploadFile(item.id)}
+                              className="h-8 w-8 text-slate-500 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
+                              title="Upload GIS File"
+                            >
+                              <UploadCloud className="w-4 h-4" />
+                            </Button>
+                          )}
+
+                          {/* Assign Surveyor */}
+                          {onAssignSurveyor && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => onAssignSurveyor(item)}
+                              className="h-8 w-8 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                              title="Assign Surveyor"
+                            >
+                              <UserCheck className="w-4 h-4" />
+                            </Button>
+                          )}
+
+                          {/* Verify GIS Data */}
+                          {onVerifyGis && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => onVerifyGis(item)}
+                              className="h-8 w-8 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                              title="Verify GIS Data"
+                            >
+                              <ShieldCheck className="w-4 h-4" />
+                            </Button>
+                          )}
+
+                          {/* Edit Survey */}
+                          {onEditSurvey && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => onEditSurvey(item)}
+                              className="h-8 w-8 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
+                              title="Edit Survey"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </Button>
+                          )}
+
+                          {/* Delete Survey */}
+                          {onDeleteSurvey && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => onDeleteSurvey(item.id)}
+                              className="h-8 w-8 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                              title="Delete Survey"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   )
@@ -345,18 +442,16 @@ const ServeyTable: React.FC<ServeyTableProps> = ({ onViewDetails }) => {
       </div>
 
       {/* Pagination Footer */}
-   
-        <CustomPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={(page) => setCurrentPage(page)}
-          totalEntries={totalEntries}
-          pageSize={pagination?.limit || 20}
-          isLoading={isFetching}
-        />
-  
+      <CustomPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+        totalEntries={totalEntries}
+        pageSize={pagination?.limit || 20}
+        isLoading={isFetching}
+      />
     </div>
   )
 }
 
-export default ServeyTable
+export default SurveyTable
