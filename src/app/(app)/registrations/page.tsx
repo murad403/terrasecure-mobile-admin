@@ -1,11 +1,7 @@
 import RegistrationsPage from '@/components/app/registrations/RegistrationsPage'
 
 const page = () => {
-    return (
-        <div>
-            <RegistrationsPage />
-        </div>
-    )
+    return <RegistrationsPage />
 }
 
 export default page;

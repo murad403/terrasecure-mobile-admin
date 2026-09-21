@@ -1,12 +1,7 @@
 import ParcelsPage from '@/components/app/parcels/ParcelsPage'
-import React from 'react'
 
 const page = () => {
-    return (
-        <div>
-            <ParcelsPage />
-        </div>
-    )
+    return <ParcelsPage />
 }
 
 export default page

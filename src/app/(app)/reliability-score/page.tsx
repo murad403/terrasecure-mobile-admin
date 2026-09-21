@@ -2,11 +2,7 @@ import ReliabilityScorePage from '@/components/app/reliability-score/Reliability
 import React from 'react'
 
 const page = () => {
-    return (
-        <div>
-            <ReliabilityScorePage />
-        </div>
-    )
+    return <ReliabilityScorePage />
 }
 
 export default page

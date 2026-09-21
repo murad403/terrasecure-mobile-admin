@@ -2,11 +2,7 @@ import QfieldSubmissionsPage from '@/components/app/qfield-submissions/QfieldSub
 import React from 'react'
 
 const page = () => {
-  return (
-    <div>
-        <QfieldSubmissionsPage />
-    </div>
-  )
+  return <QfieldSubmissionsPage />
 }
 
 export default page
