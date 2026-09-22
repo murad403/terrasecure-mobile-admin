@@ -3,7 +3,6 @@ import { useState } from 'react';
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout';
 import ConflictCard from './ConflictCard';
 import ReviewOnMapModal from './ReviewOnMapModal';
-import ResolutionWorkflowSteps from './ResolutionWorkflowSteps';
 
 export interface Conflict {
     id: string;
@@ -110,7 +109,7 @@ const ConflictsPage = () => {
             subtitle="Detected overlaps, duplicates, and boundary conflicts"
         >
             {/* Conflicts List Container */}
-            <div>
+            <>
                 {conflicts.map((conflict) => (
                     <ConflictCard
                         key={conflict.id}
@@ -127,7 +126,7 @@ const ConflictsPage = () => {
                         All conflicts resolved! No conflicts detected.
                     </div>
                 )}
-            </div>
+            </>
 
             {/* Review Modal */}
             {selectedConflict && (
@@ -142,24 +141,6 @@ const ConflictsPage = () => {
                     onApproveException={() => handleApproveException(selectedConflict.id)}
                 />
             )}
-
-            {/* Workflow Drawer */}
-            {workflowConflict && (
-                <ResolutionWorkflowSteps
-                    isOpen={workflowOpen}
-                    onClose={() => {
-                        setWorkflowOpen(false);
-                        setWorkflowConflict(null);
-                    }}
-                    conflict={workflowConflict}
-                    onCompleteWorkflow={() => {
-                        handleResolve(workflowConflict.id);
-                        setWorkflowOpen(false);
-                        setWorkflowConflict(null);
-                    }}
-                />
-            )}
-
         </DashboardChildrenLayout>
     );
 };

@@ -1,5 +1,4 @@
 "use client";
-import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Conflict } from './ConflictsPage';
 import { Button } from '@/components/ui/button';
@@ -12,13 +11,7 @@ interface ConflictCardProps {
   onApproveException: () => void;
 }
 
-const ConflictCard = ({
-  conflict,
-  onReviewOnMap,
-  onResolve,
-  onBlock,
-  onApproveException,
-}: ConflictCardProps) => {
+const ConflictCard = ({ conflict, onReviewOnMap, onResolve, onBlock, onApproveException }: ConflictCardProps) => {
   const getSeverityStyle = (severity: Conflict['severity']) => {
     switch (severity) {
       case 'High':
@@ -78,7 +71,7 @@ const ConflictCard = ({
           onClick={onResolve}
           className="w-full bg-green-500 hover:bg-green-500/90 text-white rounded-lg text-[11px] font-bold py-1.5 text-center cursor-pointer transition-colors shadow-sm"
         >
-          Resolve Workflow
+          Create Investigation
         </button>
         <button
           onClick={onBlock}
