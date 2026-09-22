@@ -13,9 +13,9 @@ import { cn } from "@/lib/utils"
 
 export const DashboardPage = () => {
   const [timeRange, setTimeRange] = useState<string>("7d")
-  const { data: response, isLoading, isFetching, error, refetch } = useGetAdminOverviewQuery({ timeRange })
+  const { data: response, isLoading, isFetching, error, refetch } = useGetAdminOverviewQuery({ timeRange });
 
-  const overview = response?.data
+  const overview = response?.data;
 
   const timeRangeOptions = [
     { label: "24 Hours", value: "24h" },
