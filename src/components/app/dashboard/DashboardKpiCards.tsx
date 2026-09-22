@@ -3,18 +3,10 @@ import React from "react"
 import {
   Users,
   MapPin,
-  DollarSign,
-  TrendingUp,
-  ShieldCheck,
-  UserCheck,
-  UserX,
   CreditCard,
-  MessageSquare,
-  AlertCircle,
   FileCheck2,
 } from "lucide-react"
 import { DashboardKpis } from "@/redux/features/dashboard/dashboard.type"
-import { cn } from "@/lib/utils"
 
 interface DashboardKpiCardsProps {
   kpis?: DashboardKpis;
@@ -34,18 +26,18 @@ export const DashboardKpiCards: React.FC<DashboardKpiCardsProps> = ({ kpis }) =>
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3.5">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-bold text-slate-900 tracking-tight">
           Executive KPIs & Metrics
         </h2>
-        <span className="text-xs text-slate-500 font-medium">
+        <span className="text-xs text-slate-500 font-medium hidden sm:inline">
           Real-time Platform Snapshot
         </span>
       </div>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Main Grid: 2x2 on laptops (lg), 4 cols on xl */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-3.5 lg:gap-4">
         {/* KPI 1: Total Users & Activity */}
         <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow space-y-3">
           <div className="flex items-center justify-between">
@@ -104,7 +96,6 @@ export const DashboardKpiCards: React.FC<DashboardKpiCardsProps> = ({ kpis }) =>
           </div>
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
             <div className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span>Avg Score:</span>
               <span className="font-bold text-slate-900">{kpis.parcels.avgReliability.value}%</span>
             </div>

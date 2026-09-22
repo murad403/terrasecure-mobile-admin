@@ -31,32 +31,34 @@ export const DashboardPage = () => {
       title="Admin Dashboard Overview"
       subtitle="Comprehensive land security operations, KPIs & real-time analytics"
     >
-      <div className="space-y-6 pb-12">
-        {/* Top Control Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
-              <Calendar className="w-4 h-4" />
+      <div className="space-y-4 md:space-y-5 lg:space-y-6 pb-12 max-w-[1600px] mx-auto w-full min-w-0">
+        {/* Top Control Bar - Responsive & Overflow Protected */}
+        <div className="p-3.5 sm:p-4 rounded-xl bg-white border border-slate-200 shadow-sm space-y-3 xl:space-y-0 xl:flex xl:items-center xl:justify-between xl:gap-4 overflow-hidden w-full">
+          {/* Left Title */}
+          <div className="flex items-center gap-3 min-w-0 shrink">
+            <div className="p-2.5 rounded-lg bg-blue-50 text-blue-600 shrink-0">
+              <Calendar className="w-5 h-5" />
             </div>
-            <div>
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">
+            <div className="min-w-0">
+              <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider truncate">
                 Time Horizon Filter
-              </span>
-              <span className="text-xs text-slate-700 font-medium">
+              </h2>
+              <p className="text-xs text-slate-600 font-medium truncate">
                 Comparing against previous period
-              </span>
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Right Controls */}
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap justify-between xl:justify-end min-w-0 w-full xl:w-auto">
             {/* Time Range Selector */}
-            <div className="inline-flex rounded-lg p-1 bg-slate-100 border border-slate-200 text-xs font-semibold">
+            <div className="inline-flex items-center rounded-lg p-1 bg-slate-100 border border-slate-200 text-xs font-semibold overflow-x-auto scrollbar-none max-w-full">
               {timeRangeOptions.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => setTimeRange(opt.value)}
                   className={cn(
-                    "px-3 py-1.5 rounded-md transition-all cursor-pointer",
+                    "px-2.5 py-1 rounded-md transition-all cursor-pointer whitespace-nowrap text-xs",
                     timeRange === opt.value
                       ? "bg-white text-slate-900 shadow-sm font-bold"
                       : "text-slate-600 hover:text-slate-900"
@@ -67,11 +69,11 @@ export const DashboardPage = () => {
               ))}
             </div>
 
-            {/* Manual Refetch Button */}
+            {/* Refresh Button */}
             <button
               onClick={() => refetch()}
               disabled={isFetching}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors disabled:opacity-50 cursor-pointer shadow-sm shrink-0"
               title="Refresh Dashboard Data"
             >
               <RefreshCw className={cn("w-3.5 h-3.5", isFetching && "animate-spin")} />
@@ -92,7 +94,7 @@ export const DashboardPage = () => {
 
         {/* Error State */}
         {error && (
-          <div className="p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 flex items-center gap-3">
+          <div className="p-4 sm:p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 flex items-center gap-3">
             <AlertCircle className="w-6 h-6 text-rose-600 shrink-0" />
             <div>
               <h4 className="font-bold text-sm">Failed to load dashboard overview</h4>

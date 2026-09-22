@@ -5,15 +5,8 @@ import {
   MapPin,
   ShoppingCart,
   FileSearch,
-  ArrowRight,
-  UserCheck,
-  Calendar,
-  DollarSign,
-  Clock,
 } from "lucide-react"
-import Link from "next/link"
 import { DashboardQueues } from "@/redux/features/dashboard/dashboard.type"
-import { cn } from "@/lib/utils"
 
 interface ActionQueuesSectionProps {
   queues?: DashboardQueues;
@@ -23,13 +16,12 @@ export const ActionQueuesSection: React.FC<ActionQueuesSectionProps> = ({ queues
   if (!queues) return null;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3.5">
       <h2 className="text-base font-bold text-slate-900 tracking-tight">
         Operational Action Queues
       </h2>
 
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-3.5 lg:gap-4">
         {/* Queue 1: Unassigned Investigations */}
         <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between space-y-3">
           <div>

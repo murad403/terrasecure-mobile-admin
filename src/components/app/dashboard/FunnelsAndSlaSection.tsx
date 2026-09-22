@@ -1,8 +1,7 @@
 "use client"
 import React from "react"
-import { Filter, Clock, CheckCircle2, AlertTriangle, ShieldCheck, ArrowDown } from "lucide-react"
+import { Filter, Clock } from "lucide-react"
 import { FunnelData, SlaData } from "@/redux/features/dashboard/dashboard.type"
-import { cn } from "@/lib/utils"
 
 interface FunnelsAndSlaSectionProps {
   funnel?: FunnelData;
@@ -13,13 +12,13 @@ export const FunnelsAndSlaSection: React.FC<FunnelsAndSlaSectionProps> = ({ funn
   if (!funnel && !sla) return null;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 lg:gap-6">
       {/* SLA Performance Card */}
       {sla && (
-        <div className="p-5 rounded-xl border border-slate-200 bg-white shadow-sm space-y-4">
+        <div className="p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-sm space-y-4 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600 shrink-0">
                 <Clock className="w-5 h-5" />
               </div>
               <div>
@@ -33,24 +32,25 @@ export const FunnelsAndSlaSection: React.FC<FunnelsAndSlaSectionProps> = ({ funn
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             {/* Investigations SLA */}
             <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/50 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Investigations</span>
-                <span className="text-[10px] font-semibold text-slate-500">
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-xs font-bold text-slate-800 truncate">Investigations</span>
+                <span className="text-[10px] font-semibold text-slate-500 shrink-0 bg-slate-200/60 px-1.5 py-0.5 rounded">
                   Target: {sla.investigations.target_hours}h
                 </span>
               </div>
-              <div className="flex items-baseline justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-lg font-extrabold text-rose-600">
+              <div className="flex items-center justify-between text-xs gap-1 pt-0.5">
+                <div className="flex items-baseline gap-1 shrink-0">
+                  <span className="text-base font-extrabold text-rose-600">
                     {sla.investigations.breached}
                   </span>
-                  <span className="text-xs text-slate-500 font-medium">Breached</span>
+                  <span className="text-[11px] text-slate-500">Breached</span>
                 </div>
-                <div className="text-xs font-medium text-emerald-600">
-                  {sla.investigations.on_track} On Track
+                <div className="flex items-baseline gap-1 text-emerald-600 font-semibold text-[11px] shrink-0">
+                  <span>{sla.investigations.on_track}</span>
+                  <span>On Track</span>
                 </div>
               </div>
               <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden flex">
@@ -72,21 +72,22 @@ export const FunnelsAndSlaSection: React.FC<FunnelsAndSlaSectionProps> = ({ funn
 
             {/* Site Visits SLA */}
             <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/50 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Site Visits</span>
-                <span className="text-[10px] font-semibold text-slate-500">
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-xs font-bold text-slate-800 truncate">Site Visits</span>
+                <span className="text-[10px] font-semibold text-slate-500 shrink-0 bg-slate-200/60 px-1.5 py-0.5 rounded">
                   Target: {sla.site_visits.target_hours}h
                 </span>
               </div>
-              <div className="flex items-baseline justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-lg font-extrabold text-amber-600">
+              <div className="flex items-center justify-between text-xs gap-1 pt-0.5">
+                <div className="flex items-baseline gap-1 shrink-0">
+                  <span className="text-base font-extrabold text-amber-600">
                     {sla.site_visits.breached}
                   </span>
-                  <span className="text-xs text-slate-500 font-medium">Breached</span>
+                  <span className="text-[11px] text-slate-500">Breached</span>
                 </div>
-                <div className="text-xs font-medium text-emerald-600">
-                  {sla.site_visits.on_track} On Track
+                <div className="flex items-baseline gap-1 text-emerald-600 font-semibold text-[11px] shrink-0">
+                  <span>{sla.site_visits.on_track}</span>
+                  <span>On Track</span>
                 </div>
               </div>
               <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden flex">
@@ -108,39 +109,43 @@ export const FunnelsAndSlaSection: React.FC<FunnelsAndSlaSectionProps> = ({ funn
 
             {/* Registrations SLA */}
             <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/50 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Registrations</span>
-                <span className="text-[10px] font-semibold text-slate-500">
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-xs font-bold text-slate-800 truncate">Registrations</span>
+                <span className="text-[10px] font-semibold text-slate-500 shrink-0 bg-slate-200/60 px-1.5 py-0.5 rounded">
                   Target: {sla.registrations.target_hours}h
                 </span>
               </div>
-              <div className="flex items-baseline justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-lg font-extrabold text-slate-800">
+              <div className="flex items-center justify-between text-xs gap-1 pt-0.5">
+                <div className="flex items-baseline gap-1 shrink-0">
+                  <span className="text-base font-extrabold text-slate-800">
                     {sla.registrations.breached}
                   </span>
-                  <span className="text-xs text-slate-500 font-medium">Breached</span>
+                  <span className="text-[11px] text-slate-500">Breached</span>
                 </div>
-                <div className="text-xs font-medium text-emerald-600">100% Compliance</div>
+                <div className="text-[11px] font-semibold text-emerald-600 shrink-0">
+                  100% Compliance
+                </div>
               </div>
             </div>
 
             {/* Land Requests SLA */}
             <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/50 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Land Requests</span>
-                <span className="text-[10px] font-semibold text-slate-500">
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-xs font-bold text-slate-800 truncate">Land Requests</span>
+                <span className="text-[10px] font-semibold text-slate-500 shrink-0 bg-slate-200/60 px-1.5 py-0.5 rounded">
                   Target: {sla.land_requests.target_hours}h
                 </span>
               </div>
-              <div className="flex items-baseline justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-lg font-extrabold text-emerald-600">
+              <div className="flex items-center justify-between text-xs gap-1 pt-0.5">
+                <div className="flex items-baseline gap-1 shrink-0">
+                  <span className="text-base font-extrabold text-emerald-600">
                     {sla.land_requests.breached}
                   </span>
-                  <span className="text-xs text-slate-500 font-medium">Breached</span>
+                  <span className="text-[11px] text-slate-500">Breached</span>
                 </div>
-                <div className="text-xs font-medium text-emerald-600">Optimal</div>
+                <div className="text-[11px] font-semibold text-emerald-600 shrink-0">
+                  Optimal
+                </div>
               </div>
             </div>
           </div>
@@ -149,10 +154,10 @@ export const FunnelsAndSlaSection: React.FC<FunnelsAndSlaSectionProps> = ({ funn
 
       {/* Registration Funnel Card */}
       {funnel?.registration && (
-        <div className="p-5 rounded-xl border border-slate-200 bg-white shadow-sm space-y-4">
+        <div className="p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-sm space-y-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-lg bg-blue-50 text-blue-600 shrink-0">
                 <Filter className="w-5 h-5" />
               </div>
               <div>
@@ -179,7 +184,7 @@ export const FunnelsAndSlaSection: React.FC<FunnelsAndSlaSectionProps> = ({ funn
                   <span className="font-medium text-slate-800 truncate">{step.label}</span>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 shrink-0">
                   <span className="font-extrabold text-slate-900">{step.value}</span>
                   {step.dropOffPct !== null ? (
                     <span className="text-[10px] font-bold text-slate-400">

@@ -5,9 +5,6 @@ import {
   Area,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -59,12 +56,12 @@ export const TrendsAndBreakdownsSection: React.FC<TrendsAndBreakdownsProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Trend Area Chart (2 cols) */}
-        <div className="lg:col-span-2 p-5 rounded-xl border border-slate-200 bg-white shadow-sm space-y-4">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 lg:gap-6">
+        {/* Trend Area Chart (2 cols on xl) */}
+        <div className="xl:col-span-2 p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-sm space-y-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-lg bg-blue-50 text-blue-600 shrink-0">
                 <TrendingUp className="w-5 h-5" />
               </div>
               <div>
@@ -78,7 +75,7 @@ export const TrendsAndBreakdownsSection: React.FC<TrendsAndBreakdownsProps> = ({
             </div>
           </div>
 
-          <div className="h-64 w-full pt-2">
+          <div className="h-64 sm:h-72 w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={registrationTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
@@ -110,11 +107,11 @@ export const TrendsAndBreakdownsSection: React.FC<TrendsAndBreakdownsProps> = ({
           </div>
         </div>
 
-        {/* Requests by Kind Bar Chart (1 col) */}
-        <div className="p-5 rounded-xl border border-slate-200 bg-white shadow-sm space-y-4">
+        {/* Requests by Kind Bar Chart (1 col on xl) */}
+        <div className="xl:col-span-1 p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-sm space-y-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600 shrink-0">
                 <PieIcon className="w-5 h-5" />
               </div>
               <div>
@@ -124,12 +121,12 @@ export const TrendsAndBreakdownsSection: React.FC<TrendsAndBreakdownsProps> = ({
             </div>
           </div>
 
-          <div className="h-64 w-full pt-2">
+          <div className="h-64 sm:h-72 w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={requestsKindData} layout="vertical" margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+              <BarChart data={requestsKindData} layout="vertical" margin={{ top: 5, right: 15, left: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" />
                 <XAxis type="number" tick={{ fontSize: 11, fill: "#64748B" }} allowDecimals={false} />
-                <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: "#334155" }} width={90} />
+                <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: "#334155" }} width={115} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "#1E293B",
@@ -146,11 +143,11 @@ export const TrendsAndBreakdownsSection: React.FC<TrendsAndBreakdownsProps> = ({
       </div>
 
       {/* Regional & Status Distributions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
         {/* Parcels by Region */}
-        <div className="p-5 rounded-xl border border-slate-200 bg-white shadow-sm space-y-3">
+        <div className="p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-sm space-y-3">
           <div className="flex items-center gap-2">
-            <Map className="w-5 h-5 text-emerald-600" />
+            <Map className="w-5 h-5 text-emerald-600 shrink-0" />
             <h3 className="font-bold text-sm text-slate-900">Parcels by Region & Reliability</h3>
           </div>
           <div className="space-y-2">
@@ -176,9 +173,9 @@ export const TrendsAndBreakdownsSection: React.FC<TrendsAndBreakdownsProps> = ({
         </div>
 
         {/* Parcels by Status */}
-        <div className="p-5 rounded-xl border border-slate-200 bg-white shadow-sm space-y-3">
+        <div className="p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-sm space-y-3">
           <div className="flex items-center gap-2">
-            <PieIcon className="w-5 h-5 text-amber-600" />
+            <PieIcon className="w-5 h-5 text-amber-600 shrink-0" />
             <h3 className="font-bold text-sm text-slate-900">Parcels by Status</h3>
           </div>
           <div className="space-y-2">
@@ -190,7 +187,7 @@ export const TrendsAndBreakdownsSection: React.FC<TrendsAndBreakdownsProps> = ({
                 >
                   <div className="flex items-center gap-2">
                     <span
-                      className="w-3 h-3 rounded-full"
+                      className="w-3 h-3 rounded-full shrink-0"
                       style={{ backgroundColor: COLORS[i % COLORS.length] }}
                     />
                     <span className="font-bold text-slate-800">{st.name}</span>
