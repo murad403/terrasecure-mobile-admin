@@ -44,24 +44,6 @@ const MonthlyRevenueChart = () => {
         <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
           Monthly Revenue (Millions XAF)
         </h3>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleExportPDF}
-            className="flex items-center gap-1 px-2.5 py-1 bg-rose-50 hover:bg-rose-100/50 text-rose-600 border border-rose-150 rounded-lg text-[10px] font-extrabold transition-colors cursor-pointer"
-          >
-            <Download className="w-3 h-3" />
-            PDF
-          </button>
-          <button
-            type="button"
-            onClick={handleExportCSV}
-            className="flex items-center gap-1 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100/50 text-emerald-600 border border-emerald-150 rounded-lg text-[10px] font-extrabold transition-colors cursor-pointer"
-          >
-            <Download className="w-3 h-3" />
-            CSV
-          </button>
-        </div>
       </div>
 
       {/* Chart Body */}
