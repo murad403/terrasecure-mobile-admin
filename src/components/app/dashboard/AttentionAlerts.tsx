@@ -99,19 +99,7 @@ export const AttentionAlerts: React.FC<AttentionAlertsProps> = ({ attention }) =
                 </div>
               </div>
 
-              <div className="mt-3 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5 text-slate-400 font-medium">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>
-                    Detected {new Date(item.detectedAt).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                </div>
-
+              {/* <div className="mt-3 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs">
                 {item.actionHref && (
                   <Link
                     href={item.actionHref}
@@ -126,7 +114,7 @@ export const AttentionAlerts: React.FC<AttentionAlertsProps> = ({ attention }) =
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 )}
-              </div>
+              </div> */}
             </div>
           );
         })}

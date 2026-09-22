@@ -27,13 +27,6 @@ export const ActivityAndTeamSection: React.FC<ActivityAndTeamSectionProps> = ({
               <p className="text-xs text-slate-500">Live platform operations and audits</p>
             </div>
           </div>
-          <Link
-            href="/audit-logs"
-            className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800"
-          >
-            <span>View All Logs</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
         </div>
 
         <div className="space-y-3 pt-1">

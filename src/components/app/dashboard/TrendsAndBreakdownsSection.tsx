@@ -76,9 +76,6 @@ export const TrendsAndBreakdownsSection: React.FC<TrendsAndBreakdownsProps> = ({
                 </p>
               </div>
             </div>
-            <span className="text-xs font-semibold px-2 py-1 rounded bg-slate-100 text-slate-600">
-              Granularity: {trends?.granularity || "day"}
-            </span>
           </div>
 
           <div className="h-64 w-full pt-2">

@@ -31,9 +31,6 @@ export const FunnelsAndSlaSection: React.FC<FunnelsAndSlaSectionProps> = ({ funn
                 </p>
               </div>
             </div>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
-              Live Compliance
-            </span>
           </div>
 
           <div className="grid grid-cols-2 gap-3 pt-2">
@@ -167,11 +164,6 @@ export const FunnelsAndSlaSection: React.FC<FunnelsAndSlaSectionProps> = ({ funn
                 </p>
               </div>
             </div>
-            {funnel.registration.biggestDropOff && (
-              <span className="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100">
-                Max Dropoff: {funnel.registration.biggestDropOff.dropOffPct}%
-              </span>
-            )}
           </div>
 
           <div className="space-y-2 pt-1">

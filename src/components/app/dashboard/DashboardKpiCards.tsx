@@ -52,10 +52,6 @@ export const DashboardKpiCards: React.FC<DashboardKpiCardsProps> = ({ kpis }) =>
             <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
               <Users className="w-5 h-5" />
             </div>
-            <div className="flex items-center gap-1 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-              <TrendingUp className="w-3 h-3" />
-              <span>Active</span>
-            </div>
           </div>
           <div>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -92,9 +88,6 @@ export const DashboardKpiCards: React.FC<DashboardKpiCardsProps> = ({ kpis }) =>
             <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
               <MapPin className="w-5 h-5" />
             </div>
-            <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
-              {kpis.parcels.totalAreaHa.value} ha
-            </span>
           </div>
           <div>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -127,9 +120,6 @@ export const DashboardKpiCards: React.FC<DashboardKpiCardsProps> = ({ kpis }) =>
             <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
               <CreditCard className="w-5 h-5" />
             </div>
-            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-              {kpis.money.revenue_7d.currency}
-            </span>
           </div>
           <div>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -155,9 +145,6 @@ export const DashboardKpiCards: React.FC<DashboardKpiCardsProps> = ({ kpis }) =>
             <div className="p-2 rounded-lg bg-purple-50 text-purple-600">
               <FileCheck2 className="w-5 h-5" />
             </div>
-            <span className="text-xs font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">
-              Quality Index
-            </span>
           </div>
           <div>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
