@@ -18,12 +18,12 @@ const AdminTopbar = ({ setMobileOpen }: AdminTopbarProps) => {
 
   const initials = user?.name
     ? user.name
-        .split(' ')
-        .filter(Boolean)
-        .map((n) => n[0])
-        .join('')
-        .substring(0, 2)
-        .toUpperCase()
+      .split(' ')
+      .filter(Boolean)
+      .map((n) => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase()
     : 'AD'
 
   return (
