@@ -1,148 +1,144 @@
 "use client";
-import { useState } from 'react';
-import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout';
-import ConflictCard from './ConflictCard';
-import ReviewOnMapModal from './ReviewOnMapModal';
-
-export interface Conflict {
-    id: string;
-    severity: 'High' | 'Medium' | 'Low';
-    type: 'Overlap' | 'Duplicate' | 'Invalid Geometry' | 'Boundary Conflict';
-    parcels: string[];
-    detectedDate: string;
-}
-
-const generateMockConflicts = (): Conflict[] => {
-    const base: Conflict[] = [
-        { id: 'CON-21', severity: 'High', type: 'Overlap', parcels: ['CM-2847', 'CM-2848'], detectedDate: '9 Jun 2025' },
-        { id: 'CON-20', severity: 'Medium', type: 'Duplicate', parcels: ['CM-2790', 'CM-2791'], detectedDate: '5 Jun 2025' },
-        { id: 'CON-19', severity: 'Low', type: 'Invalid Geometry', parcels: ['CM-2765'], detectedDate: '1 Jun 2025' },
-        { id: 'CON-18', severity: 'High', type: 'Boundary Conflict', parcels: ['CM-2701', 'CM-2702'], detectedDate: '28 May 2025' }
-    ];
-
-    const severities: ('High' | 'Medium' | 'Low')[] = ['High', 'Medium', 'Low'];
-    let idCounter = 17;
-
-    // Add overlaps to reach 23 total
-    for (let i = 0; i < 19; i++) {
-        base.push({
-            id: `CON-${idCounter--}`,
-            severity: severities[i % 3],
-            type: 'Overlap',
-            parcels: [`CM-${2840 - i}`, `CM-${2841 - i}`],
-            detectedDate: `${25 - (i % 15)} May 2025`
-        });
-    }
-
-    // Add duplicates to reach 8 total
-    for (let i = 0; i < 7; i++) {
-        base.push({
-            id: `CON-${idCounter--}`,
-            severity: severities[i % 3],
-            type: 'Duplicate',
-            parcels: [`CM-${2780 - i}`, `CM-${2781 - i}`],
-            detectedDate: `${20 - (i % 10)} May 2025`
-        });
-    }
-
-    // Add invalid geometries to reach 11 total
-    for (let i = 0; i < 10; i++) {
-        base.push({
-            id: `CON-${idCounter--}`,
-            severity: severities[i % 3],
-            type: 'Invalid Geometry',
-            parcels: [`CM-${2750 - i}`],
-            detectedDate: `${15 - (i % 8)} May 2025`
-        });
-    }
-
-    // Add boundary conflicts to reach 5 total
-    for (let i = 0; i < 4; i++) {
-        base.push({
-            id: `CON-${idCounter--}`,
-            severity: severities[i % 3],
-            type: 'Boundary Conflict',
-            parcels: [`CM-${2690 - i}`, `CM-${2691 - i}`],
-            detectedDate: `${10 - (i % 5)} May 2025`
-        });
-    }
-
-    return base.sort((a, b) => {
-        const numA = parseInt(a.id.split('-')[1]);
-        const numB = parseInt(b.id.split('-')[1]);
-        return numB - numA;
-    });
-};
+import { useState } from "react";
+import DashboardChildrenLayout from "@/components/shared/DashboardChildrenLayout";
+import ConflictCard from "./ConflictCard";
+import CreateInvestigation from "./CreateInvestigation";
+import ReviewOnMapModal from "./ReviewOnMapModal";
+import CustomPagination from "@/components/shared/CustomPagination";
+import { useGetAllConflictsQuery } from "@/redux/features/conflicts/conflicts.api";
+import { ConflictParcel } from "@/redux/features/conflicts/conflicts.type";
+import { RefreshCw, AlertCircle } from "lucide-react";
 
 const ConflictsPage = () => {
-    const [conflicts, setConflicts] = useState<Conflict[]>(generateMockConflicts);
-    const [selectedConflict, setSelectedConflict] = useState<Conflict | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [workflowOpen, setWorkflowOpen] = useState(false);
-    const [workflowConflict, setWorkflowConflict] = useState<Conflict | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [limit] = useState<number>(20);
 
-    const handleResolve = (id: string) => {
-        setConflicts(prev => prev.filter(c => c.id !== id));
-    };
+  const [selectedConflict, setSelectedConflict] = useState<ConflictParcel | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [workflowOpen, setWorkflowOpen] = useState(false);
+  const [workflowConflict, setWorkflowConflict] = useState<ConflictParcel | null>(null);
 
-    const handleOpenWorkflow = (conflict: Conflict) => {
-        setWorkflowConflict(conflict);
-        setWorkflowOpen(true);
-    };
+  // RTK Query API Fetch
+  const { data: response, isLoading, isFetching, error, refetch } = useGetAllConflictsQuery({
+    page,
+    limit,
+  });
 
-    const handleBlock = (id: string) => {
-        setConflicts(prev => prev.filter(c => c.id !== id));
-    };
+  const conflictsList = response?.data || [];
+  const pagination = response?.pagination;
 
-    const handleApproveException = (id: string) => {
-        setConflicts(prev => prev.filter(c => c.id !== id));
-    };
+  const handleOpenWorkflow = (conflict: ConflictParcel) => {
+    setWorkflowConflict(conflict);
+    setWorkflowOpen(true);
+  };
 
-    const handleReviewOnMap = (conflict: Conflict) => {
-        setSelectedConflict(conflict);
-        setIsModalOpen(true);
-    };
+  const handleBlock = (id: number | string) => {
+    refetch();
+  };
 
-    return (
-        <DashboardChildrenLayout
-            title="Conflict Detection"
-            subtitle="Detected overlaps, duplicates, and boundary conflicts"
-        >
-            {/* Conflicts List Container */}
-            <>
-                {conflicts.map((conflict) => (
-                    <ConflictCard
-                        key={conflict.id}
-                        conflict={conflict}
-                        onReviewOnMap={() => handleReviewOnMap(conflict)}
-                        onResolve={() => handleOpenWorkflow(conflict)}
-                        onBlock={() => handleBlock(conflict.id)}
-                        onApproveException={() => handleApproveException(conflict.id)}
-                    />
+  const handleApproveException = (id: number | string) => {
+    refetch();
+  };
+
+  const handleReviewOnMap = (conflict: ConflictParcel) => {
+    setSelectedConflict(conflict);
+    setIsModalOpen(true);
+  };
+
+  return (
+    <DashboardChildrenLayout
+      title="Conflict Detection"
+      subtitle="Detected overlaps, duplicates, and boundary conflicts"
+    >
+      <div className="space-y-6 pb-12">
+        {/* Loading State */}
+        {isLoading && (
+          <div className="py-20 flex flex-col items-center justify-center space-y-3 bg-white border border-slate-200 rounded-2xl shadow-sm">
+            <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+            <p className="text-sm font-semibold text-slate-600">
+              Loading land conflicts data...
+            </p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 flex items-center gap-3">
+            <AlertCircle className="w-6 h-6 text-rose-600 shrink-0" />
+            <div>
+              <h4 className="font-bold text-sm">Failed to load conflict records</h4>
+              <p className="text-xs text-rose-700">
+                Please check server connection or backend API response.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Conflicts List Container */}
+        {!isLoading && (
+          <>
+            {conflictsList.length > 0 ? (
+              <div>
+                {conflictsList.map((conflict) => (
+                  <ConflictCard
+                    key={conflict.id}
+                    conflict={conflict}
+                    onReviewOnMap={() => handleReviewOnMap(conflict)}
+                    onResolve={() => handleOpenWorkflow(conflict)}
+                    onBlock={() => handleBlock(conflict.id)}
+                    onApproveException={() => handleApproveException(conflict.id)}
+                  />
                 ))}
-
-                {conflicts.length === 0 && (
-                    <div className="text-center py-20 bg-white border border-slate-100 rounded-2xl shadow-sm text-slate-400 font-semibold">
-                        All conflicts resolved! No conflicts detected.
-                    </div>
-                )}
-            </>
-
-            {/* Review Modal */}
-            {selectedConflict && (
-                <ReviewOnMapModal
-                    isOpen={isModalOpen}
-                    onClose={() => {
-                        setIsModalOpen(false);
-                        setSelectedConflict(null);
-                    }}
-                    conflict={selectedConflict}
-                    onBlock={() => handleBlock(selectedConflict.id)}
-                    onApproveException={() => handleApproveException(selectedConflict.id)}
-                />
+              </div>
+            ) : (
+              <div className="text-center py-20 bg-white border border-slate-200 rounded-2xl shadow-sm text-slate-400 font-semibold text-sm">
+                No land conflicts found matching your filters.
+              </div>
             )}
-        </DashboardChildrenLayout>
-    );
+
+            {/* Custom Pagination */}
+            {pagination && pagination.total > 0 && (
+              <CustomPagination
+                currentPage={page}
+                totalPages={pagination.totalPages || 1}
+                onPageChange={(newPage) => setPage(newPage)}
+                totalEntries={pagination.total}
+                pageSize={limit}
+                isLoading={isFetching}
+              />
+            )}
+          </>
+        )}
+
+        {/* Review Modal */}
+        {selectedConflict && (
+          <ReviewOnMapModal
+            isOpen={isModalOpen}
+            onClose={() => {
+              setIsModalOpen(false);
+              setSelectedConflict(null);
+            }}
+            conflict={selectedConflict}
+            onBlock={() => handleBlock(selectedConflict.id)}
+            onApproveException={() => handleApproveException(selectedConflict.id)}
+          />
+        )}
+
+        {/* Create Investigation Drawer */}
+        <CreateInvestigation
+          isOpen={workflowOpen}
+          onClose={() => {
+            setWorkflowOpen(false);
+            setWorkflowConflict(null);
+          }}
+          conflict={workflowConflict}
+          onCreateInvestigation={(conflictId) => {
+            refetch();
+          }}
+        />
+      </div>
+    </DashboardChildrenLayout>
+  );
 };
 
 export default ConflictsPage;
