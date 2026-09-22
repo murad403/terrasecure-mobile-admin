@@ -72,7 +72,7 @@ const AdminSidebar = ({
             title: 'GIS',
             items: [
                 { name: 'GIS / Map', href: '/gis-map', icon: Globe },
-                { name: 'Conflicts', href: '/conflicts', icon: AlertTriangle, badge: '3' },
+                { name: 'Conflicts', href: '/conflicts', icon: AlertTriangle },
                 { name: 'QField Submissions', href: '/qfield-submissions', icon: Radio }
             ]
         },
@@ -88,7 +88,7 @@ const AdminSidebar = ({
             title: 'SYSTEM',
             items: [
                 { name: 'Subscription', href: '/subscription', icon: Layers },
-                { name: 'Notifications', href: '/notifications', icon: Bell, badge: '7' },
+                { name: 'Notifications', href: '/notifications', icon: Bell },
                 { name: 'Settings', href: '/settings', icon: Settings }
             ]
         }
@@ -152,18 +152,6 @@ const AdminSidebar = ({
                                         <Icon className={cn("w-4.5 h-4.5 shrink-0", isActive ? "text-button-color" : "text-subtitle group-hover:text-white")} />
                                         {!collapsed && (
                                             <span className="truncate flex-1">{item.name}</span>
-                                        )}
-
-                                        {/* Badge */}
-                                        {item.badge && (
-                                            <span
-                                                className={cn(
-                                                    "flex items-center justify-center text-[10px] font-bold bg-[#EF4444] text-white rounded-full min-w-4 h-4 px-1 shrink-0",
-                                                    collapsed ? "absolute -top-1.5 -right-1.5 border border-[#111827]" : ""
-                                                )}
-                                            >
-                                                {item.badge}
-                                            </span>
                                         )}
 
                                         {/* Tooltip on collapse */}
