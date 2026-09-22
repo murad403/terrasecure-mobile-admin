@@ -91,13 +91,13 @@ const AuditLogsPage = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const handleViewDetails = (log: AuditLog) => {
-    setSelectedLog(log)
-    setDrawerOpen(true)
+    setSelectedLog(log);
+    setDrawerOpen(true);
   }
 
   const handleCloseDrawer = () => {
-    setSelectedLog(null)
-    setDrawerOpen(false)
+    setSelectedLog(null);
+    setDrawerOpen(false);
   }
 
   return (
