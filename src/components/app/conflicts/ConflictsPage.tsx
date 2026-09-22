@@ -1,7 +1,6 @@
 "use client";
-import React, { useState } from 'react';
+import { useState } from 'react';
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout';
-import ConflictStats from './ConflictStats';
 import ConflictCard from './ConflictCard';
 import ReviewOnMapModal from './ReviewOnMapModal';
 import ResolutionWorkflowSteps from './ResolutionWorkflowSteps';
@@ -83,13 +82,6 @@ const ConflictsPage = () => {
     const [workflowOpen, setWorkflowOpen] = useState(false);
     const [workflowConflict, setWorkflowConflict] = useState<Conflict | null>(null);
 
-    // Dynamic stats calculation
-    const total = conflicts.length;
-    const overlaps = conflicts.filter(c => c.type === 'Overlap').length;
-    const duplicates = conflicts.filter(c => c.type === 'Duplicate').length;
-    const invalidGeoms = conflicts.filter(c => c.type === 'Invalid Geometry').length;
-    const boundaryConflicts = conflicts.filter(c => c.type === 'Boundary Conflict').length;
-
     const handleResolve = (id: string) => {
         setConflicts(prev => prev.filter(c => c.id !== id));
     };
@@ -117,15 +109,6 @@ const ConflictsPage = () => {
             title="Conflict Detection"
             subtitle="Detected overlaps, duplicates, and boundary conflicts"
         >
-            {/* Stats Cards */}
-            <ConflictStats
-                total={total}
-                overlaps={overlaps}
-                duplicates={duplicates}
-                invalidGeoms={invalidGeoms}
-                boundaryConflicts={boundaryConflicts}
-            />
-
             {/* Conflicts List Container */}
             <div>
                 {conflicts.map((conflict) => (
