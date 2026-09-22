@@ -8,7 +8,7 @@ import FunnelsAndSlaSection from "./FunnelsAndSlaSection"
 import TrendsAndBreakdownsSection from "./TrendsAndBreakdownsSection"
 import ActionQueuesSection from "./ActionQueuesSection"
 import ActivityAndTeamSection from "./ActivityAndTeamSection"
-import { RefreshCw, Calendar, Clock, AlertCircle } from "lucide-react"
+import { RefreshCw, Calendar, AlertCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export const DashboardPage = () => {
