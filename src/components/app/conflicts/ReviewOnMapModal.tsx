@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import { X, MapPin } from 'lucide-react';
 import { ConflictParcel } from '@/redux/features/conflicts/conflicts.type';
 import 'leaflet/dist/leaflet.css';
 
@@ -47,11 +47,11 @@ const ReviewOnMapModal = ({
         shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
       });
 
-      const lat = conflict.location?.latitude || 40.7128;
-      const lng = conflict.location?.longitude || -74.006;
-      const center: [number, number] = [lat, lng];
+      const defaultLat = conflict.location?.latitude || 6.9271;
+      const defaultLng = conflict.location?.longitude || 79.8612;
+      const center: [number, number] = [defaultLat, defaultLng];
 
-      const map = L.map(mapContainerRef.current, { zoomControl: false }).setView(center, 13);
+      const map = L.map(mapContainerRef.current, { zoomControl: false }).setView(center, 14);
 
       if (!active) {
         map.remove();
@@ -61,29 +61,70 @@ const ReviewOnMapModal = ({
       leafletMapRef.current = map;
 
       L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        maxZoom: 17,
+        maxZoom: 18,
         attribution: '© OpenTopoMap contributors',
       }).addTo(map);
 
-      // Draw primary boundary if exists
+      const allLatLngs: [number, number][] = [];
+
+      // 1. Draw Primary Parcel Boundary
       if (conflict.boundary && conflict.boundary.coordinates) {
         try {
-          const coords = conflict.boundary.coordinates[0].map((c: [number, number]) => [c[1], c[0]]);
-          const poly = L.polygon(coords, {
+          const rawCoords = conflict.boundary.coordinates[0];
+          const latLngs: [number, number][] = rawCoords.map((c: [number, number]) => [c[1], c[0]]);
+          latLngs.forEach((pt) => allLatLngs.push(pt));
+
+          const poly = L.polygon(latLngs, {
             color: '#15803d',
             fillColor: '#86efac',
-            fillOpacity: 0.3,
-            weight: 2,
+            fillOpacity: 0.45,
+            weight: 2.5,
           }).addTo(map);
 
-          poly.bindTooltip(conflict.slug, {
+          poly.bindTooltip(`${conflict.slug} (${conflict.parcelCode})`, {
             permanent: true,
             direction: 'center',
-            className: 'bg-transparent border-none shadow-none text-emerald-800 font-extrabold text-xs',
+            className: 'bg-white/90 border border-emerald-300 text-emerald-900 font-extrabold text-xs px-2 py-1 rounded shadow-sm',
           });
         } catch (e) {
-          console.error("Leaflet polygon parse error", e);
+          console.error("Error drawing primary parcel boundary", e);
         }
+      }
+
+      // 2. Draw Conflicting Parcels Boundaries
+      if (conflict.conflicts && conflict.conflicts.length > 0) {
+        conflict.conflicts.forEach((cItem) => {
+          const conflicting = cItem.conflictingParcel;
+          if (conflicting && conflicting.boundary && conflicting.boundary.coordinates) {
+            try {
+              const rawCoords = conflicting.boundary.coordinates[0];
+              const latLngs: [number, number][] = rawCoords.map((c: [number, number]) => [c[1], c[0]]);
+              latLngs.forEach((pt) => allLatLngs.push(pt));
+
+              const poly = L.polygon(latLngs, {
+                color: '#b91c1c',
+                fillColor: '#fca5a5',
+                fillOpacity: 0.45,
+                weight: 2.5,
+                dashArray: '5, 5',
+              }).addTo(map);
+
+              poly.bindTooltip(`${conflicting.slug} (${conflicting.parcelCode})`, {
+                permanent: true,
+                direction: 'center',
+                className: 'bg-white/90 border border-rose-300 text-rose-900 font-extrabold text-xs px-2 py-1 rounded shadow-sm',
+              });
+            } catch (e) {
+              console.error("Error drawing conflicting parcel boundary", e);
+            }
+          }
+        });
+      }
+
+      // 3. Auto-fit Map Viewport to cover all parcel geometries
+      if (allLatLngs.length > 0) {
+        const bounds = L.latLngBounds(allLatLngs);
+        map.fitBounds(bounds, { padding: [40, 40] });
       }
     };
 
@@ -114,45 +155,46 @@ const ReviewOnMapModal = ({
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 font-sans select-none">
-      <div className="bg-white rounded-[24px] w-full max-w-180 shadow-2xl flex flex-col overflow-hidden border border-slate-100">
+      <div className="bg-white rounded-[24px] w-full max-w-200 shadow-2xl flex flex-col overflow-hidden border border-slate-100">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-slate-100 flex items-start justify-between shrink-0">
+        <div className="px-6 py-5 border-b border-slate-100 flex items-start justify-between shrink-0 bg-slate-50/50">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-[16px] font-extrabold text-slate-900 leading-none">
+              <h2 className="text-base font-extrabold text-slate-900 leading-none">
                 Map Review — {conflict.slug}
               </h2>
               <span className="bg-blue-50 border border-blue-200 text-blue-700 text-[10px] font-extrabold px-2 py-0.5 rounded leading-none uppercase">
                 {conflict.parcelCode}
               </span>
             </div>
-            <p className="text-[11px] font-semibold text-slate-500 mt-2">
-              Status: {conflict.status} · Conflicting: {conflictingSlugs.join(" · ") || "None"}
+            <p className="text-xs font-medium text-slate-500 mt-2">
+              Status: <span className="font-bold text-slate-700">{conflict.status}</span> · Conflicting Parcel(s):{" "}
+              <span className="font-bold text-rose-700">{conflictingSlugs.join(", ") || "None"}</span>
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer"
+            className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Map Container */}
-        <div className="relative mx-6 my-4 h-95 bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden shrink-0">
+        <div className="relative mx-6 my-4 h-100 bg-slate-100 rounded-2xl border border-slate-200 overflow-hidden shrink-0">
           <div ref={mapContainerRef} className="w-full h-full z-10" />
 
-          {/* Legend */}
-          <div className="absolute bottom-4 left-4 bg-white/95 px-3 py-2.5 rounded-lg border border-slate-200 shadow-md z-1000 space-y-1.5 text-[10px] font-bold text-slate-700">
+          {/* Legend Overlay */}
+          <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm px-3.5 py-2.5 rounded-xl border border-slate-200 shadow-lg z-1000 space-y-1.5 text-xs font-bold text-slate-800">
             <div className="flex items-center gap-2">
               <div className="w-4 h-3 bg-emerald-100 border border-emerald-600 rounded" />
-              <span>{conflict.slug}</span>
+              <span>Primary: {conflict.slug}</span>
             </div>
             {conflictingSlugs.length > 0 && (
               <div className="flex items-center gap-2">
-                <div className="w-4 h-3 bg-rose-100 border border-rose-600 rounded" />
-                <span>{conflictingSlugs.join(", ")}</span>
+                <div className="w-4 h-3 bg-rose-100 border border-rose-600 border-dashed rounded" />
+                <span>Conflicting: {conflictingSlugs.join(", ")}</span>
               </div>
             )}
           </div>
@@ -162,21 +204,21 @@ const ReviewOnMapModal = ({
             <button
               type="button"
               onClick={handleZoomIn}
-              className="w-8 h-8 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 font-bold hover:bg-slate-50 shadow-md cursor-pointer text-sm"
+              className="w-8 h-8 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-700 font-bold hover:bg-slate-50 shadow-md cursor-pointer text-base"
             >
               +
             </button>
             <button
               type="button"
               onClick={handleZoomOut}
-              className="w-8 h-8 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 font-bold hover:bg-slate-50 shadow-md cursor-pointer text-sm"
+              className="w-8 h-8 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-700 font-bold hover:bg-slate-50 shadow-md cursor-pointer text-base"
             >
               -
             </button>
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Footer Actions */}
         <div className="px-6 py-4 flex items-center justify-between border-t border-slate-100 shrink-0 bg-white">
           <div className="flex gap-2">
             <button
@@ -184,7 +226,7 @@ const ReviewOnMapModal = ({
                 onBlock();
                 onClose();
               }}
-              className="bg-rose-50 hover:bg-rose-100 border border-rose-100 text-rose-600 rounded-lg text-xs font-bold py-2 px-4 shadow-sm cursor-pointer transition-colors"
+              className="bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded-lg text-xs font-bold py-2 px-4 shadow-sm cursor-pointer transition-colors"
             >
               Block Parcel
             </button>
@@ -200,7 +242,7 @@ const ReviewOnMapModal = ({
           </div>
           <button
             onClick={onClose}
-            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-lg text-xs font-bold py-2 px-6 shadow-sm cursor-pointer transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold py-2 px-6 shadow-sm cursor-pointer transition-colors"
           >
             Done
           </button>

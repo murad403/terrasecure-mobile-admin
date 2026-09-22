@@ -1,5 +1,4 @@
 "use client";
-import React from 'react';
 import { AlertTriangle, MapPin, ShieldCheck, Layers, GitCompare } from 'lucide-react';
 import { ConflictParcel } from '@/redux/features/conflicts/conflicts.type';
 import { Button } from '@/components/ui/button';
@@ -13,13 +12,7 @@ interface ConflictCardProps {
   onApproveException: () => void;
 }
 
-const ConflictCard = ({
-  conflict,
-  onReviewOnMap,
-  onResolve,
-  onBlock,
-  onApproveException,
-}: ConflictCardProps) => {
+const ConflictCard = ({ conflict, onReviewOnMap, onResolve, onBlock, onApproveException }: ConflictCardProps) => {
   // Extract conflicting parcel slugs
   const conflictingSlugs = conflict.conflicts
     ?.map((c) => c.conflictingParcel?.slug)
@@ -50,8 +43,8 @@ const ConflictCard = ({
                 conflict.status === "SOLD"
                   ? "bg-purple-50 border-purple-200 text-purple-700"
                   : conflict.status === "RESERVED"
-                  ? "bg-amber-50 border-amber-200 text-amber-700"
-                  : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                    ? "bg-amber-50 border-amber-200 text-amber-700"
+                    : "bg-emerald-50 border-emerald-200 text-emerald-700"
               )}
             >
               {conflict.status}
