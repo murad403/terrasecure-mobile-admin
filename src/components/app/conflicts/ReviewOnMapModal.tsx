@@ -13,13 +13,7 @@ interface ReviewOnMapModalProps {
   onApproveException: () => void;
 }
 
-const ReviewOnMapModal = ({
-  isOpen,
-  onClose,
-  conflict,
-  onBlock,
-  onApproveException,
-}: ReviewOnMapModalProps) => {
+const ReviewOnMapModal = ({ isOpen, onClose, conflict, onBlock, onApproveException }: ReviewOnMapModalProps) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<any>(null);
 

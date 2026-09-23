@@ -73,14 +73,6 @@ const ConflictCard = ({ conflict, onReviewOnMap, onResolve, onBlock, onApproveEx
               <span>Area:</span>
               <span className="font-bold text-slate-800">{conflict.areaSqm} m²</span>
             </div>
-
-            {/* Deleted Status */}
-            <div className="flex items-center gap-1.5 text-slate-600">
-              <span>DeletedAt:</span>
-              <span className="font-semibold text-slate-500">
-                {conflict.deletedAt ? new Date(conflict.deletedAt).toLocaleDateString() : "null"}
-              </span>
-            </div>
           </div>
 
           {/* Conflicting Parcel Slugs */}
@@ -122,12 +114,6 @@ const ConflictCard = ({ conflict, onReviewOnMap, onResolve, onBlock, onApproveEx
           className="w-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded-lg text-[11px] font-bold py-1.5 text-center cursor-pointer transition-colors"
         >
           Block Parcel
-        </button>
-        <button
-          onClick={onApproveException}
-          className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-lg text-[11px] font-bold py-1.5 text-center cursor-pointer transition-colors"
-        >
-          Approve Exception
         </button>
       </div>
     </div>
