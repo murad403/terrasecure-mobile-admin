@@ -1,110 +1,58 @@
 "use client"
-import React, { useState } from 'react'
-import { Pencil, Save } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Pencil, Save, X, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-
-const defaultContent = `1. Agreement to Terms
-By accessing or using the LandSecure platform, you agree to be bound by these Terms & Conditions. If you disagree with any part of the terms, you may not access the service.
-
-2. User Registration & Accounts
-You must provide accurate, complete, and current information when creating an account. Failure to do so constitutes a breach of the terms. You are responsible for safeguarding your password.
-
-3. Use of Services
-Our services must be used only for lawful land administration and GIS tracking purposes. You may not upload fraudulent land titles or survey plans.
-
-4. Fees and Payments
-Certain services (e.g. consultations, surveyor assignments) require payment. All fees are in XAF unless stated otherwise. Payments are final and non-refundable unless required by Cameroon law.
-
-5. Intellectual Property
-The LandSecure platform, logo, mapping code, and branding elements are the exclusive property of Terrasecure. User-uploaded deeds and coordinates remain the property of their respective owners.
-
-6. Limitation of Liability
-Terrasecure will not be liable for any indirect, incidental, or special damages arising out of your use of or inability to use the land registry dashboard services.
-
-7. Governing Law
-These terms shall be governed by and construed in accordance with the laws of the Republic of Cameroon, without regard to its conflict of law provisions.
-
-8. Changes to Terms
-We reserve the right, at our sole discretion, to modify or replace these terms at any time. We will provide at least 30 days notice prior to any new terms taking effect.`
+import { useGetTermsConditionsQuery, useUpdateTermsConditionsMutation } from '@/redux/features/auth/auth.api'
+import RichTextEditor from '@/components/shared/RichTextEditor'
+import { toast } from 'sonner'
 
 const TermsConditionsPage = () => {
-  const [content, setContent] = useState(defaultContent)
-  const [isEditing, setIsEditing] = useState(false)
-  const [tempContent, setTempContent] = useState(defaultContent)
-  const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const { data: getRes, isLoading, isError, refetch } = useGetTermsConditionsQuery()
+  const [updateTermsConditions, { isLoading: isUpdating }] = useUpdateTermsConditionsMutation()
 
-  const showToast = (msg: string) => {
-    setToastMessage(msg)
-    setTimeout(() => {
-      setToastMessage(null)
-    }, 3000)
-  }
+  const [isEditing, setIsEditing] = useState(false)
+  const [content, setContent] = useState('')
+
+  // Sync content state when backend data is loaded
+  useEffect(() => {
+    if (getRes?.data !== undefined) {
+      setContent(getRes.data || '')
+    }
+  }, [getRes])
 
   const startEditing = () => {
-    setTempContent(content)
+    setContent(getRes?.data || '')
     setIsEditing(true)
   }
 
   const handleCancel = () => {
+    setContent(getRes?.data || '')
     setIsEditing(false)
   }
 
-  const handleSave = () => {
-    setContent(tempContent)
-    setIsEditing(false)
-    showToast('Terms & Conditions saved successfully!')
-  }
-
-  const renderFormattedContent = (text: string) => {
-    const sections = text.split('\n\n')
-    return (
-      <div className="space-y-6">
-        {sections.map((section, idx) => {
-          const lines = section.split('\n')
-          const firstLine = lines[0]
-          const remainingText = lines.slice(1).join('\n')
-
-          // Check if first line starts with digits followed by dot (e.g. "1. Agreement to Terms")
-          const isHeader = /^\d+\.\s*\w+/.test(firstLine)
-
-          if (isHeader) {
-            return (
-              <div key={idx} className="space-y-1.5">
-                <h3 className="font-bold text-gray-900 text-sm">{firstLine}</h3>
-                {remainingText && (
-                  <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line font-normal">
-                    {remainingText}
-                  </p>
-                )}
-              </div>
-            )
-          } else {
-            return (
-              <p key={idx} className="text-sm text-gray-600 leading-relaxed whitespace-pre-line font-normal">
-                {section}
-              </p>
-            )
-          }
-        })}
-      </div>
-    )
+  const handleSave = async () => {
+    try {
+      const res = await updateTermsConditions({ data: content }).unwrap()
+      if (res.success) {
+        toast.success(res.message || 'Terms & Conditions updated successfully!')
+        setIsEditing(false)
+      } else {
+        toast.error(res.message || 'Failed to update Terms & Conditions.')
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Error updating Terms & Conditions.')
+    }
   }
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm space-y-6 relative">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-4 right-4 bg-gray-900 text-white text-xs px-4 py-2 rounded-lg shadow-md z-50 animate-bounce">
-          {toastMessage}
-        </div>
-      )}
-
-      {/* Header and edit actions */}
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
+      
+      {/* Header and Actions */}
+      <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+        <div>
           <h2 className="text-lg font-bold text-gray-900 leading-tight">Terms & Conditions</h2>
           <p className="text-xs text-gray-500 font-light">
-            Last updated: 10 Jun 2025 · Version 1.8
+            Manage legal agreements, user terms of service, and guidelines.
           </p>
         </div>
 
@@ -113,45 +61,80 @@ const TermsConditionsPage = () => {
             <>
               <Button
                 onClick={handleSave}
-                className='w-auto py-2'
+                disabled={isUpdating}
+                className="w-auto py-2 flex items-center gap-1.5"
               >
-                <Save size={13} />
-                Save
+                {isUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                Save Changes
               </Button>
               <button
+                type="button"
                 onClick={handleCancel}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-3 rounded-lg transition-colors cursor-pointer"
+                disabled={isUpdating}
+                className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg transition-colors cursor-pointer flex items-center gap-1"
               >
+                <X className="w-3.5 h-3.5" />
                 Cancel
               </button>
             </>
           ) : (
             <button
+              type="button"
               onClick={startEditing}
-              className="bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100/50 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+              disabled={isLoading}
+              className="bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100/60 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer"
             >
-              <Pencil size={12} />
-              Edit
+              <Pencil className="w-3 h-3" />
+              Edit Terms
             </button>
           )}
         </div>
       </div>
 
-      {/* Scrollable Container containing list of items */}
-      <div className="border border-gray-200 rounded-xl p-5 max-h-137.5 overflow-y-auto bg-white">
-        {isEditing ? (
-          <div className="min-h-100">
-            <textarea
-              value={tempContent}
-              onChange={(e) => setTempContent(e.target.value)}
-              className="w-full min-h-100 bg-slate-50/20 border border-slate-200 rounded-xl p-4 text-xs text-slate-750 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors leading-relaxed font-normal resize-y"
-              placeholder="Write terms and conditions content here..."
+      {/* Content Area */}
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-16 space-y-3">
+          <Loader2 className="w-7 h-7 text-button-color animate-spin" />
+          <p className="text-xs font-semibold text-slate-400">Loading Terms & Conditions...</p>
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
+          <p className="text-sm font-semibold text-rose-500">Failed to load Terms & Conditions.</p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="text-xs font-bold text-button-color hover:underline"
+          >
+            Try Again
+          </button>
+        </div>
+      ) : isEditing ? (
+        <div className="space-y-3">
+          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+            Edit HTML Content
+          </label>
+          <RichTextEditor
+            value={content}
+            onChange={setContent}
+            placeholder="Write Terms & Conditions content..."
+            minHeight="380px"
+          />
+        </div>
+      ) : (
+        <div className="border border-gray-100 rounded-xl p-6 min-h-80 bg-slate-50/30">
+          {getRes?.data ? (
+            <div
+              className="text-sm text-slate-700 leading-relaxed font-normal [&_h1]:text-2xl [&_h1]:font-extrabold [&_h1]:text-slate-900 [&_h1]:my-3 [&_h1]:block [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-slate-900 [&_h2]:my-2.5 [&_h2]:block [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-slate-900 [&_h3]:my-2 [&_h3]:block [&_p]:my-2 [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2 [&_li]:my-1"
+              dangerouslySetInnerHTML={{ __html: getRes.data }}
             />
-          </div>
-        ) : (
-          renderFormattedContent(content)
-        )}
-      </div>
+          ) : (
+            <div className="flex items-center justify-center h-48 text-xs font-semibold text-slate-400">
+              No Terms & Conditions content found. Click "Edit Terms" to add content.
+            </div>
+          )}
+        </div>
+      )}
+
     </div>
   )
 }

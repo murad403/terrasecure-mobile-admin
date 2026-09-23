@@ -1,228 +1,142 @@
 "use client"
-import React, { useState } from 'react'
-import { Pencil, Trash2, Save, Plus } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Pencil, Save, X, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-
-interface AboutSection {
-    id: string
-    title: string
-    content: string
-}
-
-const initialSections: AboutSection[] = [
-    {
-        id: '1',
-        title: 'Our Mission',
-        content: 'To become the leading digital land governance platform in Central Africa, ensuring every citizen has clear, verified, and protected land rights.',
-    },
-    {
-        id: '2',
-        title: 'Our Vision',
-        content: 'To become the leading digital land governance platform in Central Africa, ensuring every citizen has clear, verified, and protected land rights.',
-    },
-    {
-        id: '3',
-        title: 'Contact',
-        content: 'Ministry of Land Affairs, Yaounde, Cameroon Email: support@landsecure.cm Phone: +237 222 123 456',
-    },
-]
+import { useGetAboutUsQuery, useUpdateAboutUsMutation } from '@/redux/features/auth/auth.api'
+import RichTextEditor from '@/components/shared/RichTextEditor'
+import { toast } from 'sonner'
 
 const AboutUsPage = () => {
-    const [sections, setSections] = useState<AboutSection[]>(initialSections)
-    const [editingId, setEditingId] = useState<string | null>(null)
-    const [editContent, setEditContent] = useState<string>('')
+  const { data: getRes, isLoading, isError, refetch } = useGetAboutUsQuery()
+  const [updateAboutUs, { isLoading: isUpdating }] = useUpdateAboutUsMutation()
 
-    // New section inputs
-    const [showNewForm, setShowNewForm] = useState<boolean>(false)
-    const [newTitle, setNewTitle] = useState<string>('')
-    const [newContent, setNewContent] = useState<string>('')
+  const [isEditing, setIsEditing] = useState(false)
+  const [content, setContent] = useState('')
 
-    const [toastMessage, setToastMessage] = useState<string | null>(null)
-
-    const showToast = (msg: string) => {
-        setToastMessage(msg)
-        setTimeout(() => {
-            setToastMessage(null)
-        }, 3000)
+  // Sync content state when backend data is loaded
+  useEffect(() => {
+    if (getRes?.data !== undefined) {
+      setContent(getRes.data || '')
     }
+  }, [getRes])
 
-    const startEditing = (section: AboutSection) => {
-        setEditingId(section.id)
-        setEditContent(section.content)
+  const startEditing = () => {
+    setContent(getRes?.data || '')
+    setIsEditing(true)
+  }
+
+  const handleCancel = () => {
+    setContent(getRes?.data || '')
+    setIsEditing(false)
+  }
+
+  const handleSave = async () => {
+    try {
+      const res = await updateAboutUs({ data: content }).unwrap()
+      if (res.success) {
+        toast.success(res.message || 'About Us content updated successfully!')
+        setIsEditing(false)
+      } else {
+        toast.error(res.message || 'Failed to update About Us content.')
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Error updating About Us content.')
     }
+  }
 
-    const handleSave = (id: string) => {
-        if (!editContent.trim()) {
-            showToast('Content cannot be empty!')
-            return
-        }
-        setSections(prev =>
-            prev.map(sec => (sec.id === id ? { ...sec, content: editContent } : sec))
-        )
-        setEditingId(null)
-        setEditContent('')
-        showToast('Section updated successfully!')
-    }
-
-    const handleCancelEdit = () => {
-        setEditingId(null)
-        setEditContent('')
-    }
-
-    const handleDelete = (id: string) => {
-        if (confirm('Are you sure you want to delete this section?')) {
-            setSections(prev => prev.filter(sec => sec.id !== id))
-            showToast('Section deleted successfully!')
-        }
-    }
-
-    const handleAddSection = () => {
-        if (!newTitle.trim() || !newContent.trim()) {
-            showToast('Please fill out both the title and content!')
-            return
-        }
-        const newSec: AboutSection = {
-            id: Date.now().toString(),
-            title: newTitle.trim(),
-            content: newContent.trim(),
-        }
-        setSections(prev => [...prev, newSec])
-        setNewTitle('')
-        setNewContent('')
-        setShowNewForm(false)
-        showToast('New section added successfully!')
-    }
-
-    return (
-        <div className="space-y-6 relative">
-            {/* Toast Notification */}
-            {toastMessage && (
-                <div className="fixed top-4 right-4 bg-gray-900 text-white text-xs px-4 py-2.5 rounded-lg shadow-md z-50 animate-bounce">
-                    {toastMessage}
-                </div>
-            )}
-
-            {/* Header Row */}
-            <div className="flex items-center justify-between pb-1">
-                <h2 className="text-sm font-bold text-gray-900">About Us</h2>
-                <Button
-                    onClick={() => setShowNewForm(true)}
-                    className="w-auto py-2"
-                >
-                    <Plus size={14} />
-                    Add Section
-                </Button>
-            </div>
-
-            {/* List of Sections */}
-            <div className="space-y-5">
-                {sections.map(section => (
-                    <div key={section.id}>
-                        {editingId === section.id ? (
-                            // Edit Mode Card
-                            <div className="bg-white rounded-xl border border-gray-150 p-5 shadow-sm space-y-4">
-                                <h3 className="text-xs md:text-sm font-bold text-slate-800">
-                                    {section.title}
-                                </h3>
-                                <textarea
-                                    value={editContent}
-                                    onChange={e => setEditContent(e.target.value)}
-                                    className="w-full min-h-25 bg-slate-50/20 border border-slate-200 rounded-lg px-4 py-3 text-xs md:text-sm text-slate-750 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-colors leading-relaxed font-normal resize-y"
-                                    placeholder="Edit section content..."
-                                />
-                                <div className="flex items-center space-x-2">
-                                    <button
-                                        onClick={() => handleSave(section.id)}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
-                                    >
-                                        <Save size={13} className="shrink-0" />
-                                        Save
-                                    </button>
-                                    <button
-                                        onClick={handleCancelEdit}
-                                        className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            // Display Mode Card
-                            <div className="bg-white rounded-xl border border-gray-150 p-5 shadow-sm hover:border-gray-200 transition-colors relative">
-                                <div className="flex items-start justify-between">
-                                    <h3 className="text-xs md:text-sm font-bold text-slate-800">
-                                        {section.title}
-                                    </h3>
-                                    <div className="flex items-center space-x-1">
-                                        <button
-                                            onClick={() => startEditing(section)}
-                                            className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 p-1.5 rounded-lg transition-colors cursor-pointer"
-                                            title="Edit Section"
-                                        >
-                                            <Pencil size={14} />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(section.id)}
-                                            className="text-red-500 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-lg transition-colors cursor-pointer"
-                                            title="Delete Section"
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
-                                    </div>
-                                </div>
-                                <p className="text-xs md:text-sm text-slate-500 font-normal leading-relaxed mt-3.5 whitespace-pre-line">
-                                    {section.content}
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                ))}
-
-                {/* New Section Card */}
-                {showNewForm && (
-                    <div className="bg-white rounded-xl border border-emerald-500/30 p-5 shadow-sm space-y-4">
-                        <h3 className="text-xs md:text-sm font-bold text-slate-800">
-                            New Section
-                        </h3>
-                        <div className="space-y-3">
-                            <input
-                                type="text"
-                                placeholder="Section title"
-                                value={newTitle}
-                                onChange={e => setNewTitle(e.target.value)}
-                                className="w-full bg-slate-50/20 border border-slate-200 rounded-lg px-4 py-2.5 text-xs md:text-sm text-slate-750 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-colors placeholder:text-slate-400 font-semibold"
-                            />
-                            <textarea
-                                placeholder="Section content..."
-                                value={newContent}
-                                onChange={e => setNewContent(e.target.value)}
-                                className="w-full min-h-25 bg-slate-50/20 border border-slate-200 rounded-lg px-4 py-3 text-xs md:text-sm text-slate-750 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-colors placeholder:text-slate-400 font-normal resize-y"
-                            />
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <Button
-                                onClick={handleAddSection}
-                                className="w-auto"
-                            >
-                                <Plus size={14} className="shrink-0" />
-                                Add
-                            </Button>
-                            <button
-                                onClick={() => {
-                                    setShowNewForm(false)
-                                    setNewTitle('')
-                                    setNewContent('')
-                                }}
-                                className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-4 py-3.5 rounded-lg transition-colors cursor-pointer"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm space-y-6 relative">
+      
+      {/* Header and Actions */}
+      <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+        <div>
+          <h2 className="text-lg font-bold text-gray-900 leading-tight">About Us</h2>
+          <p className="text-xs text-gray-500 font-light">
+            Manage and publish information about your platform and organization.
+          </p>
         </div>
-    )
+
+        <div className="flex items-center space-x-2 shrink-0">
+          {isEditing ? (
+            <>
+              <Button
+                onClick={handleSave}
+                disabled={isUpdating}
+                className="w-auto py-2 flex items-center gap-1.5"
+              >
+                {isUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                Save Changes
+              </Button>
+              <button
+                type="button"
+                onClick={handleCancel}
+                disabled={isUpdating}
+                className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg transition-colors cursor-pointer flex items-center gap-1"
+              >
+                <X className="w-3.5 h-3.5" />
+                Cancel
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={startEditing}
+              disabled={isLoading}
+              className="bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100/60 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+            >
+              <Pencil className="w-3 h-3" />
+              Edit Content
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Content Area */}
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-16 space-y-3">
+          <Loader2 className="w-7 h-7 text-button-color animate-spin" />
+          <p className="text-xs font-semibold text-slate-400">Loading About Us content...</p>
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
+          <p className="text-sm font-semibold text-rose-500">Failed to load About Us content.</p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="text-xs font-bold text-button-color hover:underline"
+          >
+            Try Again
+          </button>
+        </div>
+      ) : isEditing ? (
+        <div className="space-y-3">
+          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+            Edit HTML Content
+          </label>
+          <RichTextEditor
+            value={content}
+            onChange={setContent}
+            placeholder="Write About Us content..."
+            minHeight="380px"
+          />
+        </div>
+      ) : (
+        <div className="border border-gray-100 rounded-xl p-6 min-h-80 bg-slate-50/30">
+          {getRes?.data ? (
+            <div
+              className="text-sm text-slate-700 leading-relaxed font-normal [&_h1]:text-2xl [&_h1]:font-extrabold [&_h1]:text-slate-900 [&_h1]:my-3 [&_h1]:block [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-slate-900 [&_h2]:my-2.5 [&_h2]:block [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-slate-900 [&_h3]:my-2 [&_h3]:block [&_p]:my-2 [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2 [&_li]:my-1"
+              dangerouslySetInnerHTML={{ __html: getRes.data }}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-48 text-xs font-semibold text-slate-400">
+              No About Us content found. Click "Edit Content" to add content.
+            </div>
+          )}
+        </div>
+      )}
+
+    </div>
+  )
 }
 
 export default AboutUsPage

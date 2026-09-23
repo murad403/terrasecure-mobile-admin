@@ -1,6 +1,8 @@
 import baseApi from "@/redux/api/api";
 import type { ApiResponse, SignInRequest, SignInResponseData, ForgotPasswordRequest, VerifyOtpRequest, ResetPasswordRequest, ChangePasswordRequest } from "@/types/auth.types";
 
+import type { LegalContentResponse, UpdateLegalContentRequest } from "./auth.type";
+
 const authApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         signIn: builder.mutation<ApiResponse<SignInResponseData>, SignInRequest>({
@@ -40,8 +42,54 @@ const authApi = baseApi.injectEndpoints({
             })
         }),
 
-        // legal api here*****************************
-        
+        // Legal APIs
+        getAboutUs: builder.query<LegalContentResponse, void>({
+            query: () => ({
+                url: "/legal/about-us",
+                method: "GET"
+            }),
+            providesTags: ["Legal"]
+        }),
+        updateAboutUs: builder.mutation<LegalContentResponse, UpdateLegalContentRequest>({
+            query: (data) => ({
+                url: "/legal/about-us",
+                method: "PUT",
+                body: data
+            }),
+            invalidatesTags: ["Legal"]
+        }),
+
+        getPrivacyPolicy: builder.query<LegalContentResponse, void>({
+            query: () => ({
+                url: "/legal/privacy-policy",
+                method: "GET"
+            }),
+            providesTags: ["Legal"]
+        }),
+        updatePrivacyPolicy: builder.mutation<LegalContentResponse, UpdateLegalContentRequest>({
+            query: (data) => ({
+                url: "/legal/privacy-policy",
+                method: "PUT",
+                body: data
+            }),
+            invalidatesTags: ["Legal"]
+        }),
+
+        getTermsConditions: builder.query<LegalContentResponse, void>({
+            query: () => ({
+                url: "/legal/term-and-condition",
+                method: "GET"
+            }),
+            providesTags: ["Legal"]
+        }),
+        updateTermsConditions: builder.mutation<LegalContentResponse, UpdateLegalContentRequest>({
+            query: (data) => ({
+                url: "/legal/term-and-condition",
+                method: "PUT",
+                body: data
+            }),
+            invalidatesTags: ["Legal"]
+        }),
     })
 });
 
@@ -50,6 +98,13 @@ export const {
     useForgotPasswordMutation,
     useVerifyOtpMutation,
     useResetPasswordMutation,
-    useChangePasswordMutation
+    useChangePasswordMutation,
+    useGetAboutUsQuery,
+    useUpdateAboutUsMutation,
+    useGetPrivacyPolicyQuery,
+    useUpdatePrivacyPolicyMutation,
+    useGetTermsConditionsQuery,
+    useUpdateTermsConditionsMutation,
 } = authApi;
+
 
