@@ -61,6 +61,15 @@ export interface ParcelRegistration {
   rejectionNotes?: string | null;
 }
 
+export interface GeoJsonPolygon {
+  type: 'Polygon';
+  coordinates: number[][][]; // [[[lng, lat], [lng, lat], ...]]]
+}
+
+export interface UpdateLandParcelBoundaryPayload {
+  boundary: GeoJsonPolygon;
+}
+
 export interface ParcelListItem {
   id: number;
   slug?: string | null;
@@ -77,6 +86,7 @@ export interface ParcelListItem {
   location?: ParcelLocation | null;
   owners?: ParcelOwner[];
   registration?: ParcelRegistration | null;
+  boundary?: GeoJsonPolygon | null;
 }
 
 export interface Pagination {

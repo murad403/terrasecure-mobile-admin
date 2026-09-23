@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react'
-import { Search, ChevronDown, Download, Upload, Pencil, Map, X, ZoomIn, ZoomOut } from 'lucide-react'
+import { Search, Download, Upload, Pencil, X, ZoomIn, ZoomOut, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import ImportSHPModal from './ImportSHPModal'
 import ImportGeoJSONModal from './ImportGeoJSONModal'
@@ -9,17 +9,8 @@ import EditPolygonModal from './EditPolygonModal'
 import AddZoneModal from './AddZoneModal'
 import EditZoneModal from './EditZoneModal'
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout'
-import Toggle from '@/components/shared/Toggle'
-
-/* ── Types ── */
-interface Parcel {
-    id: string
-    area: string
-    status: 'Published' | 'Disputed' | 'Under Verification' | 'Reserved' | 'Sold' | 'Draft' | 'Validated'
-    coords: [number, number][]
-    color: string
-    fillColor: string
-}
+import { useRetrieveParcelsQuery } from '@/redux/features/parcel/parcel.api'
+import type { ParcelListItem } from '@/redux/features/parcel/parcel.type'
 
 export interface Zone {
     id: string
@@ -55,104 +46,62 @@ const INITIAL_ZONES: Zone[] = [
         parcelsCount: 187,
         lastSurveyDate: 'Apr 2024',
         notes: 'Secondary survey completed April 2024.'
-    },
-    {
-        id: 'ZN-003',
-        name: 'Biyem-Assi Zone',
-        type: 'Covered / Surveyed',
-        city: 'All Statuses',
-        district: 'Biyem-Assi',
-        area: '5.1',
-        parcelsCount: 443,
-        lastSurveyDate: 'Jan 2024',
-        notes: 'Mixed use. Updated after road expansion.'
-    },
-    {
-        id: 'ZN-004',
-        name: 'Nlongkak Zone',
-        type: 'Covered / Surveyed',
-        city: 'All Statuses',
-        district: 'Nlongkak',
-        area: '3.3',
-        parcelsCount: 228,
-        lastSurveyDate: 'Mar 2024',
-        notes: ''
-    },
-    {
-        id: 'ZN-005',
-        name: 'Eastern Fringe',
-        type: 'Uncovered / Unsurveyed',
-        city: 'All Statuses',
-        district: 'Périphérie Est',
-        area: '8.9',
-        notes: 'Remote. No road access for survey teams.'
-    },
-    {
-        id: 'ZN-006',
-        name: 'Southern Gap Zone',
-        type: 'Uncovered / Unsurveyed',
-        city: 'All Statuses',
-        district: 'Périphérie Sud',
-        area: '6.2',
-        notes: 'Forest area. Unclear boundary with private land.'
-    },
-    {
-        id: 'ZN-007',
-        name: 'Nkoldongo Zone',
-        type: 'Future Survey Needed',
-        city: 'All Statuses',
-        district: 'Nkoldongo',
-        area: '3.7',
-        notes: 'High speculation reported. Survey scheduled Q3 2025.'
-    },
-    {
-        id: 'ZN-008',
-        name: 'Ekounou Extension',
-        type: 'Future Survey Needed',
-        city: 'All Statuses',
-        district: 'Ekounou',
-        area: '2.1',
-        notes: 'Rapid urbanisation. Requested by local gov.'
     }
 ]
 
-/* ── Mock parcel data (matches screenshot IDs & statuses) ── */
-const PARCELS: Parcel[] = [
-    { id: 'CN-2847', area: '1,240 m²', status: 'Published', coords: [[5.92, 12.05], [5.96, 12.15], [5.89, 12.18], [5.85, 12.08]], color: '#16a34a', fillColor: '#86efac' },
-    { id: 'CN-2848', area: '3,500 m²', status: 'Disputed', coords: [[5.72, 12.35], [5.76, 12.45], [5.69, 12.48], [5.65, 12.38]], color: '#dc2626', fillColor: '#fca5a5' },
-    { id: 'CN-2849', area: '820 m²', status: 'Under Verification', coords: [[5.52, 12.12], [5.57, 12.24], [5.49, 12.27], [5.45, 12.16]], color: '#2563eb', fillColor: '#93c5fd' },
-    { id: 'CN-2850', area: '2,100 m²', status: 'Reserved', coords: [[5.48, 12.52], [5.52, 12.63], [5.44, 12.65], [5.40, 12.55]], color: '#ea580c', fillColor: '#fdba74' },
-    { id: 'CN-2851', area: '1,650 m²', status: 'Sold', coords: [[5.32, 12.28], [5.36, 12.38], [5.28, 12.41], [5.24, 12.30]], color: '#0d9488', fillColor: '#5eead4' },
-    { id: 'CN-2852', area: '4,200 m²', status: 'Draft', coords: [[5.18, 12.08], [5.22, 12.18], [5.14, 12.21], [5.10, 12.10]], color: '#6b7280', fillColor: '#e5e7eb' },
-    { id: 'CN-2853', area: '750 m²', status: 'Validated', coords: [[5.08, 12.45], [5.12, 12.55], [5.04, 12.58], [5.00, 12.47]], color: '#15803d', fillColor: '#4ade80' },
+const STATUS_TABS = [
+    'All Statuses',
+    'DRAFT',
+    'VERIFICATION',
+    'VALIDATED',
+    'PUBLISHED',
+    'RESERVED',
+    'SOLD',
+    'DISPUTED',
+    'BLOCKED'
 ]
 
-function statusColor(status: Parcel['status']) {
-    return {
-        Published: 'text-green-600',
-        Disputed: 'text-red-500',
-        'Under Verification': 'text-blue-500',
-        Reserved: 'text-orange-500',
-        Sold: 'text-teal-600',
-        Draft: 'text-slate-500',
-        Validated: 'text-green-700',
-    }[status] ?? 'text-slate-500'
+function getStatusBadgeStyle(status?: string | null) {
+    switch (status?.toUpperCase()) {
+        case 'PUBLISHED':
+        case 'VALIDATED':
+            return 'text-emerald-600 bg-emerald-50 border-emerald-200'
+        case 'DISPUTED':
+        case 'BLOCKED':
+            return 'text-rose-600 bg-rose-50 border-rose-200'
+        case 'UNDER_VERIFICATION':
+        case 'VERIFICATION':
+            return 'text-blue-600 bg-blue-50 border-blue-200'
+        case 'RESERVED':
+            return 'text-amber-600 bg-amber-50 border-amber-200'
+        case 'SOLD':
+            return 'text-teal-600 bg-teal-50 border-teal-200'
+        case 'DRAFT':
+        default:
+            return 'text-slate-600 bg-slate-100 border-slate-200'
+    }
 }
 
-/* ── Layer toggle data ── */
-const LAYERS = [
-    { id: 'landParcels', label: 'Land Parcels', defaultOn: true, color: 'bg-emerald-500' },
-    { id: 'roads', label: 'Roads', defaultOn: false, color: 'bg-red-500' },
-    { id: 'districts', label: 'Districts', defaultOn: true, color: 'bg-yellow-500' },
-    { id: 'coveredZones', label: 'Covered Zones', defaultOn: true, color: 'bg-fuchsia-500' },
-    { id: 'periUrbanZones', label: 'Peri-urban Zones', defaultOn: false, color: 'bg-green-500' },
-    { id: 'highSpecZones', label: 'High Speculation Zones', defaultOn: false, color: 'bg-purple-500' },
-    { id: 'disputedZones', label: 'Disputed Zones', defaultOn: false, color: 'bg-blue-500' },
-    { id: 'adminBoundaries', label: 'Administrative Boundaries', defaultOn: true, color: 'bg-violet-500' },
-]
-
-/* ── Toggle switch ── */
-
+function getStatusColor(status?: string | null) {
+    switch (status?.toUpperCase()) {
+        case 'PUBLISHED':
+        case 'VALIDATED':
+            return { color: '#16a34a', fillColor: '#86efac' }
+        case 'DISPUTED':
+        case 'BLOCKED':
+            return { color: '#dc2626', fillColor: '#fca5a5' }
+        case 'UNDER_VERIFICATION':
+        case 'VERIFICATION':
+            return { color: '#2563eb', fillColor: '#93c5fd' }
+        case 'RESERVED':
+            return { color: '#ea580c', fillColor: '#fdba74' }
+        case 'SOLD':
+            return { color: '#0d9488', fillColor: '#5eead4' }
+        case 'DRAFT':
+        default:
+            return { color: '#6b7280', fillColor: '#e5e7eb' }
+    }
+}
 
 /* ── Main page ── */
 const GisMapPage = () => {
@@ -160,43 +109,18 @@ const GisMapPage = () => {
     const leafletMapRef = useRef<import('leaflet').Map | null>(null)
     const polygonLayersRef = useRef<Record<string, import('leaflet').Polygon>>({})
 
-    // FIX: Use a ref to track layerState to avoid stale closures in toggleLayer
-    const layerStateRef = useRef<Record<string, boolean>>(
-        Object.fromEntries(LAYERS.map((l) => [l.id, l.defaultOn]))
-    )
-    const [layerState, setLayerState] = useState<Record<string, boolean>>(
-        () => Object.fromEntries(LAYERS.map((l) => [l.id, l.defaultOn]))
-    )
-
-    const [selectedParcel, setSelectedParcel] = useState<Parcel | null>(null)
-    const [mapSearch, setMapSearch] = useState('')
     const [parcelSearch, setParcelSearch] = useState('')
+    const [statusFilter, setStatusFilter] = useState('All Statuses')
+    const [selectedParcel, setSelectedParcel] = useState<ParcelListItem | null>(null)
 
-    /* ── Filter dropdowns ── */
-    const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
-    const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({
-        'Doc Type': 'All Types',
-        'All Statuses': 'All Statuses',
-        'Date Range': 'All Time',
+    // Fetch live parcels from backend API passing search and status filter
+    const { data: parcelsResponse, isLoading: isParcelsLoading, refetch: refetchParcels } = useRetrieveParcelsQuery({
+        limit: 100,
+        search: parcelSearch || undefined,
+        status: statusFilter !== 'All Statuses' ? statusFilter : undefined
     })
-    const dropdownRef = useRef<HTMLDivElement>(null)
 
-    const DROPDOWN_OPTIONS: Record<string, string[]> = {
-        'Doc Type': ['All Types', 'Land Certificate', 'Survey Plan', 'Title Deed', 'Lease Agreement'],
-        'All Statuses': ['All Statuses', 'Published', 'Disputed', 'Under Verification', 'Reserved', 'Sold', 'Draft', 'Validated'],
-        'Date Range': ['All Time', 'Today', 'Last 7 Days', 'Last 30 Days', 'Last 6 Months', 'This Year'],
-    }
-
-    // Close dropdown on outside click
-    useEffect(() => {
-        const handleClick = (e: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-                setActiveDropdown(null)
-            }
-        }
-        document.addEventListener('mousedown', handleClick)
-        return () => document.removeEventListener('mousedown', handleClick)
-    }, [])
+    const parcels: ParcelListItem[] = parcelsResponse?.data || []
 
     /* ── Modals ── */
     const [importSHPOpen, setImportSHPOpen] = useState(false)
@@ -216,7 +140,6 @@ const GisMapPage = () => {
         const zoneWithId: Zone = {
             ...newZone,
             id: formattedId,
-            parcelsCount: newZone.type === 'Covered / Surveyed' ? Math.floor(Math.random() * 300) + 100 : undefined
         };
         setZones(prev => [...prev, zoneWithId]);
     };
@@ -225,13 +148,9 @@ const GisMapPage = () => {
         setZones(prev => prev.map(z => z.id === updatedZone.id ? updatedZone : z));
     };
 
-    const handleDeleteZone = (zoneId: string) => {
-        setZones(prev => prev.filter(z => z.id !== zoneId));
-    };
-
-    /* ── Init Leaflet map ── */
+    /* ── Init Leaflet map and render live parcels ── */
     useEffect(() => {
-        if (!mapRef.current || leafletMapRef.current) return
+        if (!mapRef.current) return
 
         let isMounted = true
 
@@ -240,12 +159,11 @@ const GisMapPage = () => {
 
             if (!isMounted) return
 
-            // Check if map is already initialized on this container
+            // Avoid re-initializing Leaflet on existing container
             if (leafletMapRef.current || (mapRef.current && (mapRef.current as any)._leaflet_id)) {
                 return
             }
 
-            // আপনার আগের সেটিংস (Marker Icons Fix)
             delete (L.Icon.Default.prototype as any)._getIconUrl
             L.Icon.Default.mergeOptions({
                 iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -264,43 +182,10 @@ const GisMapPage = () => {
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
-                maxNativeZoom: 19,
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             }).addTo(map)
 
             map.setView([5.6, 12.3], 9)
-
-            // আপনার আগের PARCELS ডেটা দিয়ে GeoJSON লেয়ার তৈরি
-            const geoJsonFeatures = PARCELS.map(p => ({
-                type: "Feature" as const,
-                properties: { id: p.id, status: p.status, area: p.area, color: p.color, fillColor: p.fillColor },
-                geometry: {
-                    type: "Polygon" as const,
-                    coordinates: [p.coords.map(c => [c[1], c[0]])] // [lng, lat] ফরম্যাটে রূপান্তর
-                }
-            }));
-
-            const geoJsonLayer = L.geoJSON(geoJsonFeatures as any, {
-                style: (feature) => ({
-                    color: feature?.properties.color,
-                    fillColor: feature?.properties.fillColor,
-                    weight: 2,
-                    fillOpacity: 0.4,
-                }),
-                onEachFeature: (feature, layer) => {
-                    const parcel = PARCELS.find(p => p.id === feature.properties.id);
-                    if (parcel) {
-                        layer.on('click', () => setSelectedParcel(parcel));
-                        layer.bindTooltip(parcel.id, {
-                            permanent: false,
-                            direction: 'center',
-                            className: 'text-xs font-bold',
-                        });
-                    }
-                }
-            }).addTo(map);
-
-            polygonLayersRef.current = geoJsonLayer as any;
         }
 
         init()
@@ -314,61 +199,87 @@ const GisMapPage = () => {
         }
     }, [])
 
+    /* ── Render live parcel polygons & markers on map ── */
+    useEffect(() => {
+        const map = leafletMapRef.current
+        if (!map || isParcelsLoading) return
+
+        const renderPolygons = async () => {
+            const L = await import('leaflet')
+
+            // Clear previous polygon layers
+            Object.values(polygonLayersRef.current).forEach(layer => {
+                if (map.hasLayer(layer)) {
+                    map.removeLayer(layer)
+                }
+            })
+            polygonLayersRef.current = {}
+
+            if (!parcels.length) return
+
+            const boundsGroup: import('leaflet').LatLngBounds[] = []
+
+            parcels.forEach((p) => {
+                const code = p.parcelCode || p.slug || `#${p.id}`
+                const styles = getStatusColor(p.status)
+
+                let latlngs: [number, number][] = []
+
+                if (p.boundary?.coordinates?.[0]?.length) {
+                  // GeoJSON coordinates: [lng, lat] -> convert to Leaflet [lat, lng]
+                  latlngs = p.boundary.coordinates[0].map(([lng, lat]) => [lat, lng])
+                } else if (p.location?.latitude && p.location?.longitude) {
+                  // Default square polygon if boundary geometry is missing
+                  const lat = p.location.latitude
+                  const lng = p.location.longitude
+                  const d = 0.005
+                  latlngs = [
+                    [lat + d, lng - d],
+                    [lat + d, lng + d],
+                    [lat - d, lng + d],
+                    [lat - d, lng - d]
+                  ]
+                }
+
+                if (latlngs.length > 0) {
+                  const poly = L.polygon(latlngs, {
+                    color: styles.color,
+                    fillColor: styles.fillColor,
+                    weight: 2,
+                    fillOpacity: 0.4
+                  }).addTo(map)
+
+                  poly.on('click', () => setSelectedParcel(p))
+                  poly.bindTooltip(code, {
+                    permanent: false,
+                    direction: 'center',
+                    className: 'text-xs font-bold'
+                  })
+
+                  polygonLayersRef.current[String(p.id)] = poly as any
+                  boundsGroup.push(poly.getBounds())
+                }
+            })
+
+            // Fit map view to bounds if parcels exist
+            if (boundsGroup.length > 0) {
+                const featureGroup = L.featureGroup(Object.values(polygonLayersRef.current))
+                map.fitBounds(featureGroup.getBounds(), { padding: [40, 40], maxZoom: 14 })
+            }
+        }
+
+        renderPolygons()
+    }, [parcels, isParcelsLoading])
+
     /* ── Zoom controls ── */
     const zoomIn = () => leafletMapRef.current?.zoomIn()
     const zoomOut = () => leafletMapRef.current?.zoomOut()
 
-    /* ── FIX: Toggle layer visibility — use ref to avoid stale closure ── */
-    const toggleLayer = (id: string) => {
-        // Read current value from ref (always fresh), not from state (stale in closure)
-        const currentOn = layerStateRef.current[id]
-        const newOn = !currentOn
-
-        // Update ref immediately
-        layerStateRef.current = { ...layerStateRef.current, [id]: newOn }
-        // Then update state to re-render
-        setLayerState({ ...layerStateRef.current })
-
-        // Actually hide / show land parcel polygons on the map
-        if (id === 'landParcels' && leafletMapRef.current) {
-            PARCELS.forEach((p) => {
-                const poly = polygonLayersRef.current[p.id]
-                if (!poly) return
-                if (newOn) {
-                    poly.addTo(leafletMapRef.current!)
-                } else {
-                    leafletMapRef.current!.removeLayer(poly)
-                }
-            })
-        }
-    }
-
-    /* ── FIX: Map GPS / parcel ID search — pan on Enter ── */
-    const handleMapSearchKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key !== 'Enter') return
-        const query = mapSearch.trim().toLowerCase()
-        if (!query) return
-
-        // Try to match by parcel ID
-        const match = PARCELS.find((p) => p.id.toLowerCase().includes(query))
-        if (match && leafletMapRef.current) {
-            const poly = polygonLayersRef.current[match.id]
-            if (poly) {
-                leafletMapRef.current.fitBounds(poly.getBounds(), { padding: [30, 30] })
-                setSelectedParcel(match)
-            }
-        }
-    }
-
-    /* ── Filtered parcel list (right panel) ── */
-    const filteredParcels = PARCELS.filter((p) =>
-        p.id.toLowerCase().includes(parcelSearch.toLowerCase())
-    )
-
     return (
         <DashboardChildrenLayout title="GIS / Map" subtitle="Interactive land parcel mapping and spatial management">
-            {/* Filter bar */}
-            <div ref={dropdownRef} className="flex items-center gap-3 flex-wrap mb-3">
+            {/* Search & Status Tabs bar */}
+            <div className="flex items-center gap-3 flex-wrap mb-3">
+                {/* Search Bar */}
                 <div className="relative">
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                     <input
@@ -378,55 +289,43 @@ const GisMapPage = () => {
                         className="pl-8 pr-3 h-9 w-44 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-300 bg-white"
                     />
                 </div>
-                {(['Doc Type', 'All Statuses', 'Date Range'] as const).map((label) => (
-                    <div key={label} className="relative">
-                        <button
-                            type="button"
-                            onClick={() => setActiveDropdown((prev) => (prev === label ? null : label))}
-                            className={cn(
-                                'flex items-center gap-1.5 h-9 px-3 border rounded-lg text-xs font-medium transition-colors cursor-pointer',
-                                activeDropdown === label
-                                    ? 'border-slate-400 bg-slate-100 text-slate-900'
-                                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-                            )}
-                        >
-                            {selectedFilters[label] === 'All Types' || selectedFilters[label] === 'All Statuses' || selectedFilters[label] === 'All Time'
-                                ? label
-                                : selectedFilters[label]}
-                            <ChevronDown className={cn('w-3 h-3 transition-transform', activeDropdown === label && 'rotate-180')} />
-                        </button>
-                        {activeDropdown === label && (
-                            <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg py-1 min-w-42.5" style={{ zIndex: 9999 }}>
-                                {DROPDOWN_OPTIONS[label].map((option) => (
-                                    <button
-                                        key={option}
-                                        type="button"
-                                        onClick={() => {
-                                            setSelectedFilters((prev) => ({ ...prev, [label]: option }))
-                                            setActiveDropdown(null)
-                                        }}
-                                        className={cn(
-                                            'w-full text-left px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer',
-                                            selectedFilters[label] === option
-                                                ? 'bg-slate-100 text-slate-900 font-semibold'
-                                                : 'text-slate-600 hover:bg-slate-50'
-                                        )}
-                                    >
-                                        {option}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
+
+                {/* Status Tabs */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                    {STATUS_TABS.map((status) => {
+                        const isSelected = statusFilter === status
+
+                        return (
+                            <button
+                                key={status}
+                                type="button"
+                                onClick={() => setStatusFilter(status)}
+                                className={cn(
+                                    'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border',
+                                    isSelected
+                                        ? 'bg-button-color text-white border-transparent shadow-xs'
+                                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                                )}
+                            >
+                                {status.replace(/_/g, ' ')}
+                            </button>
+                        )
+                    })}
+                </div>
+
+                {isParcelsLoading && (
+                    <div className="flex items-center gap-2 text-xs font-semibold text-button-color ml-auto">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        Loading Map Data...
                     </div>
-                ))}
+                )}
             </div>
 
-            {/* FIX: 3-column layout with explicit calculated height so map fills space */}
+            {/* 3-column layout */}
             <div
                 className="flex gap-0 overflow-hidden rounded-xl"
                 style={{ height: 'calc(100vh - 260px)', minHeight: '420px' }}
             >
-
                 {/* ── Map area ── */}
                 <div className="flex-1 flex flex-col border-t border-b border-slate-100 min-w-0">
                     {/* Map toolbar */}
@@ -446,8 +345,7 @@ const GisMapPage = () => {
                     <div className="relative flex-1 min-h-0 overflow-hidden">
                         <div ref={mapRef} className="w-full h-full" />
 
-                        {/* FIX: use z-[9999] (bracket notation) — z-9999 is not a valid Tailwind class */}
-                        <div className="absolute top-3 right-3 z-9999 flex flex-col gap-1">
+                        <div className="absolute top-3 right-3 z-30 flex flex-col gap-1">
                             <button
                                 type="button"
                                 onClick={zoomIn}
@@ -466,12 +364,21 @@ const GisMapPage = () => {
 
                         {/* Selected parcel info bar */}
                         {selectedParcel && (
-                            <div className="absolute bottom-0 left-0 right-0 z-9999 bg-white border-t border-slate-200 px-4 py-2 flex items-center gap-3">
-                                <span className="text-xs font-extrabold text-slate-900">{selectedParcel.id}</span>
-                                <span className={cn('text-xs font-bold', statusColor(selectedParcel.status))}>
-                                    {selectedParcel.status}
+                            <div className="absolute bottom-0 left-0 right-0 z-30 bg-white border-t border-slate-200 px-4 py-2 flex items-center gap-3">
+                                <span className="text-xs font-extrabold text-slate-900">
+                                    {selectedParcel.parcelCode || selectedParcel.slug || `#${selectedParcel.id}`}
                                 </span>
-                                <span className="text-xs font-semibold text-slate-500">{selectedParcel.area}</span>
+                                <span className={cn('text-xs font-bold px-2 py-0.5 rounded border', getStatusBadgeStyle(selectedParcel.status))}>
+                                    {selectedParcel.status || 'DRAFT'}
+                                </span>
+                                <span className="text-xs font-semibold text-slate-500">
+                                    {selectedParcel.areaSqm ? `${selectedParcel.areaSqm} m²` : 'N/A Area'}
+                                </span>
+                                {selectedParcel.location?.city && (
+                                    <span className="text-xs text-slate-400 font-medium">
+                                        📍 {selectedParcel.location.city}
+                                    </span>
+                                )}
                                 <button
                                     type="button"
                                     onClick={() => setSelectedParcel(null)}
@@ -486,30 +393,37 @@ const GisMapPage = () => {
 
                 {/* ── Parcels on Map panel ── */}
                 <div className="w-48 shrink-0 bg-white border border-slate-100 rounded-r-xl p-3 flex flex-col overflow-hidden">
-                    <h3 className="text-xs font-bold text-slate-700 mb-2 shrink-0">Parcels on Map</h3>
-                    <div className="space-y-0.5 overflow-y-auto flex-1">
-                        {filteredParcels.map((p) => (
-                            <button
-                                key={p.id}
-                                type="button"
-                                onClick={() => {
-                                    setSelectedParcel(p)
-                                    const poly = polygonLayersRef.current[p.id]
-                                    if (poly && leafletMapRef.current) {
-                                        leafletMapRef.current.fitBounds(poly.getBounds(), { padding: [20, 20] })
-                                    }
-                                }}
-                                className={cn(
-                                    'w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors cursor-pointer',
-                                    selectedParcel?.id === p.id ? 'bg-slate-100' : 'hover:bg-slate-50'
-                                )}
-                            >
-                                <span className="text-[11px] font-bold text-slate-800">{p.id}</span>
-                                <span className={cn('text-[9px] font-bold', statusColor(p.status))}>{p.status}</span>
-                            </button>
-                        ))}
-                        {filteredParcels.length === 0 && (
-                            <p className="text-[10px] text-slate-400 font-medium px-2 pt-1">No results</p>
+                    <h3 className="text-xs font-bold text-slate-700 mb-2 shrink-0">
+                        Parcels on Map ({parcels.length})
+                    </h3>
+                    <div className="space-y-1 overflow-y-auto flex-1 pr-1">
+                        {parcels.map((p) => {
+                            const code = p.parcelCode || p.slug || `#${p.id}`
+                            return (
+                                <button
+                                    key={p.id}
+                                    type="button"
+                                    onClick={() => {
+                                        setSelectedParcel(p)
+                                        const poly = polygonLayersRef.current[String(p.id)]
+                                        if (poly && leafletMapRef.current) {
+                                            leafletMapRef.current.fitBounds(poly.getBounds(), { padding: [20, 20] })
+                                        }
+                                    }}
+                                    className={cn(
+                                        'w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors cursor-pointer border',
+                                        selectedParcel?.id === p.id ? 'bg-slate-100 border-slate-300' : 'hover:bg-slate-50 border-transparent'
+                                    )}
+                                >
+                                    <span className="text-[11px] font-bold text-slate-800 truncate">{code}</span>
+                                    <span className={cn('text-[9px] font-bold px-1.5 py-0.5 rounded border shrink-0', getStatusBadgeStyle(p.status))}>
+                                        {p.status || 'DRAFT'}
+                                    </span>
+                                </button>
+                            )
+                        })}
+                        {parcels.length === 0 && !isParcelsLoading && (
+                            <p className="text-[10px] text-slate-400 font-medium px-2 pt-2">No parcels found</p>
                         )}
                     </div>
                 </div>
@@ -518,9 +432,20 @@ const GisMapPage = () => {
             {/* ── Modals ── */}
             <ImportSHPModal isOpen={importSHPOpen} onClose={() => setImportSHPOpen(false)} />
             <ImportGeoJSONModal isOpen={importGeoJSONOpen} onClose={() => setImportGeoJSONOpen(false)} />
-            <DrawPolygonModal isOpen={drawPolygonOpen} onClose={() => setDrawPolygonOpen(false)} onSave={() => setDrawPolygonOpen(false)} />
-            <EditPolygonModal isOpen={editPolygonOpen} onClose={() => setEditPolygonOpen(false)} onSave={() => setEditPolygonOpen(false)} />
-
+            <DrawPolygonModal
+                isOpen={drawPolygonOpen}
+                onClose={() => setDrawPolygonOpen(false)}
+                parcels={parcels}
+                selectedParcelId={selectedParcel?.id}
+                onSaveSuccess={() => refetchParcels()}
+            />
+            <EditPolygonModal
+                isOpen={editPolygonOpen}
+                onClose={() => setEditPolygonOpen(false)}
+                parcels={parcels}
+                selectedParcelId={selectedParcel?.id}
+                onSaveSuccess={() => refetchParcels()}
+            />
 
             <AddZoneModal
                 isOpen={addZoneOpen}
@@ -543,7 +468,7 @@ const GisMapPage = () => {
     )
 }
 
-/* ── Tiny action button component ── */
+/* ── Action button component ── */
 const ActionBtn = ({
     icon, label, onClick, accent,
 }: {

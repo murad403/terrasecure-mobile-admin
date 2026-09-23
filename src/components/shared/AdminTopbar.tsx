@@ -2,7 +2,6 @@
 import React, { useState } from 'react'
 import { Bell, Search, Menu, ChevronDown } from 'lucide-react'
 import ProfileDropdown from '../dropdown/ProfileDropdown'
-import NotificationsDropdown from '../dropdown/NotificationsDropdown'
 import { useRetrieveProfileQuery } from '@/redux/features/profile/profile.api'
 
 interface AdminTopbarProps {
@@ -52,29 +51,6 @@ const AdminTopbar = ({ setMobileOpen }: AdminTopbarProps) => {
 
       {/* Right side: Actions & User Info */}
       <div className="flex items-center gap-4">
-        {/* Notifications Icon with Badge */}
-        <div className="relative">
-          <button
-            onClick={() => {
-              setNotificationsOpen(!notificationsOpen)
-              setProfileOpen(false)
-            }}
-            className="text-slate-500 hover:text-title p-2 rounded-full hover:bg-slate-100 transition-colors relative cursor-pointer"
-            title="Notifications"
-          >
-            <Bell className="w-6 h-6" />
-            <span className="absolute top-1.5 right-1.5 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-[#EF4444] text-[9px] font-bold text-white border border-white">
-              7
-            </span>
-          </button>
-
-          {/* Notifications Dropdown */}
-          <NotificationsDropdown
-            isOpen={notificationsOpen}
-            onClose={() => setNotificationsOpen(false)}
-          />
-        </div>
-
         {/* User Info & Dropdown Trigger */}
         <div className="relative">
           <button

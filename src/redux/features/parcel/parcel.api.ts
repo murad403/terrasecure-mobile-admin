@@ -1,6 +1,6 @@
 import baseApi from "@/redux/api/api";
 import type { FetchArgs } from '@reduxjs/toolkit/query';
-import { RetrieveParcelsArgs, RetrieveParcelsResponse, ParcelDetailsResponse, UpdateParcelPayload, ParcelListItem } from "./parcel.type";
+import { RetrieveParcelsArgs, RetrieveParcelsResponse, ParcelDetailsResponse, UpdateParcelPayload, UpdateLandParcelBoundaryPayload, ParcelListItem } from "./parcel.type";
 export type { ParcelListItem };
 
 
@@ -49,6 +49,14 @@ const parcelApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["Parcel", "Conflicts"]
         }),
+        updateParcelBoundary: builder.mutation<ParcelDetailsResponse, { id: number | string; data: UpdateLandParcelBoundaryPayload }>({
+            query: ({ id, data }) => ({
+                url: `/land-parcels/${id}/boundary`,
+                method: "PATCH",
+                body: data
+            }),
+            invalidatesTags: ["Parcel", "Conflicts"]
+        }),
         deleteParcel: builder.mutation({
             query: (id) => ({
                 url: `/land-parcels/${id}`,
@@ -64,5 +72,7 @@ export const {
     useRetrieveParcelDetailsQuery,
     useCreateParcelMutation,
     useUpdateParcelMutation,
+    useUpdateParcelBoundaryMutation,
     useDeleteParcelMutation
 } = parcelApi;
+
