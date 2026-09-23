@@ -36,10 +36,6 @@ const ConflictsPage = () => {
     refetch();
   };
 
-  const handleApproveException = (id: number | string) => {
-    refetch();
-  };
-
   const handleReviewOnMap = (conflict: ConflictParcel) => {
     setSelectedConflict(conflict);
     setIsModalOpen(true);
@@ -86,7 +82,6 @@ const ConflictsPage = () => {
                     onReviewOnMap={() => handleReviewOnMap(conflict)}
                     onResolve={() => handleOpenWorkflow(conflict)}
                     onBlock={() => handleBlock(conflict.id)}
-                    onApproveException={() => handleApproveException(conflict.id)}
                   />
                 ))}
               </div>
@@ -120,7 +115,6 @@ const ConflictsPage = () => {
             }}
             conflict={selectedConflict}
             onBlock={() => handleBlock(selectedConflict.id)}
-            onApproveException={() => handleApproveException(selectedConflict.id)}
           />
         )}
 

@@ -9,10 +9,9 @@ interface ConflictCardProps {
   onReviewOnMap: () => void;
   onResolve: () => void;
   onBlock: () => void;
-  onApproveException: () => void;
 }
 
-const ConflictCard = ({ conflict, onReviewOnMap, onResolve, onBlock, onApproveException }: ConflictCardProps) => {
+const ConflictCard = ({ conflict, onReviewOnMap, onResolve, onBlock }: ConflictCardProps) => {
   // Extract conflicting parcel slugs
   const conflictingSlugs = conflict.conflicts
     ?.map((c) => c.conflictingParcel?.slug)

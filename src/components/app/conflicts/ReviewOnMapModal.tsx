@@ -10,10 +10,9 @@ interface ReviewOnMapModalProps {
   onClose: () => void;
   conflict: ConflictParcel;
   onBlock: () => void;
-  onApproveException: () => void;
 }
 
-const ReviewOnMapModal = ({ isOpen, onClose, conflict, onBlock, onApproveException }: ReviewOnMapModalProps) => {
+const ReviewOnMapModal = ({ isOpen, onClose, conflict, onBlock }: ReviewOnMapModalProps) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<any>(null);
 
@@ -224,15 +223,6 @@ const ReviewOnMapModal = ({ isOpen, onClose, conflict, onBlock, onApproveExcepti
               className="bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded-lg text-xs font-bold py-2 px-4 shadow-sm cursor-pointer transition-colors"
             >
               Block Parcel
-            </button>
-            <button
-              onClick={() => {
-                onApproveException();
-                onClose();
-              }}
-              className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-lg text-xs font-bold py-2 px-4 shadow-sm cursor-pointer transition-colors"
-            >
-              Approve Exception
             </button>
           </div>
           <button
