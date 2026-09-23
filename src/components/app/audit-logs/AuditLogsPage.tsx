@@ -10,7 +10,6 @@ const AuditLogsPage = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize] = useState(20)
 
-  const [searchQuery, setSearchQuery] = useState('')
   const [kindFilter, setKindFilter] = useState('ALL')
   const [actionFilter, setActionFilter] = useState('ALL')
   const [startDate, setStartDate] = useState('')
@@ -49,7 +48,6 @@ const AuditLogsPage = () => {
   const { data: activitiesData, isLoading, isFetching } = useGetUserActivitiesQuery({
     page: currentPage,
     limit: pageSize,
-    search: searchQuery || undefined,
     kind: kindFilter !== 'ALL' ? kindFilter : undefined,
     action: actionFilter !== 'ALL' ? actionFilter : undefined,
     startDate: isoStartDate,
@@ -77,16 +75,10 @@ const AuditLogsPage = () => {
   }
 
   const handleClearFilters = () => {
-    setSearchQuery('')
     setKindFilter('ALL')
     setActionFilter('ALL')
     setStartDate('')
     setEndDate('')
-    setCurrentPage(1)
-  }
-
-  const handleSearchChange = (val: string) => {
-    setSearchQuery(val)
     setCurrentPage(1)
   }
 
@@ -123,8 +115,6 @@ const AuditLogsPage = () => {
           isFetching={isFetching}
           onViewDetails={handleViewDetails}
           isDetailOpen={drawerOpen}
-          searchQuery={searchQuery}
-          setSearchQuery={handleSearchChange}
           kindFilter={kindFilter}
           setKindFilter={handleKindChange}
           actionFilter={actionFilter}

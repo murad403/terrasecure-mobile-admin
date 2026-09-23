@@ -46,8 +46,6 @@ interface AuditLogsTableProps {
   isDetailOpen: boolean
   
   // Filter state & setters from parent
-  searchQuery: string
-  setSearchQuery: (val: string) => void
   kindFilter: string
   setKindFilter: (val: string) => void
   actionFilter: string
@@ -71,9 +69,6 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({
   isLoading,
   isFetching,
   onViewDetails,
-  isDetailOpen,
-  searchQuery,
-  setSearchQuery,
   kindFilter,
   setKindFilter,
   actionFilter,
@@ -117,7 +112,6 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({
   const selectedActionDisplay = ACTION_OPTIONS_MAP[actionFilter] || 'All Actions'
 
   const hasActiveFilters =
-    Boolean(searchQuery) ||
     kindFilter !== 'ALL' ||
     actionFilter !== 'ALL' ||
     Boolean(startDate) ||
@@ -131,18 +125,6 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({
         <div className="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
             
-            {/* Search Bar */}
-            <div className="relative w-full sm:w-64">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                placeholder="Search by title, user, slug..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-slate-200 bg-slate-50/40 rounded-lg text-sm text-title placeholder:text-slate-400 focus:border-button-color focus:bg-white focus:outline-none focus:ring-2 focus:ring-button-color/20 transition-all font-semibold leading-relaxed"
-              />
-            </div>
-
             {/* Kind Dropdown */}
             <CustomFilterDropdown
               label="All Kinds"
