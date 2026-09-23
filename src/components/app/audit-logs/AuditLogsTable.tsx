@@ -1,177 +1,216 @@
 "use client"
-import React, { useState, useEffect } from 'react'
-import { Search } from 'lucide-react'
+import React from 'react'
+import { Search, Calendar, Filter, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'
+import type { UserActivity } from '@/redux/features/user/user.type'
 
-export interface AuditLog {
-  id: string
-  timestamp: string
-  user: string
-  role: 'Super Admin' | 'Admin' | 'Supervisor' | 'Surveyor' | 'Field Agent'
-  action: 'Publication' | 'Status Change' | 'Document Approval' | 'Login' | 'User Change' | 'Parcel Update' | 'Deletion'
-  description: string
-  ipAddress: string
-  target?: string
+export const KIND_OPTIONS_MAP: Record<string, string> = {
+  ALL: 'All Kinds',
+  LAND_CONSULTATION: 'Land Consultation',
+  LAND_INVESTIGATION: 'Land Investigation',
+  LAND_PARCEL_TRANSFER: 'Land Parcel Transfer',
+  LAND_PARCEL: 'Land Parcel',
+  LAND_PARCEL_REGISTRATION: 'Land Parcel Registration',
+  LAND_SITE_VISIT: 'Land Site Visit',
+  LAND_PARCEL_OWNERSHIP: 'Land Parcel Ownership',
+  LAND_PARCEL_DOCUMENT: 'Land Parcel Document',
+  LAND_PARCEL_CONFLICT: 'Land Parcel Conflict',
+  LAND_PARCEL_SURVEY: 'Land Parcel Survey',
+  LAND_PURCHASE_INTEREST: 'Land Purchase Interest',
 }
+
+export const REVERSE_KIND_MAP: Record<string, string> = Object.entries(KIND_OPTIONS_MAP).reduce(
+  (acc, [key, val]) => ({ ...acc, [val]: key }),
+  {}
+)
+
+export const ACTION_OPTIONS_MAP: Record<string, string> = {
+  ALL: 'All Actions',
+  CREATE: 'Create',
+  UPDATE: 'Update',
+  DELETE: 'Delete',
+}
+
+export const REVERSE_ACTION_MAP: Record<string, string> = Object.entries(ACTION_OPTIONS_MAP).reduce(
+  (acc, [key, val]) => ({ ...acc, [val]: key }),
+  {}
+)
 
 interface AuditLogsTableProps {
-  logs: AuditLog[]
-  onViewDetails: (log: AuditLog) => void
+  logs: UserActivity[]
+  isLoading?: boolean
+  isFetching?: boolean
+  onViewDetails: (log: UserActivity) => void
   isDetailOpen: boolean
+  
+  // Filter state & setters from parent
+  searchQuery: string
+  setSearchQuery: (val: string) => void
+  kindFilter: string
+  setKindFilter: (val: string) => void
+  actionFilter: string
+  setActionFilter: (val: string) => void
+  startDate: string
+  setStartDate: (val: string) => void
+  endDate: string
+  setEndDate: (val: string) => void
+  onClearFilters: () => void
+
+  // Pagination from backend
+  currentPage: number
+  setCurrentPage: (page: number) => void
+  totalPages: number
+  totalEntries: number
+  pageSize: number
 }
 
-const AuditLogsTable = ({
+const AuditLogsTable: React.FC<AuditLogsTableProps> = ({
   logs,
+  isLoading,
+  isFetching,
   onViewDetails,
-  isDetailOpen
-}: AuditLogsTableProps) => {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [userFilter, setUserFilter] = useState('All Users')
-  const [actionFilter, setActionFilter] = useState('Action Type')
-  const [dateFilter, setDateFilter] = useState('Date Range')
+  isDetailOpen,
+  searchQuery,
+  setSearchQuery,
+  kindFilter,
+  setKindFilter,
+  actionFilter,
+  setActionFilter,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+  onClearFilters,
+  currentPage,
+  setCurrentPage,
+  totalPages,
+  totalEntries,
+  pageSize,
+}) => {
 
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState(1)
-  const pageSize = 8
-
-  // Reset pagination on filter changes
-  useEffect(() => {
-    setCurrentPage(1)
-  }, [searchQuery, userFilter, actionFilter, dateFilter])
-
-  // Filtering Logic
-  const filteredLogs = logs.filter((log) => {
-    const matchesSearch =
-      log.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      log.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (log.target && log.target.toLowerCase().includes(searchQuery.toLowerCase()))
-
-    const matchesUser = userFilter === 'All Users' || log.user === userFilter
-    const matchesAction = actionFilter === 'Action Type' || log.action === actionFilter
-
-    return matchesSearch && matchesUser && matchesAction
-  })
-
-  // Pagination calculations
-  const totalEntries = filteredLogs.length
-  const totalPages = Math.ceil(totalEntries / pageSize)
-  const paginatedLogs = filteredLogs.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  )
-
-  // Get unique users list for filter
-  const userOptions = ['All Users', ...Array.from(new Set(logs.map(l => l.user)))]
-  const actionOptions = ['Action Type', 'Publication', 'Status Change', 'Document Approval', 'Login', 'User Change', 'Parcel Update', 'Deletion']
-
-  // Helpers for user avatar initials and color styling
-  const getUserStyle = (role: AuditLog['role']) => {
-    switch (role) {
-      case 'Super Admin':
-        return {
-          avatarBg: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-          badgeBg: 'bg-slate-800 text-white border-transparent'
-        }
-      case 'Admin':
-        return {
-          avatarBg: 'bg-green-100 text-green-800 border-green-205',
-          badgeBg: 'bg-emerald-800 text-white border-transparent'
-        }
-      case 'Supervisor':
-        return {
-          avatarBg: 'bg-cyan-150 text-cyan-800 border-cyan-200',
-          badgeBg: 'bg-emerald-700 text-white border-transparent'
-        }
-      case 'Surveyor':
-        return {
-          avatarBg: 'bg-blue-100 text-blue-800 border-blue-200',
-          badgeBg: 'bg-blue-600 text-white border-transparent'
-        }
-      case 'Field Agent':
-        return {
-          avatarBg: 'bg-orange-100 text-orange-850 border-orange-200',
-          badgeBg: 'bg-orange-500 text-white border-transparent'
-        }
-      default:
-        return {
-          avatarBg: 'bg-slate-100 text-slate-700 border-slate-200',
-          badgeBg: 'bg-slate-500 text-white border-transparent'
-        }
-    }
-  }
-
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').substring(0, 3).toUpperCase()
-  }
-
-  // Helpers for Action Badge styling
-  const getActionBadgeColor = (action: AuditLog['action']) => {
-    switch (action) {
-      case 'Publication':
+  const getActionBadgeColor = (action?: string) => {
+    switch (action?.toUpperCase()) {
+      case 'CREATE':
         return 'bg-emerald-50 text-emerald-600 border-emerald-200'
-      case 'Status Change':
+      case 'UPDATE':
         return 'bg-amber-50 text-amber-600 border-amber-200'
-      case 'Document Approval':
-        return 'bg-emerald-50 text-emerald-600 border-emerald-200'
-      case 'Login':
-        return 'bg-blue-50 text-blue-600 border-blue-200'
-      case 'User Change':
-        return 'bg-purple-50 text-purple-600 border-purple-200'
-      case 'Parcel Update':
-        return 'bg-teal-50 text-teal-600 border-teal-200'
-      case 'Deletion':
+      case 'DELETE':
         return 'bg-rose-50 text-rose-600 border-rose-200'
       default:
         return 'bg-slate-50 text-slate-600 border-slate-200'
     }
   }
 
+  const getInitials = (name?: string) => {
+    if (!name) return 'U'
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+  }
+
+  const cleanText = (html?: string | null) => {
+    if (!html) return null
+    return html.replace(/<[^>]*>/g, '').trim()
+  }
+
+  const selectedKindDisplay = KIND_OPTIONS_MAP[kindFilter] || 'All Kinds'
+  const selectedActionDisplay = ACTION_OPTIONS_MAP[actionFilter] || 'All Actions'
+
+  const hasActiveFilters =
+    Boolean(searchQuery) ||
+    kindFilter !== 'ALL' ||
+    actionFilter !== 'ALL' ||
+    Boolean(startDate) ||
+    Boolean(endDate)
+
   return (
     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden p-6 select-none">
       
       {/* Search & Filters Action Bar */}
-      <div className="flex flex-col xl:flex-row items-center justify-between gap-4 mb-6">
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto flex-wrap">
-          {/* Search Bar */}
-          <div className="relative w-full sm:w-64">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search parcels..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 bg-slate-50/40 rounded-lg text-sm text-title placeholder:text-slate-400 focus:border-button-color focus:bg-white focus:outline-none focus:ring-2 focus:ring-button-color/20 transition-all font-semibold leading-relaxed"
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+            
+            {/* Search Bar */}
+            <div className="relative w-full sm:w-64">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search by title, user, slug..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 border border-slate-200 bg-slate-50/40 rounded-lg text-sm text-title placeholder:text-slate-400 focus:border-button-color focus:bg-white focus:outline-none focus:ring-2 focus:ring-button-color/20 transition-all font-semibold leading-relaxed"
+              />
+            </div>
+
+            {/* Kind Dropdown */}
+            <CustomFilterDropdown
+              label="All Kinds"
+              header="Activity Kind"
+              options={Object.values(KIND_OPTIONS_MAP)}
+              selected={selectedKindDisplay}
+              onSelect={(val) => {
+                const rawKey = REVERSE_KIND_MAP[val] || 'ALL'
+                setKindFilter(rawKey)
+              }}
+              type="radio"
             />
+
+            {/* Action Dropdown */}
+            <CustomFilterDropdown
+              label="All Actions"
+              header="Action Type"
+              options={Object.values(ACTION_OPTIONS_MAP)}
+              selected={selectedActionDisplay}
+              onSelect={(val) => {
+                const rawKey = REVERSE_ACTION_MAP[val] || 'ALL'
+                setActionFilter(rawKey)
+              }}
+              type="radio"
+            />
+
+            {/* Date Inputs */}
+            <div className="flex items-center gap-2 bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600">
+              <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="bg-transparent border-0 text-slate-700 font-semibold focus:outline-none focus:ring-0 text-xs cursor-pointer"
+                  title="Start Date"
+                />
+                <span className="text-slate-400 font-normal">to</span>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="bg-transparent border-0 text-slate-700 font-semibold focus:outline-none focus:ring-0 text-xs cursor-pointer"
+                  title="End Date"
+                />
+              </div>
+            </div>
+
+            {/* Clear Filters Button */}
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={onClearFilters}
+                className="flex items-center gap-1 px-3 py-2 text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+                Clear Filters
+              </button>
+            )}
+
           </div>
 
-          {/* Users Dropdown */}
-          <CustomFilterDropdown
-            label="All Users"
-            header="All Users"
-            options={userOptions}
-            selected={userFilter}
-            onSelect={setUserFilter}
-          />
-
-          {/* Action Type Dropdown */}
-          <CustomFilterDropdown
-            label="Action Type"
-            header="Action Types"
-            options={actionOptions}
-            selected={actionFilter}
-            onSelect={setActionFilter}
-          />
-
-          {/* Date Range Dropdown */}
-          <CustomFilterDropdown
-            label="Date Range"
-            header="Date Range"
-            options={['Date Range', 'Today', 'This Week', 'This Month']}
-            selected={dateFilter}
-            onSelect={setDateFilter}
-          />
+          {isFetching && !isLoading && (
+            <div className="flex items-center gap-2 text-xs font-semibold text-button-color animate-pulse self-end">
+              <div className="w-2 h-2 rounded-full bg-button-color animate-ping" />
+              Updating logs...
+            </div>
+          )}
         </div>
       </div>
 
@@ -182,50 +221,87 @@ const AuditLogsTable = ({
             <tr className="bg-slate-50/60 border-b border-slate-100">
               <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">TIMESTAMP</th>
               <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">USER</th>
+              <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">KIND</th>
               <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">ACTION</th>
+              <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">TARGET / SLUG</th>
               <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">DESCRIPTION</th>
-              {!isDetailOpen && (
-                <th className="py-4 px-5 text-xs font-bold text-slate-500 tracking-wider uppercase">IP ADDRESS</th>
-              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            {paginatedLogs.length > 0 ? (
-              paginatedLogs.map((log) => {
-                const style = getUserStyle(log.role)
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, idx) => (
+                <tr key={idx} className="animate-pulse">
+                  <td className="py-4 px-5"><div className="h-4 bg-slate-100 rounded w-28" /></td>
+                  <td className="py-4 px-5"><div className="h-4 bg-slate-100 rounded w-32" /></td>
+                  <td className="py-4 px-5"><div className="h-4 bg-slate-100 rounded w-24" /></td>
+                  <td className="py-4 px-5"><div className="h-4 bg-slate-100 rounded w-16" /></td>
+                  <td className="py-4 px-5"><div className="h-4 bg-slate-100 rounded w-28" /></td>
+                  <td className="py-4 px-5"><div className="h-4 bg-slate-100 rounded w-48" /></td>
+                </tr>
+              ))
+            ) : logs.length > 0 ? (
+              logs.map((log) => {
+                const snapshot = log.snapshot
+                const targetText =
+                  snapshot?.slug ||
+                  snapshot?.title ||
+                  log.landInvestigation?.slug ||
+                  log.landParcel?.slug ||
+                  log.landParcelRegistration?.slug ||
+                  log.landConsultation?.slug ||
+                  `#${log.id.slice(0, 8)}`
+
+                const descriptionText =
+                  cleanText(snapshot?.description) ||
+                  cleanText(snapshot?.notes) ||
+                  snapshot?.title ||
+                  snapshot?.requestMsg ||
+                  snapshot?.message ||
+                  'N/A'
+
                 return (
                   <tr
                     key={log.id}
                     onClick={() => onViewDetails(log)}
-                    className="hover:bg-slate-50/30 transition-colors cursor-pointer"
+                    className="hover:bg-slate-50/50 transition-colors cursor-pointer group"
                   >
                     {/* Timestamp */}
-                    <td className="py-4 px-5 text-sm font-semibold text-slate-500 whitespace-nowrap">
-                      {log.timestamp}
+                    <td className="py-4 px-5 text-xs font-semibold text-slate-500 whitespace-nowrap">
+                      {new Date(log.timestamp).toLocaleString('en-US', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                      })}
                     </td>
 
                     {/* User */}
                     <td className="py-4 px-5">
-                      <div className="flex items-center gap-3">
-                        {/* Avatar */}
-                        <div className={cn(
-                          "w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 border shadow-sm",
-                          style.avatarBg
-                        )}>
-                          {getInitials(log.user)}
-                        </div>
-                        {/* Name */}
-                        <span className="text-sm font-semibold text-slate-800 whitespace-nowrap">
-                          {log.user}
-                        </span>
-                        {/* Role Badge */}
-                        <span className={cn(
-                          "px-2 py-0.5 rounded text-[9px] font-extrabold whitespace-nowrap uppercase tracking-wider",
-                          style.badgeBg
-                        )}>
-                          {log.role}
+                      <div className="flex items-center gap-2.5">
+                        {log.user?.profilePicture?.url ? (
+                          <img
+                            src={log.user.profilePicture.url}
+                            alt={log.user.name}
+                            className="w-7 h-7 rounded-full object-cover border shadow-sm shrink-0"
+                          />
+                        ) : (
+                          <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-bold shrink-0 border border-emerald-200 shadow-sm">
+                            {getInitials(log.user?.name)}
+                          </div>
+                        )}
+                        <span className="text-sm font-semibold text-slate-800 whitespace-nowrap group-hover:text-button-color transition-colors">
+                          {log.user?.name || `User #${log.userId}`}
                         </span>
                       </div>
+                    </td>
+
+                    {/* Kind */}
+                    <td className="py-4 px-5">
+                      <span className="px-2.5 py-0.5 rounded text-[10px] font-extrabold bg-blue-50 text-button-color border border-blue-100 uppercase tracking-wider inline-block whitespace-nowrap">
+                        {log.kind ? log.kind.replace(/_/g, ' ') : 'N/A'}
+                      </span>
                     </td>
 
                     {/* Action Badge */}
@@ -238,24 +314,22 @@ const AuditLogsTable = ({
                       </span>
                     </td>
 
-                    {/* Description */}
-                    <td className="py-4 px-5 text-sm font-semibold text-slate-600 leading-relaxed">
-                      {log.description}
+                    {/* Target / Slug */}
+                    <td className="py-4 px-5 text-xs font-bold text-slate-700 font-mono whitespace-nowrap">
+                      {targetText}
                     </td>
 
-                    {/* IP Address */}
-                    {!isDetailOpen && (
-                      <td className="py-4 px-5 text-sm font-semibold text-slate-550 font-mono">
-                        {log.ipAddress}
-                      </td>
-                    )}
+                    {/* Description */}
+                    <td className="py-4 px-5 text-xs font-semibold text-slate-600 max-w-xs truncate" title={descriptionText}>
+                      {descriptionText}
+                    </td>
                   </tr>
                 )
               })
             ) : (
               <tr>
-                <td colSpan={isDetailOpen ? 4 : 5} className="py-10 text-center text-sm font-semibold text-slate-400">
-                  No audit logs found matching criteria.
+                <td colSpan={6} className="py-12 text-center text-sm font-semibold text-slate-400">
+                  No user activities found matching your criteria.
                 </td>
               </tr>
             )}

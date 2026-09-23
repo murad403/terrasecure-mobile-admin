@@ -3,7 +3,17 @@ import type { User } from '@/interfaces/user.interface';
 import type { FetchArgs } from '@reduxjs/toolkit/query';
 import { ApiResponse } from '@/redux/api/api-response.interface';
 import { UserRole, UserStatus, Gender } from '@/enum';
-import type { PermissionItem, RoleWithPermissions, SetUserRolesInput, PermissionKeysInput, RbacUserListArgs, RbacUserListResponseData } from './user.type';
+import type { 
+  PermissionItem, 
+  RoleWithPermissions, 
+  SetUserRolesInput, 
+  PermissionKeysInput, 
+  RbacUserListArgs, 
+  RbacUserListResponseData,
+  GetUserActivitiesArgs,
+  GetUserActivitiesResponse,
+  GetUserActivityDetailsResponse
+} from './user.type';
 
 
 export interface RetrieveUsersArgs {
@@ -101,6 +111,37 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Permission'],
     }),
+
+    // User Activities / Audit Logs Endpoints
+    getUserActivities: builder.query<GetUserActivitiesResponse, GetUserActivitiesArgs | void>({
+      query: (args) => {
+        const page = args?.page || 1;
+        const limit = args?.limit || 20;
+        const params: FetchArgs['params'] = { page, limit };
+
+        if (args?.search) params.search = args.search;
+        if (args?.kind && args.kind !== 'ALL') params.kind = args.kind;
+        if (args?.action && args.action !== 'ALL') params.action = args.action;
+        if (args?.userId) params.userId = args.userId;
+        if (args?.startDate) params.startDate = args.startDate;
+        if (args?.endDate) params.endDate = args.endDate;
+
+        return {
+          url: `/user-activities`,
+          method: 'GET',
+          params,
+        };
+      },
+      providesTags: ['UserActivity'],
+    }),
+
+    getUserActivityDetails: builder.query<GetUserActivityDetailsResponse, string>({
+      query: (id) => ({
+        url: `/user-activities/${id}`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, id) => [{ type: 'UserActivity', id }],
+    }),
   }),
 });
 
@@ -112,4 +153,7 @@ export const {
   useSetUserRolesMutation,
   useGrantPermissionsMutation,
   useRevokePermissionsMutation,
+  useGetUserActivitiesQuery,
+  useGetUserActivityDetailsQuery,
 } = userApi;
+
