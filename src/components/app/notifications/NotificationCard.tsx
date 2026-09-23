@@ -1,135 +1,145 @@
 import React from 'react'
-import { NotificationItem } from './NotificationsPage'
+import type { NotificationItem } from '@/redux/features/notifications/notifications.type'
 import {
   ShieldAlert,
-  FolderPlus,
-  Compass,
-  Search,
-  MessageSquare,
   AlertTriangle,
   FileCheck,
+  Info,
   ArrowUpRight,
+  Trash2,
+  Check
 } from 'lucide-react'
 
-interface CardProps {
+interface NotificationCardProps {
   notification: NotificationItem;
   onMarkRead: (id: string) => void;
   onDelete: (id: string) => void;
+  isMarkingRead?: boolean;
+  isDeleting?: boolean;
 }
 
-const NotificationCard = ({ notification, onMarkRead, onDelete }: CardProps) => {
-  // Map category icons & style settings
-  const getCategoryStyles = (category: string, isApproved: boolean = false) => {
+const NotificationCard: React.FC<NotificationCardProps> = ({
+  notification,
+  onMarkRead,
+  onDelete,
+  isMarkingRead,
+  isDeleting,
+}) => {
+  const getTypeStyles = (type?: string) => {
     const size = 18
-    switch (category) {
-      case 'Conflicts':
+    switch (type?.toUpperCase()) {
+      case 'WARNING':
         return {
-          icon: <ShieldAlert size={size} className="text-white" />,
-          wrapperClass: 'bg-red-500 rounded-full w-9 h-9 flex items-center justify-center shrink-0 shadow-sm border border-red-400',
+          icon: <AlertTriangle size={size} className="text-amber-600" />,
+          wrapperClass: 'bg-amber-50 rounded-xl w-9 h-9 flex items-center justify-center shrink-0 border border-amber-200/80 shadow-xs',
         }
-      case 'Registrations':
-        if (isApproved) {
-          return {
-            icon: <FileCheck size={size} className="text-emerald-700" />,
-            wrapperClass: 'bg-emerald-50 rounded-lg w-9 h-9 flex items-center justify-center shrink-0 border border-emerald-100',
-          }
-        }
+      case 'ERROR':
+      case 'DANGER':
         return {
-          icon: <FolderPlus size={size} className="text-amber-700" />,
-          wrapperClass: 'bg-amber-50 rounded-lg w-9 h-9 flex items-center justify-center shrink-0 border border-amber-100',
+          icon: <ShieldAlert size={size} className="text-rose-600" />,
+          wrapperClass: 'bg-rose-50 rounded-xl w-9 h-9 flex items-center justify-center shrink-0 border border-rose-200/80 shadow-xs',
         }
-      case 'Surveys':
+      case 'SUCCESS':
         return {
-          icon: <Compass size={size} className="text-sky-700" />,
-          wrapperClass: 'bg-sky-50 rounded-lg w-9 h-9 flex items-center justify-center shrink-0 border border-sky-100',
+          icon: <FileCheck size={size} className="text-emerald-600" />,
+          wrapperClass: 'bg-emerald-50 rounded-xl w-9 h-9 flex items-center justify-center shrink-0 border border-emerald-200/80 shadow-xs',
         }
-      case 'Investigations':
-        return {
-          icon: <Search size={size} className="text-slate-600" />,
-          wrapperClass: 'bg-slate-100 rounded-lg w-9 h-9 flex items-center justify-center shrink-0 border border-slate-200',
-        }
-      case 'Consultations':
-        return {
-          icon: <MessageSquare size={size} className="text-indigo-700" />,
-          wrapperClass: 'bg-indigo-50 rounded-lg w-9 h-9 flex items-center justify-center shrink-0 border border-indigo-100',
-        }
-      case 'Suspicious':
-        return {
-          icon: <AlertTriangle size={size} className="text-amber-800" />,
-          wrapperClass: 'bg-amber-50 rounded-lg w-9 h-9 flex items-center justify-center shrink-0 border border-amber-150',
-        }
+      case 'INFO':
       default:
         return {
-          icon: <ShieldAlert size={size} className="text-gray-600" />,
-          wrapperClass: 'bg-gray-50 rounded-lg w-9 h-9 flex items-center justify-center shrink-0 border border-gray-150',
+          icon: <Info size={size} className="text-blue-600" />,
+          wrapperClass: 'bg-blue-50 rounded-xl w-9 h-9 flex items-center justify-center shrink-0 border border-blue-200/80 shadow-xs',
         }
     }
   }
 
-  const isApproved = notification.title.includes('Approved')
-  const styles = getCategoryStyles(notification.category, isApproved)
+  const styles = getTypeStyles(notification.type)
+
+  const formattedDate = new Date(notification.createdAt).toLocaleString('en-US', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  })
 
   return (
     <div
       className={`border rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-200 shadow-sm ${
-        notification.isUnread
-          ? 'bg-emerald-50/10 border-emerald-150'
+        !notification.isRead
+          ? 'bg-emerald-50/10 border-emerald-200/80'
           : 'bg-white border-gray-100'
       }`}
     >
       {/* Left Content Column */}
-      <div className="flex items-start space-x-3.5 flex-1">
-        {/* Category Icon */}
+      <div className="flex items-start space-x-3.5 flex-1 min-w-0">
+        {/* Category / Type Icon */}
         <div className={styles.wrapperClass}>{styles.icon}</div>
 
         {/* Text Area */}
-        <div>
-          <div className="flex items-center">
-            <h4 className="text-xs md:text-sm font-bold text-gray-900 leading-tight">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs md:text-sm font-bold text-slate-900 leading-tight">
               {notification.title}
             </h4>
-            {notification.isUnread && (
-              <span className="text-emerald-500 font-extrabold text-xs ml-1.5" title="Unread">
-                •
-              </span>
+            {!notification.isRead && (
+              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Unread" />
             )}
+            <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
+              {notification.type}
+            </span>
           </div>
-          <p className="text-[10px] md:text-xs text-gray-500 font-light mt-0.5 leading-normal max-w-2xl">
-            {notification.description}
+
+          <p className="text-xs text-slate-600 font-medium mt-1 leading-relaxed max-w-3xl">
+            {notification.message}
           </p>
-          <span className="text-[9px] md:text-[10px] text-gray-400 mt-1 leading-none block font-light">
-            {notification.time}
+
+          <span className="text-[10px] text-slate-400 mt-1.5 leading-none block font-semibold">
+            {formattedDate}
           </span>
         </div>
       </div>
 
       {/* Right Controls Column */}
-      <div className="flex items-center justify-end space-x-3.5 shrink-0 self-end md:self-auto min-w-40">
-        {/* Mark read button */}
-        {notification.isUnread && (
+      <div className="flex items-center justify-end space-x-2 shrink-0 self-end md:self-auto">
+        {/* Mark Read Button */}
+        {!notification.isRead && (
           <button
+            type="button"
             onClick={() => onMarkRead(notification.id)}
-            className="text-button-color hover:bg-emerald-50 text-[10px] font-bold px-2 py-1 rounded transition-colors cursor-pointer"
+            disabled={isMarkingRead}
+            className="text-button-color hover:bg-emerald-50 text-xs font-bold px-2.5 py-1.5 rounded-lg border border-emerald-100 transition-colors cursor-pointer flex items-center gap-1 disabled:opacity-50"
+            title="Mark as read"
           >
+            <Check className="w-3.5 h-3.5" />
             Mark read
           </button>
         )}
 
-        {/* Go to button */}
-        <button
-          className="border border-gray-200 hover:bg-gray-55 text-gray-700 text-[10px] font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
-          title="Go to detail"
-        >
-          <ArrowUpRight size={12} />
-          Go to
-        </button>
+        {/* Action Link Button if actionUrl is available */}
+        {notification.actionUrl && (
+          <a
+            href={notification.actionUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
+            title="Open Link"
+          >
+            <ArrowUpRight className="w-3.5 h-3.5" />
+            Action
+          </a>
+        )}
 
-        {/* Delete button */}
+        {/* Delete Button */}
         <button
+          type="button"
           onClick={() => onDelete(notification.id)}
-          className="text-red-650 hover:text-red-700 hover:bg-red-50 text-[10px] font-bold px-2 py-1 rounded transition-colors cursor-pointer"
-          title="Delete"
+          disabled={isDeleting}
+          className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 text-xs font-bold px-2.5 py-1.5 rounded-lg border border-rose-100 transition-colors cursor-pointer flex items-center gap-1 disabled:opacity-50"
+          title="Delete Notification"
         >
+          <Trash2 className="w-3.5 h-3.5" />
           Delete
         </button>
       </div>
