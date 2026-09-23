@@ -11,6 +11,7 @@ import EditZoneModal from './EditZoneModal'
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout'
 import { useRetrieveParcelsQuery } from '@/redux/features/parcel/parcel.api'
 import type { ParcelListItem } from '@/redux/features/parcel/parcel.type'
+import { toast } from 'sonner'
 
 export interface Zone {
     id: string
@@ -103,6 +104,18 @@ function getStatusColor(status?: string | null) {
     }
 }
 
+const downloadFile = (content: string, fileName: string, contentType: string) => {
+    const blob = new Blob([content], { type: contentType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+};
+
 /* ── Main page ── */
 const GisMapPage = () => {
     const mapRef = useRef<HTMLDivElement>(null)
@@ -146,6 +159,135 @@ const GisMapPage = () => {
 
     const handleUpdateZone = (updatedZone: Zone) => {
         setZones(prev => prev.map(z => z.id === updatedZone.id ? updatedZone : z));
+    };
+
+    /* ── Helper to retrieve valid GeoJSON Polygon geometry ── */
+    const getParcelGeometry = (p: ParcelListItem) => {
+        if (p.boundary?.coordinates?.[0]?.length) {
+            const ring = p.boundary.coordinates[0].map(([lng, lat]) => [lng, lat]);
+            // Ensure closed ring (first position === last position)
+            const first = ring[0];
+            const last = ring[ring.length - 1];
+            if (first[0] !== last[0] || first[1] !== last[1]) {
+                ring.push([first[0], first[1]]);
+            }
+            return {
+                type: 'Polygon' as const,
+                coordinates: [ring],
+            };
+        }
+        if (p.location?.latitude && p.location?.longitude) {
+            const lat = p.location.latitude;
+            const lng = p.location.longitude;
+            const d = 0.003;
+            return {
+                type: 'Polygon' as const,
+                coordinates: [[
+                    [lng - d, lat + d],
+                    [lng + d, lat + d],
+                    [lng + d, lat - d],
+                    [lng - d, lat - d],
+                    [lng - d, lat + d],
+                ]],
+            };
+        }
+        return null;
+    };
+
+    /* ── Export Handlers ── */
+    const handleExportGeoJSON = () => {
+        const targetParcels = selectedParcel ? [selectedParcel] : parcels;
+
+        if (targetParcels.length === 0) {
+            toast.error('No parcels available to export.');
+            return;
+        }
+
+        const features = targetParcels
+            .map((p) => {
+                const geom = getParcelGeometry(p);
+                if (!geom) return null;
+                return {
+                    type: 'Feature',
+                    id: p.id,
+                    properties: {
+                        id: p.id,
+                        parcelCode: p.parcelCode || p.slug || `#${p.id}`,
+                        slug: p.slug,
+                        status: p.status,
+                        areaSqm: p.areaSqm,
+                        location: p.location ? `${p.location.addressLine1 || ''} ${p.location.city || ''} ${p.location.country || ''}`.trim() : null,
+                    },
+                    geometry: geom,
+                };
+            })
+            .filter(Boolean);
+
+        if (features.length === 0) {
+            toast.error('Selected parcel(s) do not have valid boundary geometry set.');
+            return;
+        }
+
+        const geoJsonData = {
+            type: 'FeatureCollection',
+            features,
+        };
+
+        const fileName = selectedParcel
+            ? `${selectedParcel.parcelCode || selectedParcel.slug || `parcel_${selectedParcel.id}`}_boundary.geojson`
+            : 'land_parcels_export.geojson';
+
+        downloadFile(JSON.stringify(geoJsonData, null, 2), fileName, 'application/geo+json');
+        toast.success(`Exported GeoJSON for ${selectedParcel ? selectedParcel.parcelCode || `#${selectedParcel.id}` : `${features.length} parcel(s)`}`);
+    };
+
+    const handleExportSHP = () => {
+        const targetParcels = selectedParcel ? [selectedParcel] : parcels;
+
+        if (targetParcels.length === 0) {
+            toast.error('No parcels available to export.');
+            return;
+        }
+
+        const features = targetParcels
+            .map((p) => {
+                const geom = getParcelGeometry(p);
+                if (!geom) return null;
+                return {
+                    type: 'Feature',
+                    id: p.id,
+                    properties: {
+                        FID: p.id,
+                        PARCEL_ID: p.id,
+                        CODE: p.parcelCode || p.slug || `#${p.id}`,
+                        STATUS: p.status || 'DRAFT',
+                        AREA_SQM: p.areaSqm || 0,
+                        CITY: p.location?.city || '',
+                        ADDRESS: p.location?.addressLine1 || '',
+                    },
+                    geometry: geom,
+                };
+            })
+            .filter(Boolean);
+
+        if (features.length === 0) {
+            toast.error('Selected parcel(s) do not have valid boundary geometry set.');
+            return;
+        }
+
+        const shpSchemaData = {
+            format: 'ESRI Shapefile GeoJSON Schema',
+            exportedAt: new Date().toISOString(),
+            type: 'FeatureCollection',
+            features,
+        };
+
+        const fileName = selectedParcel
+            ? `${selectedParcel.parcelCode || selectedParcel.slug || `parcel_${selectedParcel.id}`}_shp.json`
+            : 'land_parcels_shp_export.json';
+
+        downloadFile(JSON.stringify(shpSchemaData, null, 2), fileName, 'application/json');
+        toast.success(`Exported SHP data for ${selectedParcel ? selectedParcel.parcelCode || `#${selectedParcel.id}` : `${features.length} parcel(s)`}`);
     };
 
     /* ── Init Leaflet map and render live parcels ── */
@@ -222,6 +364,7 @@ const GisMapPage = () => {
             parcels.forEach((p) => {
                 const code = p.parcelCode || p.slug || `#${p.id}`
                 const styles = getStatusColor(p.status)
+                const isSelected = selectedParcel?.id === p.id
 
                 let latlngs: [number, number][] = []
 
@@ -243,10 +386,10 @@ const GisMapPage = () => {
 
                 if (latlngs.length > 0) {
                   const poly = L.polygon(latlngs, {
-                    color: styles.color,
-                    fillColor: styles.fillColor,
-                    weight: 2,
-                    fillOpacity: 0.4
+                    color: isSelected ? '#2563eb' : styles.color,
+                    fillColor: isSelected ? '#3b82f6' : styles.fillColor,
+                    weight: isSelected ? 4 : 2,
+                    fillOpacity: isSelected ? 0.6 : 0.4
                   }).addTo(map)
 
                   poly.on('click', () => setSelectedParcel(p))
@@ -261,15 +404,15 @@ const GisMapPage = () => {
                 }
             })
 
-            // Fit map view to bounds if parcels exist
-            if (boundsGroup.length > 0) {
+            // Fit map view to bounds if parcels exist and no parcel is currently selected
+            if (boundsGroup.length > 0 && !selectedParcel) {
                 const featureGroup = L.featureGroup(Object.values(polygonLayersRef.current))
                 map.fitBounds(featureGroup.getBounds(), { padding: [40, 40], maxZoom: 14 })
             }
         }
 
         renderPolygons()
-    }, [parcels, isParcelsLoading])
+    }, [parcels, isParcelsLoading, selectedParcel?.id])
 
     /* ── Zoom controls ── */
     const zoomIn = () => leafletMapRef.current?.zoomIn()
@@ -334,8 +477,8 @@ const GisMapPage = () => {
                         <div className="flex items-center gap-1.5 flex-wrap">
                             <ActionBtn icon={<Upload className="w-3 h-3" />} label="Import GeoJSON" onClick={() => setImportGeoJSONOpen(true)} />
                             <ActionBtn icon={<Upload className="w-3 h-3" />} label="Import SHP" onClick={() => setImportSHPOpen(true)} />
-                            <ActionBtn icon={<Download className="w-3 h-3" />} label="Export GeoJSON" onClick={() => { }} />
-                            <ActionBtn icon={<Download className="w-3 h-3" />} label="Export SHP" onClick={() => { }} />
+                            <ActionBtn icon={<Download className="w-3 h-3" />} label="Export GeoJSON" onClick={handleExportGeoJSON} />
+                            <ActionBtn icon={<Download className="w-3 h-3" />} label="Export SHP" onClick={handleExportSHP} />
                             <ActionBtn icon={<Pencil className="w-3 h-3" />} label="Draw Polygon" onClick={() => setDrawPolygonOpen(true)} accent />
                             <ActionBtn icon={<Pencil className="w-3 h-3" />} label="Edit Polygon" onClick={() => setEditPolygonOpen(true)} accent />
                         </div>
@@ -364,7 +507,7 @@ const GisMapPage = () => {
 
                         {/* Selected parcel info bar */}
                         {selectedParcel && (
-                            <div className="absolute bottom-0 left-0 right-0 z-30 bg-white border-t border-slate-200 px-4 py-2 flex items-center gap-3">
+                            <div className="absolute bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-xs border-t border-slate-200 px-4 py-2 flex items-center gap-3 shadow-lg">
                                 <span className="text-xs font-extrabold text-slate-900">
                                     {selectedParcel.parcelCode || selectedParcel.slug || `#${selectedParcel.id}`}
                                 </span>
@@ -379,13 +522,32 @@ const GisMapPage = () => {
                                         📍 {selectedParcel.location.city}
                                     </span>
                                 )}
-                                <button
-                                    type="button"
-                                    onClick={() => setSelectedParcel(null)}
-                                    className="ml-auto text-slate-400 hover:text-slate-600 cursor-pointer p-0.5"
-                                >
-                                    <X className="w-3.5 h-3.5" />
-                                </button>
+                                <div className="ml-auto flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={handleExportGeoJSON}
+                                        className="flex items-center gap-1 h-7 px-2.5 rounded-md text-[11px] font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors shadow-xs cursor-pointer"
+                                    >
+                                        <Download className="w-3 h-3 text-slate-500" />
+                                        Export GeoJSON
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleExportSHP}
+                                        className="flex items-center gap-1 h-7 px-2.5 rounded-md text-[11px] font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors shadow-xs cursor-pointer"
+                                    >
+                                        <Download className="w-3 h-3 text-slate-500" />
+                                        Export SHP
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedParcel(null)}
+                                        className="text-slate-400 hover:text-slate-600 cursor-pointer p-1 rounded-md hover:bg-slate-100 transition-colors ml-1"
+                                        title="Deselect boundary"
+                                    >
+                                        <X className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -430,8 +592,20 @@ const GisMapPage = () => {
             </div>
 
             {/* ── Modals ── */}
-            <ImportSHPModal isOpen={importSHPOpen} onClose={() => setImportSHPOpen(false)} />
-            <ImportGeoJSONModal isOpen={importGeoJSONOpen} onClose={() => setImportGeoJSONOpen(false)} />
+            <ImportSHPModal
+                isOpen={importSHPOpen}
+                onClose={() => setImportSHPOpen(false)}
+                parcels={parcels}
+                selectedParcelId={selectedParcel?.id}
+                onSaveSuccess={() => refetchParcels()}
+            />
+            <ImportGeoJSONModal
+                isOpen={importGeoJSONOpen}
+                onClose={() => setImportGeoJSONOpen(false)}
+                parcels={parcels}
+                selectedParcelId={selectedParcel?.id}
+                onSaveSuccess={() => refetchParcels()}
+            />
             <DrawPolygonModal
                 isOpen={drawPolygonOpen}
                 onClose={() => setDrawPolygonOpen(false)}
