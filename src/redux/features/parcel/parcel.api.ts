@@ -47,7 +47,7 @@ const parcelApi = baseApi.injectEndpoints({
                 method: "PATCH",
                 body: data
             }),
-            invalidatesTags: ["Parcel"]
+            invalidatesTags: ["Parcel", "Conflicts"]
         }),
         deleteParcel: builder.mutation({
             query: (id) => ({

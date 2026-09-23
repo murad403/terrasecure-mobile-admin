@@ -6,8 +6,10 @@ import CreateInvestigation from "./CreateInvestigation";
 import ReviewOnMapModal from "./ReviewOnMapModal";
 import CustomPagination from "@/components/shared/CustomPagination";
 import { useGetAllConflictsQuery } from "@/redux/features/conflicts/conflicts.api";
+import { useUpdateParcelMutation } from "@/redux/features/parcel/parcel.api";
 import { ConflictParcel } from "@/redux/features/conflicts/conflicts.type";
 import { RefreshCw, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 const ConflictsPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -23,6 +25,7 @@ const ConflictsPage = () => {
     page,
     limit,
   });
+  const [updateParcel] = useUpdateParcelMutation();
 
   const conflictsList = response?.data || [];
   const pagination = response?.pagination;
@@ -32,8 +35,13 @@ const ConflictsPage = () => {
     setWorkflowOpen(true);
   };
 
-  const handleBlock = (id: number | string) => {
-    refetch();
+  const handleBlock = async (id: number | string) => {
+    try {
+      const res = await updateParcel({ id, data: { status: "BLOCKED" } }).unwrap();
+      toast.success(res?.message || "Parcel blocked successfully!");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to block parcel.");
+    }
   };
 
   const handleReviewOnMap = (conflict: ConflictParcel) => {
@@ -114,7 +122,6 @@ const ConflictsPage = () => {
               setSelectedConflict(null);
             }}
             conflict={selectedConflict}
-            onBlock={() => handleBlock(selectedConflict.id)}
           />
         )}
 

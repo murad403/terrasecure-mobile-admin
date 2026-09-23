@@ -9,10 +9,9 @@ interface ReviewOnMapModalProps {
   isOpen: boolean;
   onClose: () => void;
   conflict: ConflictParcel;
-  onBlock: () => void;
 }
 
-const ReviewOnMapModal = ({ isOpen, onClose, conflict, onBlock }: ReviewOnMapModalProps) => {
+const ReviewOnMapModal = ({ isOpen, onClose, conflict }: ReviewOnMapModalProps) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<any>(null);
 
@@ -213,18 +212,7 @@ const ReviewOnMapModal = ({ isOpen, onClose, conflict, onBlock }: ReviewOnMapMod
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 flex items-center justify-between border-t border-slate-100 shrink-0 bg-white">
-          <div className="flex gap-2">
-            <button
-              onClick={() => {
-                onBlock();
-                onClose();
-              }}
-              className="bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded-lg text-xs font-bold py-2 px-4 shadow-sm cursor-pointer transition-colors"
-            >
-              Block Parcel
-            </button>
-          </div>
+        <div className="px-6 py-4 flex items-center justify-end border-t border-slate-100 shrink-0 bg-white">
           <button
             onClick={onClose}
             className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold py-2 px-6 shadow-sm cursor-pointer transition-colors"

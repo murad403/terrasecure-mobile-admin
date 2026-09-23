@@ -39,11 +39,13 @@ const ConflictCard = ({ conflict, onReviewOnMap, onResolve, onBlock }: ConflictC
             <span
               className={cn(
                 "text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider border",
-                conflict.status === "SOLD"
-                  ? "bg-purple-50 border-purple-200 text-purple-700"
-                  : conflict.status === "RESERVED"
-                    ? "bg-amber-50 border-amber-200 text-amber-700"
-                    : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                conflict.status === "BLOCKED"
+                  ? "bg-rose-100 border-rose-300 text-rose-800"
+                  : conflict.status === "SOLD"
+                    ? "bg-purple-50 border-purple-200 text-purple-700"
+                    : conflict.status === "RESERVED"
+                      ? "bg-amber-50 border-amber-200 text-amber-700"
+                      : "bg-emerald-50 border-emerald-200 text-emerald-700"
               )}
             >
               {conflict.status}
@@ -110,9 +112,15 @@ const ConflictCard = ({ conflict, onReviewOnMap, onResolve, onBlock }: ConflictC
         </button>
         <button
           onClick={onBlock}
-          className="w-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded-lg text-[11px] font-bold py-1.5 text-center cursor-pointer transition-colors"
+          disabled={conflict.status === "BLOCKED"}
+          className={cn(
+            "w-full rounded-lg text-[11px] font-bold py-1.5 text-center transition-colors border",
+            conflict.status === "BLOCKED"
+              ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+              : "bg-rose-50 hover:bg-rose-100 border-rose-200 text-rose-600 cursor-pointer"
+          )}
         >
-          Block Parcel
+          {conflict.status === "BLOCKED" ? "Blocked" : "Block Parcel"}
         </button>
       </div>
     </div>
