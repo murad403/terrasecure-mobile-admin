@@ -1,6 +1,10 @@
 import baseApi from "@/redux/api/api";
 import { ApiResponse } from "@/redux/api/api-response.interface";
-import { ConflictParcel, GetAllConflictsArgs } from "./conflicts.type";
+import {
+  ConflictParcel,
+  GetAllConflictsArgs,
+  CreateInvestigationForConflictPayload,
+} from "./conflicts.type";
 
 const conflictsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -20,8 +24,21 @@ const conflictsApi = baseApi.injectEndpoints({
       },
       providesTags: ["Conflicts"],
     }),
+    createInvestigationForConflict: builder.mutation<
+      ApiResponse<any>,
+      { parcelId: number | string; data: CreateInvestigationForConflictPayload }
+    >({
+      query: ({ parcelId, data }) => ({
+        url: `/land-conflicts/${parcelId}/investigation`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Conflicts", "Investigations"],
+    }),
   }),
 });
 
-export const { useGetAllConflictsQuery } = conflictsApi;
-export default conflictsApi;
+export const {
+  useGetAllConflictsQuery,
+  useCreateInvestigationForConflictMutation,
+} = conflictsApi;

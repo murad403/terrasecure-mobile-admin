@@ -93,3 +93,17 @@ export interface ConflictParcel {
   conflicts: ParcelConflictItem[];
   conflictCount: number;
 }
+
+export type LandInvestigationPriorityLevel = "HIGH" | "MEDIUM" | "LOW";
+
+export type LandParcelConflictKind = "OVERLAP" | "DUPLICATE" | "BOUNDARY_DISPUTE" | "INVALID_GEOMETRY";
+
+export interface CreateInvestigationForConflictPayload {
+  title?: string;
+  description?: string;
+  priorityLevel?: LandInvestigationPriorityLevel;
+  investigatorId?: number;
+  conflictKind?: LandParcelConflictKind;
+  conflictingParcelId?: number;
+  overlapAreaSqm?: number;
+}

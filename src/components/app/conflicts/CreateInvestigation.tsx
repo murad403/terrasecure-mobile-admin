@@ -1,9 +1,22 @@
 "use client"
-import React, { useState, useEffect } from 'react'
-import { X, ShieldAlert, CheckCircle2 } from 'lucide-react'
-import { ConflictParcel } from '@/redux/features/conflicts/conflicts.type'
+import React, { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { X, ShieldAlert } from 'lucide-react'
+import {
+  ConflictParcel,
+  LandInvestigationPriorityLevel,
+  CreateInvestigationForConflictPayload,
+} from '@/redux/features/conflicts/conflicts.type'
+import {
+  createInvestigationForConflictSchema,
+  CreateInvestigationForConflictFormValues,
+} from '@/validation/investigation.validation'
+import { useCreateInvestigationForConflictMutation } from '@/redux/features/conflicts/conflicts.api'
+import { useRetrieveUsersQuery } from '@/redux/features/user/user.api'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 interface CreateInvestigationProps {
   isOpen: boolean
@@ -18,26 +31,58 @@ export const CreateInvestigation: React.FC<CreateInvestigationProps> = ({
   conflict,
   onCreateInvestigation,
 }) => {
-  const [kind, setKind] = useState('OWNERSHIP_DISPUTE')
-  const [priority, setPriority] = useState('HIGH')
-  const [targetParcel, setTargetParcel] = useState('')
-  const [assignedOfficer, setAssignedOfficer] = useState('Inspector Alain Dimi')
-  const [description, setDescription] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
+  const [createInvestigation, { isLoading: isSubmitting }] = useCreateInvestigationForConflictMutation()
+
+  // Fetch users for investigator assignment dropdown
+  const { data: usersResponse } = useRetrieveUsersQuery({ limit: 100 }, { skip: !isOpen })
+  const userList = usersResponse?.data || []
 
   const conflictingSlugs = conflict?.conflicts
     ?.map((c) => c.conflictingParcel?.slug)
-    .filter(Boolean) || [];
+    .filter(Boolean) || []
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<CreateInvestigationForConflictFormValues>({
+    resolver: zodResolver(createInvestigationForConflictSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      priorityLevel: 'HIGH',
+      conflictKind: 'BOUNDARY_DISPUTE',
+      conflictingParcelId: undefined,
+      investigatorId: undefined,
+      overlapAreaSqm: undefined,
+    },
+  })
+
+  const currentPriority = watch('priorityLevel')
 
   useEffect(() => {
     if (conflict) {
-      setTargetParcel(conflict.parcelCode || '')
-      setDescription(`Investigation initiated for ${conflict.slug} (${conflict.parcelCode}) conflicting with: ${conflictingSlugs.join(', ') || 'N/A'}.`)
-      setPriority('HIGH')
+      const firstConflicting = conflict.conflicts?.[0]?.conflictingParcel
+      const conflictingSlug = firstConflicting?.slug || conflictingSlugs[0] || ''
+
+      reset({
+        title: conflictingSlug
+          ? `Boundary dispute between ${conflict.slug} and ${conflictingSlug}`
+          : `Boundary dispute for ${conflict.slug}`,
+        description: `<p>The boundary of parcel ${conflict.slug} (${conflict.parcelCode}) conflicts with parcel(s): ${
+          conflictingSlugs.join(', ') || 'N/A'
+        }. Further field verification required.</p>`,
+        priorityLevel: 'HIGH',
+        conflictKind: 'BOUNDARY_DISPUTE',
+        conflictingParcelId: firstConflicting?.id,
+        overlapAreaSqm: conflict.areaSqm || undefined,
+        investigatorId: undefined,
+      })
     }
-    setIsSuccess(false)
-  }, [conflict])
+  }, [conflict, reset])
 
   // Lock scroll when open
   useEffect(() => {
@@ -53,21 +98,43 @@ export const CreateInvestigation: React.FC<CreateInvestigationProps> = ({
 
   if (!isOpen || !conflict) return null
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const onSubmit = async (values: CreateInvestigationForConflictFormValues) => {
+    try {
+      const payload: CreateInvestigationForConflictPayload = {
+        title: values.title?.trim() || undefined,
+        description: values.description?.trim() || undefined,
+        priorityLevel: values.priorityLevel,
+        conflictKind: values.conflictKind,
+        conflictingParcelId:
+          values.conflictingParcelId && !isNaN(values.conflictingParcelId)
+            ? Number(values.conflictingParcelId)
+            : undefined,
+        investigatorId:
+          values.investigatorId && !isNaN(values.investigatorId)
+            ? Number(values.investigatorId)
+            : undefined,
+        overlapAreaSqm:
+          values.overlapAreaSqm !== undefined &&
+          values.overlapAreaSqm !== null &&
+          !isNaN(values.overlapAreaSqm)
+            ? Number(values.overlapAreaSqm)
+            : undefined,
+      }
 
-    // Simulate creation
-    setTimeout(() => {
-      setIsSubmitting(false)
-      setIsSuccess(true)
-      setTimeout(() => {
-        if (onCreateInvestigation) {
-          onCreateInvestigation(conflict.id)
-        }
-        onClose()
-      }, 1000)
-    }, 600)
+      const res = await createInvestigation({
+        parcelId: conflict.id,
+        data: payload,
+      }).unwrap()
+
+      toast.success(res?.message || 'Investigation created successfully!')
+
+      if (onCreateInvestigation) {
+        onCreateInvestigation(conflict.id)
+      }
+      onClose()
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Failed to create investigation for conflict.')
+    }
   }
 
   return (
@@ -79,7 +146,7 @@ export const CreateInvestigation: React.FC<CreateInvestigationProps> = ({
       />
 
       {/* Slide-out Drawer Panel */}
-      <div className="relative w-full sm:w-115 md:w-125 h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-350 ease-out border-l border-slate-100 z-50">
+      <div className="relative w-full sm:w-115 md:w-130 h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-350 ease-out border-l border-slate-100 z-50">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-100 shrink-0 bg-slate-50/50">
           <div className="flex items-center gap-2.5">
@@ -96,6 +163,7 @@ export const CreateInvestigation: React.FC<CreateInvestigationProps> = ({
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-200/60 transition-colors cursor-pointer"
           >
@@ -104,18 +172,11 @@ export const CreateInvestigation: React.FC<CreateInvestigationProps> = ({
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
-          {isSuccess && (
-            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-              <span>Investigation created successfully! Updating conflict status...</span>
-            </div>
-          )}
-
+        <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-6 space-y-4">
           {/* Conflict Summary Box */}
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs">
             <div className="flex items-center justify-between font-bold text-slate-800">
-              <span>Target Slug</span>
+              <span>Target Parcel Slug</span>
               <span className="text-slate-900 font-mono font-extrabold">{conflict.slug}</span>
             </div>
             <div className="flex items-center justify-between text-slate-600">
@@ -134,33 +195,49 @@ export const CreateInvestigation: React.FC<CreateInvestigationProps> = ({
             </div>
           </div>
 
-          {/* Investigation Kind / Category */}
+          {/* Investigation Title */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700">Investigation Kind</label>
+            <label className="text-xs font-bold text-slate-700">Investigation Title</label>
+            <input
+              type="text"
+              {...register('title')}
+              placeholder="e.g. Boundary dispute between Parcel A-1023 and Parcel A-1045"
+              className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.title && (
+              <p className="text-[11px] text-rose-600 font-semibold mt-0.5">{errors.title.message}</p>
+            )}
+          </div>
+
+          {/* Conflict Kind / Category */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700">Conflict Kind</label>
             <select
-              value={kind}
-              onChange={(e) => setKind(e.target.value)}
+              {...register('conflictKind')}
               className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="OWNERSHIP_DISPUTE">Ownership Dispute</option>
               <option value="BOUNDARY_DISPUTE">Boundary Dispute</option>
-              <option value="OVERLAP_VERIFICATION">Overlap Verification</option>
-              <option value="FRAUD_TITLE_FORGERY">Fraud & Title Forgery</option>
+              <option value="OVERLAP">Overlap</option>
+              <option value="DUPLICATE">Duplicate Registration</option>
+              <option value="INVALID_GEOMETRY">Invalid Geometry</option>
             </select>
+            {errors.conflictKind && (
+              <p className="text-[11px] text-rose-600 font-semibold mt-0.5">{errors.conflictKind.message}</p>
+            )}
           </div>
 
           {/* Priority Level */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700">Priority Level</label>
             <div className="grid grid-cols-3 gap-2">
-              {['HIGH', 'MEDIUM', 'LOW'].map((p) => (
+              {(['HIGH', 'MEDIUM', 'LOW'] as LandInvestigationPriorityLevel[]).map((p) => (
                 <button
                   key={p}
                   type="button"
-                  onClick={() => setPriority(p)}
+                  onClick={() => setValue('priorityLevel', p, { shouldValidate: true })}
                   className={cn(
                     "py-2 text-xs font-bold rounded-lg border transition-all cursor-pointer text-center",
-                    priority === p
+                    currentPriority === p
                       ? p === 'HIGH'
                         ? 'bg-rose-50 border-rose-300 text-rose-700 font-extrabold shadow-sm'
                         : p === 'MEDIUM'
@@ -173,43 +250,81 @@ export const CreateInvestigation: React.FC<CreateInvestigationProps> = ({
                 </button>
               ))}
             </div>
+            {errors.priorityLevel && (
+              <p className="text-[11px] text-rose-600 font-semibold mt-0.5">{errors.priorityLevel.message}</p>
+            )}
           </div>
 
-          {/* Target Parcel Selection */}
+          {/* Conflicting Parcel Selection */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700">Target Parcel Code</label>
-            <input
-              type="text"
-              readOnly
-              value={targetParcel}
-              className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-100 text-slate-700 font-mono"
-            />
-          </div>
-
-          {/* Assigned Officer */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700">Assigned Lead Investigator</label>
+            <label className="text-xs font-bold text-slate-700">Conflicting Parcel Target</label>
             <select
-              value={assignedOfficer}
-              onChange={(e) => setAssignedOfficer(e.target.value)}
+              {...register('conflictingParcelId', { valueAsNumber: true })}
               className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="Inspector Alain Dimi">Inspector Alain Dimi (Field Senior)</option>
-              <option value="Marie Nkodo">Marie Nkodo (Regional Admin)</option>
-              <option value="Samuel Kotto">Samuel Kotto (Cadastral Inspector)</option>
+              <option value="">None (Single-Parcel Issue)</option>
+              {conflict.conflicts?.map((cItem) => {
+                const cp = cItem.conflictingParcel
+                if (!cp) return null
+                return (
+                  <option key={cItem.id} value={cp.id}>
+                    {cp.slug} ({cp.parcelCode})
+                  </option>
+                )
+              })}
             </select>
+            {errors.conflictingParcelId && (
+              <p className="text-[11px] text-rose-600 font-semibold mt-0.5">{errors.conflictingParcelId.message}</p>
+            )}
           </div>
 
-          {/* Description & Field Notes */}
+          {/* Lead Investigator Selection */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700">Investigation Scope & Instructions</label>
+            <label className="text-xs font-bold text-slate-700">Assigned Investigator (Optional)</label>
+            <select
+              {...register('investigatorId', { valueAsNumber: true })}
+              className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Unassigned</option>
+              {userList.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name || user.email} (ID: {user.id})
+                </option>
+              ))}
+            </select>
+            {errors.investigatorId && (
+              <p className="text-[11px] text-rose-600 font-semibold mt-0.5">{errors.investigatorId.message}</p>
+            )}
+          </div>
+
+          {/* Computed Overlap Area (sqm) */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700">Overlap Area (sqm)</label>
+            <input
+              type="number"
+              step="any"
+              min={0}
+              {...register('overlapAreaSqm', { valueAsNumber: true })}
+              placeholder="e.g. 120.5"
+              className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.overlapAreaSqm && (
+              <p className="text-[11px] text-rose-600 font-semibold mt-0.5">{errors.overlapAreaSqm.message}</p>
+            )}
+          </div>
+
+          {/* Description & Scope */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700">Description & Field Instructions</label>
             <textarea
               rows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              {...register('description')}
               placeholder="Enter instructions for the field investigator..."
-              className="w-full p-3 text-xs font-medium rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
+              className="w-full p-3 text-xs font-medium rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed font-mono"
             />
+            {errors.description && (
+              <p className="text-[11px] text-rose-600 font-semibold mt-0.5">{errors.description.message}</p>
+            )}
           </div>
 
           {/* Submit / Cancel Footer */}
@@ -225,7 +340,7 @@ export const CreateInvestigation: React.FC<CreateInvestigationProps> = ({
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-5 py-2 shadow-sm"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-5 py-2 shadow-sm cursor-pointer"
             >
               {isSubmitting ? 'Creating...' : 'Create Investigation'}
             </Button>

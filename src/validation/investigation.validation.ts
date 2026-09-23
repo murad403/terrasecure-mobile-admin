@@ -68,3 +68,23 @@ export const finalizeDecisionSchema = z
   });
 
 export type FinalizeDecisionFormValues = z.infer<typeof finalizeDecisionSchema>;
+
+export const createInvestigationForConflictSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(1, 'Title must be at least 1 characters')
+    .max(200, 'Title must be at most 200 characters')
+    .optional()
+    .or(z.literal('')),
+  description: z.string().max(5000, 'Description cannot exceed 5000 characters').optional(),
+  priorityLevel: z.enum(['HIGH', 'MEDIUM', 'LOW']).optional(),
+  conflictKind: z.enum(['OVERLAP', 'DUPLICATE', 'BOUNDARY_DISPUTE', 'INVALID_GEOMETRY']).optional(),
+  conflictingParcelId: z.number().optional(),
+  investigatorId: z.number().optional(),
+  overlapAreaSqm: z.number().min(0, 'Overlap area must be non-negative').optional(),
+});
+
+export type CreateInvestigationForConflictFormValues = z.infer<typeof createInvestigationForConflictSchema>;
+
+
