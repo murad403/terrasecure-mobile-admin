@@ -266,9 +266,10 @@ const GisMapPage = () => {
 
             leafletMapRef.current = map
 
-            L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                maxZoom: 17,
-                attribution: '© OpenTopoMap contributors',
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                maxNativeZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             }).addTo(map)
 
             map.setView([5.6, 12.3], 9)

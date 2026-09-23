@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, MapPin } from 'lucide-react';
+import { X } from 'lucide-react';
 import { ConflictParcel } from '@/redux/features/conflicts/conflicts.type';
 import 'leaflet/dist/leaflet.css';
 
@@ -60,9 +60,10 @@ const ReviewOnMapModal = ({
 
       leafletMapRef.current = map;
 
-      L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '© OpenTopoMap contributors',
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        maxNativeZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
       const allLatLngs: [number, number][] = [];
@@ -124,7 +125,7 @@ const ReviewOnMapModal = ({
       // 3. Auto-fit Map Viewport to cover all parcel geometries
       if (allLatLngs.length > 0) {
         const bounds = L.latLngBounds(allLatLngs);
-        map.fitBounds(bounds, { padding: [40, 40] });
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 18 });
       }
     };
 
