@@ -1,14 +1,11 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react'
-import {
-    Search, ChevronDown, Download, Upload, Pencil, Map, X, ZoomIn, ZoomOut,
-} from 'lucide-react'
+import { Search, ChevronDown, Download, Upload, Pencil, Map, X, ZoomIn, ZoomOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import ImportSHPModal from './ImportSHPModal'
 import ImportGeoJSONModal from './ImportGeoJSONModal'
 import DrawPolygonModal from './DrawPolygonModal'
 import EditPolygonModal from './EditPolygonModal'
-import ManageZoneModal from './ManageZoneModal'
 import AddZoneModal from './AddZoneModal'
 import EditZoneModal from './EditZoneModal'
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout'
@@ -206,15 +203,14 @@ const GisMapPage = () => {
     const [importGeoJSONOpen, setImportGeoJSONOpen] = useState(false)
     const [drawPolygonOpen, setDrawPolygonOpen] = useState(false)
     const [editPolygonOpen, setEditPolygonOpen] = useState(false)
-    const [manageZonesOpen, setManageZonesOpen] = useState(false)
     const [addZoneOpen, setAddZoneOpen] = useState(false)
     const [editZoneOpen, setEditZoneOpen] = useState(false)
     const [editingZone, setEditingZone] = useState<Zone | null>(null)
     const [zones, setZones] = useState<Zone[]>(INITIAL_ZONES)
 
     const handleAddZone = (newZone: Omit<Zone, 'id'>) => {
-        const nextIdNumber = zones.length > 0 
-            ? Math.max(...zones.map(z => parseInt(z.id.split('-')[1]) || 0)) + 1 
+        const nextIdNumber = zones.length > 0
+            ? Math.max(...zones.map(z => parseInt(z.id.split('-')[1]) || 0)) + 1
             : 1;
         const formattedId = `ZN-${String(nextIdNumber).padStart(3, '0')}`;
         const zoneWithId: Zone = {
@@ -232,7 +228,7 @@ const GisMapPage = () => {
     const handleDeleteZone = (zoneId: string) => {
         setZones(prev => prev.filter(z => z.id !== zoneId));
     };
-    
+
     /* ── Init Leaflet map ── */
     useEffect(() => {
         if (!mapRef.current || leafletMapRef.current) return
@@ -258,7 +254,7 @@ const GisMapPage = () => {
             })
 
             const map = L.map(mapRef.current!, { zoomControl: false })
-            
+
             if (!isMounted) {
                 map.remove()
                 return
@@ -430,47 +426,11 @@ const GisMapPage = () => {
                 className="flex gap-0 overflow-hidden rounded-xl"
                 style={{ height: 'calc(100vh - 260px)', minHeight: '420px' }}
             >
-                {/* ── Layer Controls ── */}
-                <div className="w-52 shrink-0 bg-white border border-slate-100 rounded-l-xl p-4 space-y-3 overflow-y-auto">
-                    <h3 className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                        <Map className="w-3.5 h-3.5" />
-                        Layer Controls
-                    </h3>
-                    <div className="space-y-3">
-                        {LAYERS.map((layer) => (
-                            <div key={layer.id} className="flex items-center justify-between gap-2">
-                                <span className={cn(
-                                    'text-[11px] font-semibold',
-                                    layerState[layer.id] ? 'text-slate-700' : 'text-slate-400'
-                                )}>
-                                    {layer.label}
-                                </span>
-                                <Toggle
-                                    on={layerState[layer.id]}
-                                    onToggle={() => toggleLayer(layer.id)}
-                                    color={layer.color}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </div>
 
                 {/* ── Map area ── */}
                 <div className="flex-1 flex flex-col border-t border-b border-slate-100 min-w-0">
                     {/* Map toolbar */}
                     <div className="bg-white border-b border-slate-100 px-3 py-2 flex items-center gap-2 flex-wrap shrink-0">
-                        {/* FIX: GPS / Parcel ID search — fires on Enter */}
-                        <div className="relative flex-1 min-w-40">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400" />
-                            <input
-                                value={mapSearch}
-                                onChange={(e) => setMapSearch(e.target.value)}
-                                onKeyDown={handleMapSearchKey}
-                                placeholder="Search parcel ID or GPS (3.848, 11.502)..."
-                                className="pl-7 pr-3 h-8 w-full border border-slate-200 rounded-lg text-[11px] font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-300 bg-white"
-                            />
-                        </div>
-
                         {/* Action buttons */}
                         <div className="flex items-center gap-1.5 flex-wrap">
                             <ActionBtn icon={<Upload className="w-3 h-3" />} label="Import GeoJSON" onClick={() => setImportGeoJSONOpen(true)} />
@@ -479,7 +439,6 @@ const GisMapPage = () => {
                             <ActionBtn icon={<Download className="w-3 h-3" />} label="Export SHP" onClick={() => { }} />
                             <ActionBtn icon={<Pencil className="w-3 h-3" />} label="Draw Polygon" onClick={() => setDrawPolygonOpen(true)} accent />
                             <ActionBtn icon={<Pencil className="w-3 h-3" />} label="Edit Polygon" onClick={() => setEditPolygonOpen(true)} accent />
-                            <ActionBtn icon={<Map className="w-3 h-3" />} label="Manage Zones" onClick={() => setManageZonesOpen(true)} accent="purple" />
                         </div>
                     </div>
 
@@ -556,39 +515,28 @@ const GisMapPage = () => {
                 </div>
             </div>
 
-             {/* ── Modals ── */}
+            {/* ── Modals ── */}
             <ImportSHPModal isOpen={importSHPOpen} onClose={() => setImportSHPOpen(false)} />
             <ImportGeoJSONModal isOpen={importGeoJSONOpen} onClose={() => setImportGeoJSONOpen(false)} />
             <DrawPolygonModal isOpen={drawPolygonOpen} onClose={() => setDrawPolygonOpen(false)} onSave={() => setDrawPolygonOpen(false)} />
             <EditPolygonModal isOpen={editPolygonOpen} onClose={() => setEditPolygonOpen(false)} onSave={() => setEditPolygonOpen(false)} />
-            
-            <ManageZoneModal 
-                isOpen={manageZonesOpen} 
-                onClose={() => setManageZonesOpen(false)} 
-                zones={zones} 
-                onDeleteZone={handleDeleteZone}
-                onEditZone={(zone) => {
-                    setEditingZone(zone);
-                    setEditZoneOpen(true);
-                }}
-                onOpenAddZone={() => setAddZoneOpen(true)}
+
+
+            <AddZoneModal
+                isOpen={addZoneOpen}
+                onClose={() => setAddZoneOpen(false)}
+                onAdd={handleAddZone}
             />
-            
-            <AddZoneModal 
-                isOpen={addZoneOpen} 
-                onClose={() => setAddZoneOpen(false)} 
-                onAdd={handleAddZone} 
-            />
-            
+
             {editingZone && (
-                <EditZoneModal 
-                    isOpen={editZoneOpen} 
+                <EditZoneModal
+                    isOpen={editZoneOpen}
                     onClose={() => {
                         setEditZoneOpen(false);
                         setEditingZone(null);
-                    }} 
-                    zone={editingZone} 
-                    onSave={handleUpdateZone} 
+                    }}
+                    zone={editingZone}
+                    onSave={handleUpdateZone}
                 />
             )}
         </DashboardChildrenLayout>
