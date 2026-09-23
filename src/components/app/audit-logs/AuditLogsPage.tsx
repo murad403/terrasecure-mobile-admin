@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import { useState } from 'react'
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout'
 import AuditLogsTable, { type AuditLog } from './AuditLogsTable'
 import AuditLogDetailsModal from './AuditLogDetailsModal'

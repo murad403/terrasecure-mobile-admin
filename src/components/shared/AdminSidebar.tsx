@@ -73,7 +73,7 @@ const AdminSidebar = ({
             items: [
                 { name: 'GIS / Map', href: '/gis-map', icon: Globe },
                 { name: 'Conflicts', href: '/conflicts', icon: AlertTriangle },
-                { name: 'QField Submissions', href: '/qfield-submissions', icon: Radio }
+                // { name: 'QField Submissions', href: '/qfield-submissions', icon: Radio }
             ]
         },
         {

@@ -73,7 +73,7 @@ export const createInvestigationForConflictSchema = z.object({
   title: z
     .string()
     .trim()
-    .min(1, 'Title must be at least 1 characters')
+    .min(1, 'Title is required')
     .max(200, 'Title must be at most 200 characters')
     .optional()
     .or(z.literal('')),

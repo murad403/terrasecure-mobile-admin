@@ -3,15 +3,7 @@ import type { User } from '@/interfaces/user.interface';
 import type { FetchArgs } from '@reduxjs/toolkit/query';
 import { ApiResponse } from '@/redux/api/api-response.interface';
 import { UserRole, UserStatus, Gender } from '@/enum';
-import type {
-  PermissionItem,
-  RoleWithPermissions,
-  RbacUserItem,
-  SetUserRolesInput,
-  PermissionKeysInput,
-  RbacUserListArgs,
-  RbacUserListResponseData,
-} from './user.type';
+import type { PermissionItem, RoleWithPermissions, SetUserRolesInput, PermissionKeysInput, RbacUserListArgs, RbacUserListResponseData } from './user.type';
 
 
 export interface RetrieveUsersArgs {
