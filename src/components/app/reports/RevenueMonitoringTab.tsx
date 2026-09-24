@@ -1,5 +1,3 @@
-"use client"
-import React from 'react'
 import RevenueMonitoringStats from './RevenueMonitoringStats'
 import MonthlyRevenueChart from './MonthlyRevenueChart'
 import RevenueByTypeChart from './RevenueByTypeChart'

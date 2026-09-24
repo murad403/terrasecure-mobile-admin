@@ -1,13 +1,7 @@
-"use client"
-import React from 'react'
 import InvestigationsTable from './InvestigationsTable'
 
 const InvestigationsTab = () => {
-  return (
-    <div>
-      <InvestigationsTable />
-    </div>
-  )
+  return <InvestigationsTable />
 }
 
 export default InvestigationsTab

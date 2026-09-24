@@ -6,19 +6,15 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import formatDate from '@/utils/formatDate'
-import {
-  useRetrieveProfileQuery,
-  useUpdateProfileMutation,
-  useUploadImageMutation,
-} from '@/redux/features/profile/profile.api'
+import { useRetrieveProfileQuery, useUpdateProfileMutation, useUploadImageMutation } from '@/redux/features/profile/profile.api'
 import type { UpdateProfileInput } from '@/redux/features/profile/profile.type'
 
 const GenerateSettingsPage = () => {
-  const { data: profileResponse, isLoading, isError } = useRetrieveProfileQuery()
-  const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation()
-  const [uploadImage, { isLoading: isUploading }] = useUploadImageMutation()
+  const { data: profileResponse, isLoading, isError } = useRetrieveProfileQuery();
+  const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
+  const [uploadImage, { isLoading: isUploading }] = useUploadImageMutation();
 
-  const profileData = profileResponse?.data
+  const profileData = profileResponse?.data;
 
   // Form State
   const [name, setName] = useState('')
@@ -98,12 +94,12 @@ const GenerateSettingsPage = () => {
 
   const initials = profileData?.name
     ? profileData.name
-        .split(' ')
-        .filter(Boolean)
-        .map((n) => n[0])
-        .join('')
-        .substring(0, 2)
-        .toUpperCase()
+      .split(' ')
+      .filter(Boolean)
+      .map((n) => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase()
     : 'US'
 
   if (isLoading) {

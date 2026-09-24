@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ownerSchema, type OwnerFormValues } from '@/validation/parcel.validation'
@@ -7,13 +7,7 @@ import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface AddOwnerModalProps {
   isOpen: boolean
@@ -61,7 +55,7 @@ const AddOwnerModal = ({ isOpen, onClose, onAddOwner }: AddOwnerModalProps) => {
   }
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-[1px] p-4 overflow-y-auto animate-in fade-in duration-200"
       onClick={onClose}
     >
@@ -84,7 +78,7 @@ const AddOwnerModal = ({ isOpen, onClose, onAddOwner }: AddOwnerModalProps) => {
         {/* Form Body */}
         <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col">
           <div className="p-6 space-y-4">
-            
+
             {/* Owner Name */}
             <div className="space-y-1.5">
               <Label htmlFor="owner_name">Owner Name</Label>
@@ -153,7 +147,7 @@ const AddOwnerModal = ({ isOpen, onClose, onAddOwner }: AddOwnerModalProps) => {
             <button
               type="button"
               onClick={onClose}
-             className="px-4 w-1/2 py-4 border border-slate-400 text-xs font-semibold text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+              className="px-4 w-1/2 py-4 border border-slate-400 text-xs font-semibold text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
             >
               Cancel
             </button>

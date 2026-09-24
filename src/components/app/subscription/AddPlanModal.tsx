@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { planSchema, type PlanFormValues } from '@/validation/subscription.validation'
@@ -8,14 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { SubscriptionPlan } from './SubscriptionPage'
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface AddPlanModalProps {
   isOpen: boolean;
@@ -136,11 +129,10 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
                     key={item.name}
                     type="button"
                     onClick={() => setValue('icon', item.name)}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-                      selectedIcon === item.name
+                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer ${selectedIcon === item.name
                         ? 'border-2 border-emerald-600 bg-emerald-50 text-emerald-700'
                         : 'border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100'
-                    }`}
+                      }`}
                   >
                     {item.icon}
                   </button>
@@ -249,11 +241,10 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
                       key={item.name}
                       type="button"
                       onClick={() => setValue('badgeColor', item.name)}
-                      className={`w-6 h-6 rounded-full transition-all cursor-pointer ${item.class} ${
-                        selectedColor === item.name
+                      className={`w-6 h-6 rounded-full transition-all cursor-pointer ${item.class} ${selectedColor === item.name
                           ? 'ring-2 ring-offset-2 ring-slate-800'
                           : 'opacity-70 hover:opacity-100'
-                      }`}
+                        }`}
                       title={item.name}
                     />
                   ))}
@@ -330,14 +321,12 @@ const AddPlanModal = ({ isOpen, onClose, onAdd, nextDisplayOrder }: AddPlanModal
               <button
                 type="button"
                 onClick={() => setValue('isActive', !isActive)}
-                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  isActive ? 'bg-button-color' : 'bg-gray-200'
-                }`}
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isActive ? 'bg-button-color' : 'bg-gray-200'
+                  }`}
               >
                 <span
-                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                    isActive ? 'translate-x-4' : 'translate-x-0'
-                  }`}
+                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${isActive ? 'translate-x-4' : 'translate-x-0'
+                    }`}
                 />
               </button>
             </div>

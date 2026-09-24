@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Pencil, Save, X, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useGetTermsConditionsQuery, useUpdateTermsConditionsMutation } from '@/redux/features/auth/auth.api'

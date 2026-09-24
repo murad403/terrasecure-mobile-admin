@@ -1,5 +1,3 @@
-"use client"
-import React from 'react'
 import GPSSearchMonitoringStats from './GPSSearchMonitoringStats'
 import RecentGPSSearchLogTable from './RecentGPSSearchLogTable'
 

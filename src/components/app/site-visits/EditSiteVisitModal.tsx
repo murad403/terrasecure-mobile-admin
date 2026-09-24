@@ -4,13 +4,7 @@ import { X, Pencil, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { LandSiteVisitKind } from '@/enum'
 import { useUpdateSiteVisitMutation } from '@/redux/features/siteVisits/siteVisit.api'
 import { UserPicker } from '@/components/tools/UserPicker'
@@ -134,7 +128,7 @@ export const EditSiteVisitModal = ({ isOpen, onClose, visit }: EditSiteVisitModa
             <p className="text-xs text-destructive font-semibold">{error}</p>
           )}
 
-           {/* Assigned Surveyor */}
+          {/* Assigned Surveyor */}
           <div className="space-y-1.5">
             <Label className="text-xs font-bold text-slate-700 block">
               Assigned Surveyor (optional)
@@ -195,7 +189,7 @@ export const EditSiteVisitModal = ({ isOpen, onClose, visit }: EditSiteVisitModa
             />
           </div>
 
-         
+
 
           {/* Footer actions */}
           <div className="flex items-center justify-between gap-3 pt-2 border-t border-slate-100">

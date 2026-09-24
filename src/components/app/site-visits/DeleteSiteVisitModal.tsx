@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import { X, Trash2, Loader2, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useDeleteSiteVisitMutation } from '@/redux/features/siteVisits/siteVisit.api'

@@ -1,24 +1,11 @@
 "use client"
-import React, { useEffect, useState } from 'react'
-import {
-  X,
-  Building2,
-  User,
-  DollarSign,
-  MessageSquare,
-  ArrowRightLeft,
-  ShieldCheck,
-  CheckCheck,
-  Calendar,
-  MapPin,
-  Loader2,
-} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { X, Building2, DollarSign, MessageSquare, ArrowRightLeft, ShieldCheck, CheckCheck, MapPin, Loader2 } from 'lucide-react'
 import formatDate from '@/utils/formatDate'
 import type { PurchaseInterestItem } from '@/redux/features/purchase-interests/purchase-interests.type'
 import { Button } from '@/components/ui/button'
 import { useGetPurchaseInterestDetailsQuery } from '@/redux/features/purchase-interests/purchase-interests.api'
 import { getTransferActionState } from './PurchaseInterestsTable'
-
 import ReplyInterestModal from './ReplyInterestModal'
 import CreateTransferModal from './CreateTransferModal'
 import TransferActionModal from './TransferActionModal'

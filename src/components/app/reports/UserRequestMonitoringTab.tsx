@@ -1,5 +1,3 @@
-"use client"
-import React from 'react'
 import UserRequestMonitoringStats from './UserRequestMonitoringStats'
 import RequestActivityLogTable from './RequestActivityLogTable'
 

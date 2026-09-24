@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { X, MessageSquare, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -7,10 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { useReplyPurchaseInterestMutation } from '@/redux/features/purchase-interests/purchase-interests.api'
-import {
-  replyPurchaseInterestSchema,
-  type ReplyPurchaseInterestFormValues,
-} from '@/validation/purchase-interest.validation'
+import { replyPurchaseInterestSchema, type ReplyPurchaseInterestFormValues } from '@/validation/purchase-interest.validation'
 
 interface ReplyInterestModalProps {
   isOpen: boolean

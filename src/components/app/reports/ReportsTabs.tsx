@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import { CreditCard, Map, Users, MapPin, Activity } from 'lucide-react'
 import { cn } from '@/lib/utils'
 

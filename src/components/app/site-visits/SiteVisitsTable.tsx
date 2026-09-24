@@ -1,15 +1,12 @@
 "use client"
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Search, Plus, Eye, Check, X, Loader2, Pencil, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'
 import { Button } from '@/components/ui/button'
 import formatDate from '@/utils/formatDate'
-import {
-  useRetrieveSiteVisitsQuery,
-  useRetrieveMySiteVisitsQuery,
-} from '@/redux/features/siteVisits/siteVisit.api'
+import { useRetrieveSiteVisitsQuery, useRetrieveMySiteVisitsQuery } from '@/redux/features/siteVisits/siteVisit.api'
 import { LandSiteVisitKind, LandSiteVisitStatus } from '@/enum'
 
 interface SiteVisitsTableProps {

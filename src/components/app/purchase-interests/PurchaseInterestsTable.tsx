@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import { Search, Eye, MessageSquare, ArrowRightLeft, ShieldCheck, CheckCheck, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'

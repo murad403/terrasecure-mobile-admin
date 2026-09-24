@@ -10,11 +10,7 @@ import { useUploadFileMutation } from '@/redux/features/profile/profile.api'
 import { toast } from 'sonner'
 import formatFileSize from '@/utils/formatFileSize'
 import LocationPicker, { type LocationValue } from '@/components/tools/LocationPicker'
-import type {
-  LandParcelOwnershipType,
-  LandParcelOwnershipStatus,
-  LandParcelDocumentType,
-} from '@/redux/features/registrations/registration.type'
+import type { LandParcelOwnershipType, LandParcelOwnershipStatus, LandParcelDocumentType } from '@/redux/features/registrations/registration.type'
 
 interface RegistrantInput {
   ownerName: string

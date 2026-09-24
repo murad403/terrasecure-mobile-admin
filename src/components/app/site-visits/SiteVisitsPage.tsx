@@ -1,15 +1,11 @@
 "use client"
-import React, { useState } from 'react'
+import { useState } from 'react'
 import SiteVisitsTable from './SiteVisitsTable'
 import ScheduleSiteVisitModal from './ScheduleSiteVisitModal'
 import EditSiteVisitModal from './EditSiteVisitModal'
 import DeleteSiteVisitModal from './DeleteSiteVisitModal'
 import SiteVisitDetails from './SiteVisitDetails'
-import {
-  useRetrieveSiteVisitDetailsQuery,
-  useCompleteSiteVisitMutation,
-  useCancelSiteVisitMutation,
-} from '@/redux/features/siteVisits/siteVisit.api'
+import { useRetrieveSiteVisitDetailsQuery, useCompleteSiteVisitMutation, useCancelSiteVisitMutation } from '@/redux/features/siteVisits/siteVisit.api'
 import { toast } from 'sonner'
 
 const SiteVisitsPage = () => {

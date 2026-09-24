@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Shield, Users, Search, Loader2, Check, UserCheck, Key, Pencil, X } from 'lucide-react'
 import { toast } from 'sonner'
 import CustomPagination from '@/components/shared/CustomPagination'

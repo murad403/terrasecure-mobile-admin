@@ -1,19 +1,13 @@
 "use client"
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { X, ShieldCheck, CheckCheck, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import {
-  useVerifyTransfersMutation,
-  useCompleteTransfersMutation,
-} from '@/redux/features/purchase-interests/purchase-interests.api'
-import {
-  transferActionSchema,
-  type TransferActionFormValues,
-} from '@/validation/purchase-interest.validation'
+import { useVerifyTransfersMutation, useCompleteTransfersMutation } from '@/redux/features/purchase-interests/purchase-interests.api'
+import { transferActionSchema, type TransferActionFormValues } from '@/validation/purchase-interest.validation'
 
 interface TransferActionModalProps {
   isOpen: boolean
@@ -153,11 +147,10 @@ export const TransferActionModal = ({
             <Button
               type="submit"
               disabled={isLoading}
-              className={`w-1/2 cursor-pointer disabled:opacity-50 font-bold ${
-                isVerify
+              className={`w-1/2 cursor-pointer disabled:opacity-50 font-bold ${isVerify
                   ? 'bg-blue-600 hover:bg-blue-700 text-white'
                   : 'bg-emerald-600 hover:bg-emerald-700 text-white'
-              }`}
+                }`}
             >
               {isLoading ? (
                 <div className="flex items-center gap-1.5">

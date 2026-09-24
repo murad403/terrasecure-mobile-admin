@@ -1,15 +1,6 @@
 "use client"
-import React, { useState, useEffect } from 'react'
-import { Download } from 'lucide-react'
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer
-} from 'recharts'
+import { useState, useEffect } from 'react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 const data = [
   { month: 'Jan', revenue: 4.6 },
@@ -28,14 +19,6 @@ const MonthlyRevenueChart = () => {
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  const handleExportPDF = () => {
-    alert('Exporting chart as PDF...')
-  }
-
-  const handleExportCSV = () => {
-    alert('Exporting chart data as CSV...')
-  }
 
   return (
     <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col h-full min-h-95">

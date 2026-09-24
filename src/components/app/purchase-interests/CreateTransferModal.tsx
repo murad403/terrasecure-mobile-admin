@@ -8,10 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { useLandParcelTransfersMutation } from '@/redux/features/purchase-interests/purchase-interests.api'
-import {
-  createTransferSchema,
-  type CreateTransferFormValues,
-} from '@/validation/purchase-interest.validation'
+import { createTransferSchema, type CreateTransferFormValues } from '@/validation/purchase-interest.validation'
 
 interface CreateTransferModalProps {
   isOpen: boolean

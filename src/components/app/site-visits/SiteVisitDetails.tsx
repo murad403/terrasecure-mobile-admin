@@ -1,19 +1,5 @@
 "use client"
-import React from 'react'
-import {
-  X,
-  Loader2,
-  Check,
-  Trash2,
-  Building2,
-  MapPin,
-  Calendar,
-  User,
-  Phone,
-  FileText,
-  DollarSign,
-  Users,
-} from 'lucide-react'
+import { X, Loader2, Check, Trash2, Building2, MapPin, Calendar, Phone, FileText, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
