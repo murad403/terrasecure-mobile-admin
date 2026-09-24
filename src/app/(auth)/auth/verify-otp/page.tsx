@@ -1,5 +1,5 @@
 import VerifyOtpPage from '@/components/auth/VerifyOtpPage'
-import React, { Suspense } from 'react'
+import { Suspense } from 'react'
 
 const page = () => {
   return (

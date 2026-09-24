@@ -1,17 +1,6 @@
 "use client"
 import React from "react"
-import {
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts"
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import { TrendingUp, PieChart as PieIcon, Map } from "lucide-react"
 import { DashboardTrends, DashboardBreakdowns } from "@/redux/features/dashboard/dashboard.type"
 

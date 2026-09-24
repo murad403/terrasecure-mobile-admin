@@ -1,11 +1,6 @@
 "use client"
 import React from "react"
-import {
-  Users,
-  MapPin,
-  CreditCard,
-  FileCheck2,
-} from "lucide-react"
+import { Users, MapPin, CreditCard, FileCheck2 } from "lucide-react"
 import { DashboardKpis } from "@/redux/features/dashboard/dashboard.type"
 
 interface DashboardKpiCardsProps {

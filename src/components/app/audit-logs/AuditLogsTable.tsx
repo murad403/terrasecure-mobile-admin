@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import { Search, Calendar, Filter, X } from 'lucide-react'
+import { Calendar, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import CustomPagination from '@/components/shared/CustomPagination'
 import CustomFilterDropdown from '@/components/dropdown/CustomFilterDropdown'

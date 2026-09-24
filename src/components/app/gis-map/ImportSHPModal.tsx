@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import ImportGISModal from './ImportGISModal'
 import type { ParcelListItem } from '@/redux/features/parcel/parcel.type'
 

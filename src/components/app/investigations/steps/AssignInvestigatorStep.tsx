@@ -9,10 +9,7 @@ import { toast } from 'sonner'
 import { UserPicker } from '@/components/tools/UserPicker'
 import type { User } from '@/interfaces/user.interface'
 import { useAssignInvestigatorMutation } from '@/redux/features/investigations/investigations.api'
-import {
-  assignInvestigatorSchema,
-  type AssignInvestigatorFormValues,
-} from '@/validation/investigation.validation'
+import { assignInvestigatorSchema, type AssignInvestigatorFormValues } from '@/validation/investigation.validation'
 import type { LandInvestigationUser } from '@/redux/features/investigations/investigations.type';
 
 

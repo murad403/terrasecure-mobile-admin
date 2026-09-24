@@ -4,12 +4,7 @@ import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout
 import NotificationCard from './NotificationCard'
 import CustomPagination from '@/components/shared/CustomPagination'
 import { Trash2, BellOff, Loader2 } from 'lucide-react'
-import {
-  useGetNotificationsQuery,
-  useMarkNotificationAsReadMutation,
-  useDeleteNotificationMutation,
-  useDeleteAllNotificationsMutation
-} from '@/redux/features/notifications/notifications.api'
+import { useGetNotificationsQuery, useMarkNotificationAsReadMutation, useDeleteNotificationMutation, useDeleteAllNotificationsMutation } from '@/redux/features/notifications/notifications.api'
 import { toast } from 'sonner'
 
 const NotificationsPage = () => {
@@ -77,7 +72,7 @@ const NotificationsPage = () => {
       subtitle="All platform alerts and system notifications"
     >
       <div className="space-y-6">
-        
+
         {/* Header Summary and Action Buttons Row */}
         <div className="flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
           <div>

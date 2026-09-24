@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import { useState } from 'react'
 import InvestigationsTable from './InvestigationsTable'
 import InvestigationDetailsModal from './InvestigationDetailsModal'
 import CreateInvestigationModal from './CreateInvestigationModal'

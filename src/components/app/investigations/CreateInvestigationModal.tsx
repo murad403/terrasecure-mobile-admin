@@ -11,10 +11,7 @@ import { ParcelPicker } from '@/components/tools/ParcelPicker'
 import type { ParcelListItem } from '@/redux/features/parcel/parcel.type'
 import { useUploadFileMutation } from '@/redux/features/profile/profile.api'
 import { useCreateLandInvestigationMutation } from '@/redux/features/investigations/investigations.api'
-import {
-  createInvestigationSchema,
-  type CreateInvestigationFormValues,
-} from '@/validation/investigation.validation'
+import { createInvestigationSchema, type CreateInvestigationFormValues } from '@/validation/investigation.validation'
 import { LandInvestigationKind, LandInvestigationPriorityLevel } from '@/enum'
 
 interface CreateInvestigationModalProps {

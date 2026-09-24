@@ -1,6 +1,5 @@
 import PaymentsPage from '@/components/app/payments/PaymentsPage'
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout'
-import React from 'react'
 
 const page = () => {
   return (
@@ -13,4 +12,4 @@ const page = () => {
   )
 }
 
-export default page
+export default page

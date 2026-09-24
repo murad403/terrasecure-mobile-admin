@@ -1,21 +1,10 @@
 "use client"
-import React, { useState, useEffect } from 'react'
-import {
-  X,
-  MapPin,
-  Loader2,
-  Building2,
-  User,
-  FileText,
-  CheckCircle2,
-  Check,
-  ChevronRight,
-} from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { X, MapPin, Loader2, Building2, FileText, CheckCircle2, Check } from 'lucide-react'
 import formatDate from '@/utils/formatDate'
 import { useRetrieveLandInvestigationDetailsQuery } from '@/redux/features/investigations/investigations.api'
 import type { LandInvestigationItem } from '@/redux/features/investigations/investigations.type'
 import { LandInvestigationKind } from '@/enum'
-
 import AssignInvestigatorStep from './steps/AssignInvestigatorStep'
 import AttachEvidenceStep from './steps/AttachEvidenceStep'
 import SubmitFindingsStep from './steps/SubmitFindingsStep'
@@ -332,20 +321,18 @@ export const InvestigationDetailsModal = ({
                       key={step.number}
                       type="button"
                       onClick={() => setActiveStepTab(step.number)}
-                      className={`flex flex-col items-center justify-center p-2 rounded-lg transition-all cursor-pointer text-center ${
-                        isActive
+                      className={`flex flex-col items-center justify-center p-2 rounded-lg transition-all cursor-pointer text-center ${isActive
                           ? 'bg-white text-slate-900 shadow-xs font-bold'
                           : 'text-slate-500 hover:text-slate-800 font-medium'
-                      }`}
+                        }`}
                     >
                       <div
-                        className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mb-1 ${
-                          step.isCompleted
+                        className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mb-1 ${step.isCompleted
                             ? 'bg-emerald-500 text-white'
                             : isActive
-                            ? 'bg-button-color text-white'
-                            : 'bg-slate-200 text-slate-600'
-                        }`}
+                              ? 'bg-button-color text-white'
+                              : 'bg-slate-200 text-slate-600'
+                          }`}
                       >
                         {step.isCompleted ? <Check size={11} strokeWidth={3} /> : step.number}
                       </div>

@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FileCheck, Loader2 } from 'lucide-react'
@@ -7,10 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { useSubmitFindingsMutation } from '@/redux/features/investigations/investigations.api'
-import {
-  submitFindingsSchema,
-  type SubmitFindingsFormValues,
-} from '@/validation/investigation.validation'
+import { submitFindingsSchema, type SubmitFindingsFormValues } from '@/validation/investigation.validation'
 
 interface SubmitFindingsStepProps {
   investigationId: number | string

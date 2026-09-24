@@ -1,14 +1,5 @@
-import React from 'react'
 import type { NotificationItem } from '@/redux/features/notifications/notifications.type'
-import {
-  ShieldAlert,
-  AlertTriangle,
-  FileCheck,
-  Info,
-  ArrowUpRight,
-  Trash2,
-  Check
-} from 'lucide-react'
+import { ShieldAlert, AlertTriangle, FileCheck, Info, ArrowUpRight, Trash2, Check } from 'lucide-react'
 
 interface NotificationCardProps {
   notification: NotificationItem;
@@ -66,11 +57,10 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
 
   return (
     <div
-      className={`border rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-200 shadow-sm ${
-        !notification.isRead
+      className={`border rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-200 shadow-sm ${!notification.isRead
           ? 'bg-emerald-50/10 border-emerald-200/80'
           : 'bg-white border-gray-100'
-      }`}
+        }`}
     >
       {/* Left Content Column */}
       <div className="flex items-start space-x-3.5 flex-1 min-w-0">

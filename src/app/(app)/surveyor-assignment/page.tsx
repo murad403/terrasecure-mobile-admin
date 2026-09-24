@@ -1,6 +1,5 @@
 import SurveyorAssignmentPage from '@/components/app/surveyor-assignment/SurveyorAssignmentPage'
 import DashboardChildrenLayout from '@/components/shared/DashboardChildrenLayout'
-import React from 'react'
 
 const page = () => {
   return (

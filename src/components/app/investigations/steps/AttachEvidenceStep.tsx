@@ -8,10 +8,7 @@ import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { useUploadFileMutation } from '@/redux/features/profile/profile.api'
 import { useAttachEvidenceMutation } from '@/redux/features/investigations/investigations.api'
-import {
-  attachEvidenceSchema,
-  type AttachEvidenceFormValues,
-} from '@/validation/investigation.validation'
+import { attachEvidenceSchema, type AttachEvidenceFormValues } from '@/validation/investigation.validation'
 
 interface AttachEvidenceStepProps {
   investigationId: number | string

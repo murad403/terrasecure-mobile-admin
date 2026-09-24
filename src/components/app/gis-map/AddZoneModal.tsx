@@ -3,13 +3,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Check, MapPin, FolderPlus } from 'lucide-react';
 import { Zone } from './GisMapPage';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';

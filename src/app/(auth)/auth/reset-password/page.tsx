@@ -1,5 +1,5 @@
 import ResetPasswordPage from '@/components/auth/ResetPasswordPage'
-import React, { Suspense } from 'react'
+import { Suspense } from 'react'
 
 const page = () => {
   return (

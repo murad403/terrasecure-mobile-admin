@@ -1,7 +1,6 @@
 "use client"
 import React from "react"
-import { AlertTriangle, Info, ShieldAlert, ArrowRight, Clock } from "lucide-react"
-import Link from "next/link"
+import { AlertTriangle, Info, ShieldAlert } from "lucide-react"
 import { AttentionData } from "@/redux/features/dashboard/dashboard.type"
 import { cn } from "@/lib/utils"
 

@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Gavel, Loader2, AlertCircle } from 'lucide-react'
@@ -8,10 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { useSubmitFinalDecisionMutation } from '@/redux/features/investigations/investigations.api'
-import {
-  finalizeDecisionSchema,
-  type FinalizeDecisionFormValues,
-} from '@/validation/investigation.validation'
+import { finalizeDecisionSchema, type FinalizeDecisionFormValues } from '@/validation/investigation.validation'
 import type { LandInvestigationDecision } from '@/redux/features/investigations/investigations.type'
 
 interface FinalizeDecisionStepProps {

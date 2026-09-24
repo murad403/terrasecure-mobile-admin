@@ -4,13 +4,7 @@ import { createPortal } from 'react-dom';
 import { X, Check, MapPin, Save } from 'lucide-react';
 import { Zone } from './GisMapPage';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
