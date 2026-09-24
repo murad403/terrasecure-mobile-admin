@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { X, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Parcel } from '../app/reliability-score/ReliabilityScorePage'

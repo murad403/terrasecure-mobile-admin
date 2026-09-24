@@ -1,20 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { SettingsItem } from './SubscriptionPage'
-import {
-  Smartphone,
-  CreditCard,
-  Zap,
-  Sliders,
-  DollarSign,
-  ShieldAlert,
-  SmartphoneNfc,
-  ClipboardList,
-  Compass,
-  Gauge,
-  UserCheck,
-  Globe,
-  Plus,
-} from 'lucide-react'
+import { Smartphone, CreditCard, Zap, Sliders, DollarSign, ShieldAlert, ClipboardList, Compass, Gauge, UserCheck, Globe } from 'lucide-react'
 
 interface ControlsTabProps {
   paymentMethods: SettingsItem[];
@@ -110,14 +96,12 @@ const PaymentControlsFeatureFlagsTab = ({
                 {/* Switch Toggle */}
                 <button
                   onClick={() => onToggleItem(pm.id, 'payment')}
-                  className={`relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    pm.isActive ? 'bg-[#10b981]' : 'bg-slate-700'
-                  }`}
+                  className={`relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${pm.isActive ? 'bg-[#10b981]' : 'bg-slate-700'
+                    }`}
                 >
                   <span
-                    className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                      pm.isActive ? 'translate-x-3' : 'translate-x-0'
-                    }`}
+                    className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${pm.isActive ? 'translate-x-3' : 'translate-x-0'
+                      }`}
                   />
                 </button>
               </div>
@@ -172,11 +156,10 @@ const PaymentControlsFeatureFlagsTab = ({
                   Configure
                 </button>
                 <span
-                  className={`text-[10px] px-2.5 py-0.5 rounded font-bold border w-12 text-center uppercase ${
-                    pm.isActive
+                  className={`text-[10px] px-2.5 py-0.5 rounded font-bold border w-12 text-center uppercase ${pm.isActive
                       ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
                       : 'bg-gray-50 text-gray-400 border-gray-150'
-                  }`}
+                    }`}
                 >
                   {pm.isActive ? 'On' : 'Off'}
                 </span>
@@ -233,11 +216,10 @@ const PaymentControlsFeatureFlagsTab = ({
                 </button>
                 <button
                   onClick={() => onToggleItem(fee.id, 'fee')}
-                  className={`text-[10px] px-2.5 py-0.5 rounded font-bold border w-12 text-center uppercase transition-all cursor-pointer ${
-                    fee.isActive
+                  className={`text-[10px] px-2.5 py-0.5 rounded font-bold border w-12 text-center uppercase transition-all cursor-pointer ${fee.isActive
                       ? 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100/50'
                       : 'bg-gray-50 text-gray-400 border-gray-150 hover:bg-gray-100'
-                  }`}
+                    }`}
                 >
                   {fee.isActive ? 'On' : 'Off'}
                 </button>
@@ -294,11 +276,10 @@ const PaymentControlsFeatureFlagsTab = ({
                 </button>
                 <button
                   onClick={() => onToggleItem(tier.id, 'tier')}
-                  className={`text-[10px] px-2.5 py-0.5 rounded font-bold border w-12 text-center uppercase transition-all cursor-pointer ${
-                    tier.isActive
+                  className={`text-[10px] px-2.5 py-0.5 rounded font-bold border w-12 text-center uppercase transition-all cursor-pointer ${tier.isActive
                       ? 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100/50'
                       : 'bg-gray-50 text-gray-400 border-gray-150 hover:bg-gray-100'
-                  }`}
+                    }`}
                 >
                   {tier.isActive ? 'On' : 'Off'}
                 </button>

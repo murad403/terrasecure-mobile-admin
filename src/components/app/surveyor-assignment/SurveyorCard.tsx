@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import { MapPin, Layers, ClipboardList, Star } from 'lucide-react'
 import { cn } from '@/lib/utils'
 

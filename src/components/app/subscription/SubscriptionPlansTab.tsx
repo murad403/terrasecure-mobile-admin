@@ -1,4 +1,3 @@
-import React from 'react'
 import { SubscriptionPlan, PromoBanner } from './SubscriptionPage'
 import PromotionalBannerForm from './PromotionalBannerForm'
 import SubscriptionPlanCard from './SubscriptionPlanCard'

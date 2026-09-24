@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { User, Settings, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { removeToken } from '@/lib/auth'

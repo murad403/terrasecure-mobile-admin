@@ -1,4 +1,3 @@
-import React from 'react'
 import { CreditCard, Sliders } from 'lucide-react'
 
 interface TabsProps {

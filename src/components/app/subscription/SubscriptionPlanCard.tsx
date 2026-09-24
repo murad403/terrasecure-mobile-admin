@@ -1,19 +1,5 @@
-import React from 'react'
 import { SubscriptionPlan } from './SubscriptionPage'
-import {
-  Zap,
-  Star,
-  Crown,
-  Rocket,
-  Gem,
-  Trophy,
-  Sun,
-  Flame,
-  Pencil,
-  Trash2,
-  Check,
-  X,
-} from 'lucide-react'
+import { Zap, Star, Crown, Rocket, Gem, Trophy, Sun, Flame, Pencil, Trash2, Check, X } from 'lucide-react'
 
 interface PlanCardProps {
   plan: SubscriptionPlan;
@@ -100,9 +86,8 @@ const SubscriptionPlanCard = ({
 
   return (
     <div
-      className={`bg-white rounded-xl shadow-sm flex flex-col relative overflow-hidden transition-all duration-200 ${
-        isPopular ? `${colors.border}` : 'border border-gray-100'
-      }`}
+      className={`bg-white rounded-xl shadow-sm flex flex-col relative overflow-hidden transition-all duration-200 ${isPopular ? `${colors.border}` : 'border border-gray-100'
+        }`}
     >
       {/* MOST POPULAR header banner */}
       {isPopular && (
@@ -131,14 +116,12 @@ const SubscriptionPlanCard = ({
             {/* Toggle switch */}
             <button
               onClick={() => onToggleActive(plan.id)}
-              className={`relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                plan.isActive ? 'bg-button-color' : 'bg-gray-200'
-              }`}
+              className={`relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${plan.isActive ? 'bg-button-color' : 'bg-gray-200'
+                }`}
             >
               <span
-                className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                  plan.isActive ? 'translate-x-3' : 'translate-x-0'
-                }`}
+                className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${plan.isActive ? 'translate-x-3' : 'translate-x-0'
+                  }`}
               />
             </button>
 
@@ -175,9 +158,8 @@ const SubscriptionPlanCard = ({
           {plan.features.map((feature, idx) => (
             <li
               key={idx}
-              className={`flex items-center space-x-2 text-[11px] ${
-                feature.enabled ? 'text-gray-700' : 'text-gray-400 font-light line-through decoration-gray-300'
-              }`}
+              className={`flex items-center space-x-2 text-[11px] ${feature.enabled ? 'text-gray-700' : 'text-gray-400 font-light line-through decoration-gray-300'
+                }`}
             >
               {feature.enabled ? (
                 <div className="w-3.5 h-3.5 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
@@ -195,11 +177,10 @@ const SubscriptionPlanCard = ({
 
         {/* Choose Button */}
         <button
-          className={`w-full py-2 rounded-lg text-xs font-bold mt-auto transition-colors cursor-pointer flex items-center justify-center ${
-            isPopular
+          className={`w-full py-2 rounded-lg text-xs font-bold mt-auto transition-colors cursor-pointer flex items-center justify-center ${isPopular
               ? `${colors.button}`
               : 'border border-[#1b4332] text-[#1b4332] hover:bg-[#1b4332]/5'
-          }`}
+            }`}
         >
           Choose {plan.name} Plan
         </button>

@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import SurveyorCard, { type SurveyorRecord } from './SurveyorCard'
 
 interface SurveyorRosterProps {

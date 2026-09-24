@@ -5,13 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { type SurveyorRecord } from './SurveyorCard'
 
 export interface AssignmentRecord {
@@ -129,15 +123,15 @@ const EditSurveyorModal = ({
                 const isSelected = selectedSurveyorId === surveyor.id
                 const avatarCls = cn(
                   "w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-extrabold shrink-0 tracking-wider uppercase",
-                  surveyor.status === 'busy'      && "bg-amber-100 text-amber-700",
+                  surveyor.status === 'busy' && "bg-amber-100 text-amber-700",
                   surveyor.status === 'available' && "bg-emerald-100 text-emerald-700",
-                  surveyor.status === 'offline'   && "bg-slate-100 text-slate-500"
+                  surveyor.status === 'offline' && "bg-slate-100 text-slate-500"
                 )
                 const statusBadgeCls = cn(
                   "inline-block px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase",
-                  surveyor.status === 'busy'      && 'bg-amber-50 text-amber-600 border border-amber-200',
+                  surveyor.status === 'busy' && 'bg-amber-50 text-amber-600 border border-amber-200',
                   surveyor.status === 'available' && 'bg-emerald-50 text-emerald-600 border border-emerald-200',
-                  surveyor.status === 'offline'   && 'bg-slate-100 text-slate-500 border border-slate-200'
+                  surveyor.status === 'offline' && 'bg-slate-100 text-slate-500 border border-slate-200'
                 )
                 return (
                   <div

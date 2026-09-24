@@ -1,5 +1,4 @@
-import React from 'react'
-import { Info, RefreshCw } from 'lucide-react'
+import { RefreshCw } from 'lucide-react'
 
 interface StatsProps {
   activePlans: string;

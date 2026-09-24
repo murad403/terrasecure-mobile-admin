@@ -1,25 +1,6 @@
 "use client"
 import React, { useRef, useEffect, useState } from 'react'
-import {
-  Bold,
-  Italic,
-  Underline,
-  Strikethrough,
-  List,
-  ListOrdered,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  Code,
-  Eye,
-  Heading1,
-  Heading2,
-  Heading3,
-  Pilcrow as ParagraphIcon,
-  RotateCcw,
-  RotateCw,
-  RemoveFormatting
-} from 'lucide-react'
+import { Bold, Italic, Underline, Strikethrough, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, Code, Eye, Heading1, Heading2, Heading3, Pilcrow as ParagraphIcon, RotateCcw, RotateCw, RemoveFormatting } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface RichTextEditorProps {
@@ -97,10 +78,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   return (
     <div className="border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden flex flex-col transition-all focus-within:border-button-color focus-within:ring-2 focus-within:ring-button-color/10">
-      
+
       {/* Formatting Toolbar */}
       <div className="bg-slate-50/90 border-b border-slate-200 p-2 flex flex-wrap items-center gap-1 select-none">
-        
+
         {/* Basic Text Formatting */}
         <div className="flex items-center gap-0.5 pr-2 border-r border-slate-200">
           <button
